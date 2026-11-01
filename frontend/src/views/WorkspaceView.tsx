@@ -1,0 +1,549 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { 
+  Play, 
+  Send, 
+  Sparkles, 
+  CheckCircle, 
+  AlertCircle, 
+  FileCode, 
+  Activity, 
+  Layers, 
+  RotateCcw,
+  Zap,
+  BookOpen
+} from 'lucide-react';
+import { MonacoEditor } from '../components/MonacoEditor';
+import { ExecutionTerminal } from '../components/ExecutionTerminal';
+import { ProcessTimeline } from '../components/ProcessTimeline';
+import { CodingSession, CodeSubmission, ProcessEventItem, AuthUser, ProcessFeatures } from '../types';
+import { api } from '../services/api';
+
+interface WorkspaceViewProps {
+  session: CodingSession | null;
+  currentUser?: AuthUser | null;
+  onCodeSubmitted: (submission: CodeSubmission) => void;
+  onNavigateToViva: () => void;
+}
+
+const DEFAULT_PYTHON_CODE = `# Python Code Comprehension Task
+# Implement an accumulator that computes the sum of squares up to n,
+# but skips multiples of 3.
+
+def sum_of_squares_skipping_threes(n: int) -> int:
+    total = 0
+    for i in range(1, n + 1):
+        if i % 3 == 0:
+            continue
+        total += i * i
+    return total
+
+# Test the function with n = 5
+result = sum_of_squares_skipping_threes(5)
+print(f"Computed total: {result}")
+`;
+
+export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
+  session,
+  currentUser,
+  onCodeSubmitted,
+  onNavigateToViva,
+}) => {
+  const [code, setCode] = useState(DEFAULT_PYTHON_CODE);
+  const [stdout, setStdout] = useState<string | null>(null);
+  const [stderr, setStderr] = useState<string | null>(null);
+  const [isRunning, setIsRunning] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [executionTime, setExecutionTime] = useState<number | null>(null);
+  const [telemetryQueue, setTelemetryQueue] = useState<ProcessEventItem[]>([]);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [astAnalysis, setAstAnalysis] = useState<import('../types').ASTAnalysisResult | null>(null);
+  const [activeRightTab, setActiveRightTab] = useState<'terminal' | 'ast' | 'telemetry'>('terminal');
+  const [processFeatures, setProcessFeatures] = useState<ProcessFeatures | null>(null);
+  const [isLoadingFeatures, setIsLoadingFeatures] = useState(false);
+  const [assignments, setAssignments] = useState<import('../types').Assignment[]>([]);
+  const [selectedAssignment, setSelectedAssignment] = useState<import('../types').Assignment | null>(null);
+
+  // Load teacher-authored assignments for student's classroom on mount
+  useEffect(() => {
+    const loadAssignments = async () => {
+      try {
+        const list = await api.listAssignments(currentUser?.classroomId);
+        setAssignments(list);
+        if (list.length > 0 && !selectedAssignment) {
+          setSelectedAssignment(list[0]);
+          setCode(list[0].starter_code);
+        }
+      } catch (err) {
+        console.error('Failed to load assignments', err);
+      }
+    };
+    loadAssignments();
+  }, [currentUser?.classroomId]);
+
+  const handleSelectAssignment = (assignmentId: string) => {
+    const found = assignments.find((a) => a.id === assignmentId);
+    if (found) {
+      setSelectedAssignment(found);
+      setCode(found.starter_code);
+      setStdout(null);
+      setStderr(null);
+      setStatusMessage(`Loaded teacher assignment: "${found.title}"`);
+    }
+  };
+
+  const fetchTelemetryFeatures = async () => {
+    if (!session) return;
+    setIsLoadingFeatures(true);
+    try {
+      const feat = await api.getProcessFeatures(session.id);
+      setProcessFeatures(feat);
+    } catch (err) {
+      console.error('Failed to load process features', err);
+    } finally {
+      setIsLoadingFeatures(false);
+    }
+  };
+
+  // Periodically flush telemetry events
+  useEffect(() => {
+    if (!session || telemetryQueue.length === 0) return;
+
+    const timer = setTimeout(async () => {
+      const batch = [...telemetryQueue];
+      setTelemetryQueue([]);
+      try {
+        await api.sendTelemetryBatch(session.id, batch);
+        if (activeRightTab === 'telemetry') {
+          fetchTelemetryFeatures();
+        }
+      } catch (err) {
+        console.error('Failed to flush telemetry batch', err);
+      }
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [telemetryQueue, session, activeRightTab]);
+
+  const handleTelemetryEvent = (event: ProcessEventItem) => {
+    setTelemetryQueue((prev) => [...prev, event]);
+  };
+
+  const handleRunCode = async () => {
+    if (!session) return;
+    setIsRunning(true);
+    setStdout(null);
+    setStderr(null);
+    setExecutionTime(null);
+    setStatusMessage(null);
+
+    // Record run telemetry
+    handleTelemetryEvent({
+      event_type: 'run',
+      delta_chars: 0,
+      paste_length: 0,
+      timestamp: new Date().toISOString(),
+    });
+
+    try {
+      const [runRes, astRes] = await Promise.all([
+        api.runCode(code),
+        api.analyzeCode(code),
+      ]);
+
+      setExecutionTime(runRes.execution_time_ms);
+      setStdout(runRes.stdout || null);
+      setStderr(runRes.stderr || null);
+      setAstAnalysis(astRes);
+
+      // Record detailed outcome event for process telemetry
+      handleTelemetryEvent({
+        event_type: 'run',
+        delta_chars: 0,
+        paste_length: 0,
+        timestamp: new Date().toISOString(),
+        event_metadata: {
+          is_error: !runRes.success,
+          message: runRes.error_type || (runRes.success ? 'Run Succeeded' : 'Run Error'),
+          execution_time_ms: runRes.execution_time_ms,
+        },
+      });
+
+      if (runRes.success) {
+        setStatusMessage(`Executed successfully in ${runRes.execution_time_ms.toFixed(1)}ms (Isolated Sandbox)`);
+      } else {
+        setStatusMessage(runRes.error_type ? `Execution error: ${runRes.error_type}` : 'Execution completed with errors.');
+      }
+    } catch (err: any) {
+      setStderr(err.message || 'Execution error encountered.');
+    } finally {
+      setIsRunning(false);
+    }
+  };
+
+  const handleSubmitForViva = async () => {
+    if (!session || isSubmitting) return;
+    setIsSubmitting(true);
+    setStatusMessage('Submitting code snapshot and queuing dynamic viva...');
+
+    handleTelemetryEvent({
+      event_type: 'submit',
+      delta_chars: 0,
+      paste_length: 0,
+      timestamp: new Date().toISOString(),
+    });
+
+    try {
+      if (telemetryQueue.length > 0) {
+        await api.sendTelemetryBatch(session.id, telemetryQueue);
+        setTelemetryQueue([]);
+      }
+
+      const submission = await api.submitCode(session.id, code);
+      onCodeSubmitted(submission);
+      setStatusMessage('Code submitted successfully! Proceeding to AI Viva questioning...');
+      setTimeout(() => {
+        onNavigateToViva();
+      }, 700);
+    } catch (err: any) {
+      setStatusMessage(`Submission failed: ${err.message}`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleResetCode = () => {
+    if (selectedAssignment) {
+      setCode(selectedAssignment.starter_code);
+    } else {
+      setCode(DEFAULT_PYTHON_CODE);
+    }
+    setStdout(null);
+    setStderr(null);
+  };
+
+  if (!session) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-center max-w-md mx-auto">
+        <AlertCircle className="w-12 h-12 text-amber-500 mb-3" />
+        <h3 className="text-xl font-bold text-slate-900 mb-2">No Active Session Selected</h3>
+        <p className="text-sm text-slate-500 mb-6">
+          Please create or select a student session to enter the coding workspace.
+        </p>
+      </div>
+    );
+  }
+
+  const problemName = selectedAssignment?.title || 
+    (session.title && session.title.toLowerCase() !== 'test' ? session.title : 'Accumulator with Modulo Filtering');
+
+  const problemStatement = selectedAssignment?.description || 
+    'Implement an accumulator function that computes the sum of squares up to n, skipping multiples of 3. Ensure your loop preserves invariant state across cycles and correctly handles control-flow skipping.';
+
+  const problemDifficulty = selectedAssignment?.difficulty || 'medium';
+  const problemTags = selectedAssignment?.concept_tags && selectedAssignment.concept_tags.length > 0
+    ? selectedAssignment.concept_tags
+    : ['modulo-filtering', 'accumulator-invariants', 'loop-control'];
+
+  return (
+    <div className="max-w-7xl mx-auto space-y-4 px-4 sm:px-6 py-4">
+      {/* Top Workspace Header & Problem Card */}
+      <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm space-y-3.5">
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-3">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-xs font-mono px-2.5 py-0.5 rounded-full bg-sky-50 text-sky-700 border border-sky-200 font-bold uppercase">
+              {session.language} 3.14
+            </span>
+            <span className={`text-[11px] font-mono uppercase px-2.5 py-0.5 rounded-full font-bold border ${
+              problemDifficulty === 'easy'
+                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                : problemDifficulty === 'hard'
+                ? 'bg-rose-50 text-rose-700 border-rose-200'
+                : 'bg-amber-50 text-amber-700 border-amber-200'
+            }`}>
+              {problemDifficulty}
+            </span>
+            {currentUser?.classroomCode && (
+              <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-800 border border-indigo-200 font-semibold">
+                Cohort: {currentUser.classroomCode}
+              </span>
+            )}
+            <span className="text-xs text-slate-500 font-mono">
+              Candidate: <strong className="text-slate-800 font-semibold">{session.student_name}</strong>
+            </span>
+          </div>
+
+          {/* Action Controls */}
+          <div className="flex items-center gap-2.5 flex-wrap">
+            {/* Teacher Assignment Selector */}
+            {assignments.length > 0 && (
+              <div className="flex items-center gap-1.5">
+                <span className="text-[11px] font-mono text-slate-500 hidden sm:inline">Task:</span>
+                <select
+                  value={selectedAssignment?.id || ''}
+                  onChange={(e) => handleSelectAssignment(e.target.value)}
+                  className="bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 font-medium"
+                >
+                  {assignments.map((a) => (
+                    <option key={a.id} value={a.id}>
+                      {a.title} ({a.difficulty})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            <button
+              onClick={handleResetCode}
+              className="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-colors text-xs font-medium flex items-center gap-1.5"
+              title="Reset code template"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Reset</span>
+            </button>
+
+            <button
+              onClick={handleRunCode}
+              disabled={isRunning}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition-colors shadow-sm disabled:opacity-50"
+            >
+              <Play className="w-3.5 h-3.5 fill-current" />
+              {isRunning ? 'Running...' : 'Run Code'}
+            </button>
+
+            <button
+              onClick={handleSubmitForViva}
+              disabled={isSubmitting}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-bold text-xs transition-all shadow-sm disabled:opacity-50"
+            >
+              <Sparkles className="w-4 h-4" />
+              {isSubmitting ? 'Submitting...' : 'Submit for Viva'}
+            </button>
+          </div>
+        </div>
+
+        {/* Problem Title & Statement */}
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <BookOpen className="w-4 h-4 text-sky-600 flex-shrink-0" />
+            <h2 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight">
+              {problemName}
+            </h2>
+          </div>
+
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 text-xs text-slate-700 leading-relaxed font-sans">
+            <span className="font-bold text-slate-900 block mb-1 uppercase tracking-wider text-[10px] font-mono text-sky-700">
+              Problem Statement:
+            </span>
+            <p className="text-slate-800 text-xs sm:text-sm font-medium leading-relaxed">
+              {problemStatement}
+            </p>
+          </div>
+
+          {problemTags.length > 0 && (
+            <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+              <span className="text-[10px] font-mono text-slate-500 font-bold uppercase tracking-wider mr-1">
+                Target Concepts:
+              </span>
+              {problemTags.map((tag, i) => (
+                <span
+                  key={i}
+                  className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-50 border border-sky-200 text-sky-700 font-medium"
+                >
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {statusMessage && (
+        <div className="px-4 py-2 rounded-xl bg-sky-50 border border-sky-200 text-xs text-sky-800 flex items-center gap-2 animate-fadeIn font-medium">
+          <Zap className="w-4 h-4 text-sky-600" />
+          <span>{statusMessage}</span>
+        </div>
+      )}
+
+      {/* Split Workspace: Editor & Output */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 h-[650px]">
+        {/* Left: Monaco Code Editor */}
+        <div className="lg:col-span-7 h-full flex flex-col">
+          <MonacoEditor
+            value={code}
+            onChange={setCode}
+            onTelemetryEvent={handleTelemetryEvent}
+          />
+        </div>
+
+        {/* Right: Terminal & Analysis Panel */}
+        <div className="lg:col-span-5 h-full flex flex-col gap-3">
+          {/* Tab bar */}
+          <div className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-xl border border-slate-200 text-xs">
+            <button
+              onClick={() => setActiveRightTab('terminal')}
+              className={`flex-1 py-1.5 px-2 rounded-lg font-bold transition-colors ${
+                activeRightTab === 'terminal'
+                  ? 'bg-white text-sky-700 border border-slate-200 shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              Terminal
+            </button>
+            <button
+              onClick={() => setActiveRightTab('ast')}
+              className={`flex-1 py-1.5 px-2 rounded-lg font-bold transition-colors flex items-center justify-center gap-1.5 ${
+                activeRightTab === 'ast'
+                  ? 'bg-white text-indigo-700 border border-slate-200 shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <span>AST</span>
+              {astAnalysis && (
+                <span className={`w-2 h-2 rounded-full ${astAnalysis.is_syntax_valid ? 'bg-emerald-500' : 'bg-rose-500'}`} />
+              )}
+            </button>
+            <button
+              onClick={() => {
+                setActiveRightTab('telemetry');
+                fetchTelemetryFeatures();
+              }}
+              className={`flex-1 py-1.5 px-2 rounded-lg font-bold transition-colors flex items-center justify-center gap-1.5 ${
+                activeRightTab === 'telemetry'
+                  ? 'bg-white text-teal-700 border border-slate-200 shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Activity className="w-3.5 h-3.5 text-teal-600" />
+              <span>Telemetry</span>
+            </button>
+          </div>
+
+          <div className="flex-1 min-h-[350px] overflow-y-auto">
+            {activeRightTab === 'terminal' ? (
+              <ExecutionTerminal
+                stdout={stdout}
+                stderr={stderr}
+                isRunning={isRunning}
+                executionTimeMs={executionTime}
+                sandboxUsed={true}
+              />
+            ) : activeRightTab === 'ast' ? (
+              <div className="flex flex-col h-full bg-white rounded-xl border border-slate-300 overflow-hidden text-slate-800 shadow-sm">
+                <div className="p-3 bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-800 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Layers className="w-4 h-4 text-indigo-600" />
+                    <span>Concrete Syntax Tree & Metrics</span>
+                  </div>
+                  {astAnalysis && (
+                    <span className="font-mono text-[11px] text-slate-600">
+                      Complexity: <strong className="text-slate-900">{astAnalysis.cyclomatic_complexity}</strong>
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex-1 p-4 overflow-y-auto text-xs space-y-4 font-sans bg-white">
+                  {!astAnalysis ? (
+                    <div className="text-slate-400 italic py-8 text-center">
+                      Run or submit your program to parse its Abstract Syntax Tree (AST).
+                    </div>
+                  ) : !astAnalysis.is_syntax_valid ? (
+                    <div className="p-3 bg-rose-50 rounded-xl border border-rose-200 text-rose-800 space-y-1">
+                      <div className="font-bold flex items-center gap-1.5">
+                        <AlertCircle className="w-4 h-4 text-rose-600" />
+                        <span>Syntax Error Detected (Line {astAnalysis.syntax_error_details?.line})</span>
+                      </div>
+                      <p className="text-[11px]">{astAnalysis.syntax_error_details?.diagnostic}</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {/* Functions */}
+                      <div>
+                        <span className="font-bold uppercase tracking-wider text-[10px] text-slate-500 block mb-1">
+                          Functions ({astAnalysis.functions.length})
+                        </span>
+                        {astAnalysis.functions.length === 0 ? (
+                          <span className="text-slate-400 italic text-[11px]">No functions declared</span>
+                        ) : (
+                          <div className="space-y-1">
+                            {astAnalysis.functions.map((f, i) => (
+                              <div key={i} className="p-2 bg-slate-50 rounded-lg border border-slate-200 font-mono text-[11px] flex items-center justify-between">
+                                <span className="text-sky-700 font-bold">{f.name}({f.arguments.join(', ')})</span>
+                                <span className="text-slate-500 text-[10px]">
+                                  {f.is_recursive ? '🌀 Recursive' : 'Lines ' + f.line_number + '-' + f.end_line_number}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Loops & Conditions */}
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+                          <span className="text-slate-500 text-[10px] block font-mono">Loops</span>
+                          <span className="text-base font-bold text-slate-900 font-mono">{astAnalysis.loops.length}</span>
+                        </div>
+                        <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+                          <span className="text-slate-500 text-[10px] block font-mono">Conditions</span>
+                          <span className="text-base font-bold text-slate-900 font-mono">{astAnalysis.conditions.length}</span>
+                        </div>
+                      </div>
+
+                      {/* Candidate Viva Concepts */}
+                      <div>
+                        <span className="font-bold uppercase tracking-wider text-[10px] text-indigo-700 block mb-1.5">
+                          Identified Viva Concepts ({astAnalysis.candidate_concepts.length})
+                        </span>
+                        <div className="space-y-1.5">
+                          {astAnalysis.candidate_concepts.map((c, i) => (
+                            <div key={i} className="p-2.5 bg-indigo-50/60 rounded-lg border border-indigo-200 text-[11px]">
+                              <span className="font-bold text-indigo-900 block">{c.concept_name}</span>
+                              <p className="text-slate-600 text-[10px] mt-0.5 line-clamp-2">{c.description}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="h-full overflow-y-auto">
+                <ProcessTimeline
+                  features={processFeatures}
+                  isLoading={isLoadingFeatures}
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Quick AST & Process Telemetry Info */}
+          <div className="bg-white border border-slate-200 rounded-xl p-4 text-xs space-y-2 select-none shadow-sm">
+            <div className="flex items-center justify-between text-slate-700 font-bold uppercase tracking-wider text-[11px]">
+              <span className="flex items-center gap-1.5">
+                <Layers className="w-3.5 h-3.5 text-sky-600" />
+                Live Telemetry & Diagnostics
+              </span>
+              <span className="text-emerald-600 font-mono text-[10px] font-bold">● Recording</span>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2 pt-1 font-mono text-[11px]">
+              <div className="bg-slate-50 p-2 rounded-lg border border-slate-200">
+                <div className="text-slate-500 text-[10px]">Characters</div>
+                <div className="text-slate-900 font-bold">{code.length}</div>
+              </div>
+              <div className="bg-slate-50 p-2 rounded-lg border border-slate-200">
+                <div className="text-slate-500 text-[10px]">Lines</div>
+                <div className="text-slate-900 font-bold">{code.split('\n').length}</div>
+              </div>
+              <div className="bg-slate-50 p-2 rounded-lg border border-slate-200">
+                <div className="text-slate-500 text-[10px]">Queued Events</div>
+                <div className="text-sky-700 font-bold">{telemetryQueue.length}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};

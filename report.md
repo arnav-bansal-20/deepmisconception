@@ -242,7 +242,7 @@ Actual: Misconception          0                     2                     38
 | **Code Embeddings** | Hugging Face CodeBERT (`microsoft/codebert-base`), PyTorch 2.15 (Apple Silicon MPS) |
 | **Machine Learning** | NumPy Vectorized Cross-Attention, Scikit-learn (RandomForest, LogisticReg, MLP) |
 | **Evaluation Metrics**| Cohen's Kappa, Confusion Matrix, Per-class Precision/Recall/Macro-F1 |
-| **Testing** | Pytest, Pytest-Asyncio, HTTPX TestClient (54 / 54 Passing Tests) |
+| **Testing** | Pytest, Pytest-Asyncio, HTTPX TestClient (59 / 59 Passing Tests) |
 
 ---
 
@@ -264,8 +264,9 @@ The platform contains an end-to-end automated test suite covering all architectu
 | `test_process_telemetry.py` | Paste ratio, edit burstiness, typing pace, error recovery | ✅ PASSED |
 | `test_comprehension_engine.py` | Multimodal evidence fusion ($S_{\text{composite}}$), conflict detection, reporting | ✅ PASSED |
 | `test_ml_pipeline.py` | 40-D feature extractors, cross-attention transformer, baselines, ablations | ✅ PASSED |
+| `test_novelty_pipeline.py` | Process Transformer, AST + CodeBERT, Sentence-Transformer, Cross-Attention Fusion | ✅ PASSED |
 | `test_inter_rater.py` | Cohen's Kappa, inter-rater concordance, confusion matrices, evaluation API | ✅ PASSED |
-| **Total Test Suite** | **54 / 54 Unit Tests Passing (100%)** | ✅ **PASSED** |
+| **Total Test Suite** | **59 / 59 Unit Tests Passing (100%)** | ✅ **PASSED** |
 | **Frontend Production Build** | **0 errors, 1,969 modules transformed in 887ms** | ✅ **PASSED** |
 
 ---

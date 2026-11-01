@@ -106,14 +106,52 @@ Tracks editor events (keystrokes, edit deltas, paste operations, run attempts, r
 - **Pedagogical Profile**: Identifies developer habits (e.g., *Balanced Incremental Developer*, *Iterative Trial-and-Error Debugger*, *Rapid Block Importer*).
 - **Ethical Safeguard**: Process telemetry is strictly treated as supporting contextual evidence—never as a sole accusation of dishonesty.
 
-### 4.6. Multi-Modal Evidence Fusion Formula
+### 4.6. Comprehensive Diagnostic Evaluation Criteria
+
+DeepMisconception evaluates code comprehension through a multi-tiered, multimodal decision framework. Rather than assigning a simple pass/fail grade, the system assesses whether a student's mental model matches the operational mechanics of the written code.
+
+#### 4.6.1. Multimodal Scoring Dimensions
 The overall rule-based comprehension score is computed via a transparent, weighted evidence matrix:
 $$S_{\text{composite}} = 0.20 \cdot S_{\text{ast}} + 0.25 \cdot S_{\text{exec}} + 0.40 \cdot S_{\text{viva}} + 0.15 \cdot S_{\text{proc}}$$
 
-- **Diagnostic Thresholds**:
-  - $S_{\text{composite}} \ge 0.75 \implies$ **`Understood`**
-  - $0.45 \le S_{\text{composite}} < 0.75 \implies$ **`Partial Understanding`**
-  - $S_{\text{composite}} < 0.45$ or $\ge 2$ severe contradictions $\implies$ **`Possible Misconception`**
+1. **AST Structural Score ($S_{\text{ast}} \in [0.1, 1.0]$, weight = 0.20)**:
+   - Evaluates syntactic validity, algorithmic constructs, and cyclomatic complexity ($M = E - N + 2P$).
+   - A syntax error penalizes $S_{\text{ast}}$ to $0.10$; complete modular code with proper control structures scores $0.80 - 1.00$.
+2. **Execution Fidelity Score ($S_{\text{exec}} \in [0.1, 1.0]$, weight = 0.25)**:
+   - Measures actual sandbox execution output fidelity.
+   - Clean exit without errors = $1.00$.
+   - Runtime exception / traceback = $0.20 - 0.35$.
+   - Infinite loop / timeout ($>2.0\text{s}$) or memory explosion ($>128\text{MB}$) = $0.10$.
+3. **Viva Reasoning Score ($S_{\text{viva}} \in [0.0, 1.0]$, weight = 0.40)**:
+   - The primary indicator of conceptual understanding, evaluating student explanations to code-grounded oral questions:
+     - `Correct` ($1.00$): The student accurately explains invariant logic, variable mutations, and boundary conditions.
+     - `Partially Correct` ($0.65$): Understands the general idea but misses critical nuances or boundary edge cases.
+     - `Insufficient Evidence` ($0.40$): Evasive or non-committal answers (*"idk"*, *"it just works"*, *"maybe memory"*).
+     - `Incorrect` ($0.15$): Fundamentally flawed conceptual assertions or direct factual contradictions.
+4. **Process Authenticity Score ($S_{\text{proc}} \in [0.2, 1.0]$, weight = 0.15)**:
+   - Evaluates problem-solving rhythm. High paste ratios ($>70\%$) without testing incur a minor penalty ($-0.35$), while iterative debugging and high error recovery ($\ge 80\%$) grant a bonus ($+0.10$).
+   - *Ethical Guarantee*: Never used alone to penalize; serves strictly as contextual behavioral support ($0.15$).
+
+#### 4.6.2. Diagnostic Classification Thresholds & Trigger Rules
+
+The system synthesizes all signals into three mutually exclusive pedagogical labels:
+
+| Diagnostic Verdict | Specific Evaluation Criteria & Mathematical Triggers | Pedagogical Interpretation |
+|---|---|---|
+| **✅ `Understood`** | **1.** Composite Score $S_{\text{composite}} \ge 0.75$<br>**2.** Zero `Incorrect` viva answers ($N_{\text{incorrect}} = 0$)<br>**3.** Zero severe contradictions between explanation and runtime trace<br>**4.** Clean sandbox execution and valid AST structure | The student possesses a sound, verifiable mental model. They can articulate *why* their code works, correctly justify boundary conditions, and predict state mutations accurately. |
+| **⚠️ `Partial Understanding`** | **1.** Composite Score $0.45 \le S_{\text{composite}} < 0.75$<br>**2.** At most one `Incorrect` viva answer ($N_{\text{incorrect}} \le 1$)<br>**3.** Explanations capture high-level algorithmic intent but miss edge cases, loop termination invariants, or state handling | The student understands the overarching algorithmic goal (e.g., searching or sorting), but harbors fragile knowledge regarding off-by-one errors, recursion unwinding, or edge cases. |
+| **❌ `Possible Misconception`** | **Triggered if ANY of the following conditions occur:**<br>**1.** Composite Score $S_{\text{composite}} < 0.45$<br>**2.** Two or more `Incorrect` viva answers ($N_{\text{incorrect}} \ge 2$)<br>**3.** Three or more diagnosed conceptual contradictions ($N_{\text{contradictions}} \ge 3$)<br>**4.** Direct factual contradiction between explanation and runtime trace (e.g., claiming a loop terminates when it infinitely recurses, or misidentifying variable mutability) | The student holds active, contradictory misunderstandings about programming semantics. Their verbal explanation directly conflicts with the physical execution of their code. |
+
+#### 4.6.3. Conflicting Signal & Review Escalation Heuristics
+When individual modalities yield divergent signals, DeepMisconception avoids naive classification and flags the session with `needs_instructor_review = True`:
+- **Code Sophistication vs. Reasoning Gap**: $S_{\text{ast}} \ge 0.85$ and $S_{\text{viva}} < 0.40$ (identifies borrowed, memorized, or AI-generated code that the student cannot verbally defend).
+- **High Paste Block + Ambiguous Explanation**: $R_{\text{paste}} > 0.60$ and $S_{\text{viva}} < 0.50$ (flags unverified bulk code imports).
+- **High Evaluator Uncertainty**: Model uncertainty $> 0.65$ or contradictory semantic claims routes the student report directly to faculty arbitration.
+
+#### 4.6.4. Neural Cross-Attention Alignment (Phase 8 Deep Learning Model)
+In the neural architecture, evaluation criteria are modeled continuously:
+- **Code Queries ($Q = X_{\text{AST}} W_Q$)** attend to **Explanation Keys/Values ($K = X_{\text{Viva}} W_K, V = X_{\text{Viva}} W_V$)**.
+- When code constructs (e.g., a dictionary lookup on line 4) are contradicted or omitted in the explanation (e.g., the student discusses linear list scans), the cross-attention dot product $Q K^T$ collapses, lowering alignment weights and pushing the classification head toward **`Possible Misconception`**.
 
 ### 4.7. Teacher Guidance & Cohort Isolation
 - **Classrooms/Cohorts**: Teachers create student cohorts with custom enrollment codes (e.g., `CS101-ALPHA`).

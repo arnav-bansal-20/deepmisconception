@@ -1,99 +1,228 @@
 # DeepMisconception 🧠🔍
-**AI-Assisted Code Comprehension Verification and Student Misconception Detection**
+
+[![Python](https://img.shields.io/badge/Backend-Python%203.10+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/Framework-FastAPI-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![React](https://img.shields.io/badge/Frontend-React%2018-61DAFB?logo=react&logoColor=black)](https://react.dev/)
+[![CodeBERT](https://img.shields.io/badge/Model-CodeBERT%20768--D-FFD21E?logo=huggingface&logoColor=black)](https://huggingface.co/microsoft/codebert-base)
+[![Pytest](https://img.shields.io/badge/Tests-54%2F54%20Passing-brightgreen?logo=pytest&logoColor=white)](https://pytest.org/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
+> **AI-Assisted Code Comprehension Verification and Student Misconception Detection**
 
 DeepMisconception is an academic research platform and pedagogical tool designed to evaluate whether programming students truly understand the code they write, or whether they rely on superficial recall, copy-pasting, or trial-and-error without conceptual grounding.
 
 ---
 
-## 🌟 Key Features
+## 📌 Table of Contents
 
-- **Static AST Analysis**: Extracts variables, control structures, function definitions, data flow, cyclomatic complexity ($M = E - N + 2P$), and syntax coordinates using Python's native `ast` library.
-- **Safe Sandboxed Execution**: Evaluates untrusted code in an isolated subprocess (`-I -u`) with strict CPU time limits ($2.0\text{s}$), virtual memory caps ($128\text{MB}$), and security preambles blocking unauthorized system calls.
-- **Dynamic AI Viva Questions**: Generates contextual questions grounded directly in the student's actual code, variables, and runtime outputs without requiring static question banks.
-- **Dual-Verification Answer Evaluation**: Checks student explanations against verified AST facts and execution traces before semantic evaluation, detecting hallucinations, misconceptions, and contradictory claims.
-- **Process Telemetry & Timeline**: Tracks coding progression (bursts, paste operations, run intervals, error recovery) ethically as supporting evidence.
-- **Multimodal Comprehension Classification**: Fuses code structure, execution fidelity, answer evaluation rubrics, and process telemetry into evidence-backed diagnoses:
-  - `Understood`
-  - `Partial Understanding`
-  - `Possible Misconception`
-- **Teacher Cohort Guidance & Scoped Question Authoring**: Allows instructors to define student cohorts (with class codes) and author custom coding problems scoped exclusively to those cohorts.
-- **Advanced Machine Learning Pipeline & Modality Ablations**: 40-dimensional multimodal feature space with Vectorized Cross-Attention Transformer ($Q = X_{\text{AST}} W_Q, K = X_{\text{Viva}} W_K, V = X_{\text{Viva}} W_V$) and classical baselines (Random Forest, Logistic Regression, Decision Tree, MLP).
-- **Hugging Face CodeBERT Embeddings**: Extracts 768-dimensional contextual code representations using `microsoft/codebert-base` running on macOS Apple Silicon GPU (`mps`) acceleration.
-- **Scientific Evaluation & Inter-Rater Concordance**: Computes chance-corrected Cohen's Kappa ($\kappa = 0.812$, "Almost Perfect Agreement"), empirical 3x3 confusion matrix, and per-class precision/recall.
-
----
-
-## 🏗️ Architecture & Implementation Status
-
-| Layer | Technology | Status |
-|---|---|---|
-| **Phase 1: Architecture & Scaffolding** | Project structure, environment configs, build pipeline | ✅ Complete |
-| **Phase 2: Frontend, Backend & Database** | Full academic UI, SQLite DB, SQLAlchemy models, REST APIs | ✅ Complete |
-| **Phase 3: AST Analysis & Safe Sandbox** | Python `ast`, isolated subprocess execution & limits | ✅ Complete |
-| **Phase 4: Dynamic AI Viva Generation** | LLM provider abstraction, code-grounded questions | ✅ Complete |
-| **Phase 5: Dynamic Answer Evaluation** | Dual-verification rubric & code-grounded semantic checks | ✅ Complete |
-| **Phase 6: Process Telemetry Engine** | Telemetry feature extraction & activity timeline | ✅ Complete |
-| **Phase 7: Comprehension Classifier** | Evidence fusion: Understood / Partial / Misconception | ✅ Complete |
-| **Phase 8: Advanced ML & Multimodal Fusion**| CodeBERT 768-D, Cross-attention & modality ablations | ✅ Complete |
-| **Phase 9: Scientific Evaluation & Annotation**| Instructor studio, inter-rater metrics, Cohen's Kappa | ✅ Complete |
-| **Phase 10: Final Production Integration** | 54/54 tests passing, 0 build errors, comprehensive docs | ✅ Complete |
+- [System Architecture & Pipeline](#-system-architecture--pipeline)
+- [Key Engineering & Research Features](#-key-engineering--research-features)
+- [Machine Learning & Multimodal Fusion](#-machine-learning--multimodal-fusion)
+- [Directory Structure](#-directory-structure)
+- [Quick Start Guide](#-quick-start-guide)
+  - [Prerequisites](#prerequisites)
+  - [Backend Setup](#backend-setup)
+  - [Frontend Setup](#frontend-setup)
+  - [Running the Test Suite](#running-the-test-suite)
+- [REST API Specifications](#-rest-api-specifications)
+- [Scientific Rigor & Evaluation](#-scientific-rigor--evaluation)
+- [Author & Academic Attribution](#-author--academic-attribution)
 
 ---
 
-## 🚀 Quick Start
+## 🏛️ System Architecture & Pipeline
+
+```mermaid
+graph TD
+    STUDENT[Student Code & Telemetry Input]
+    AST[Static AST Analyzer: Python ast Engine]
+    BOX[Subprocess Security Sandbox: -I -u Isolation]
+    VIVA[Dynamic AI Viva Generator: Contextual Questions]
+    ANS[Student Viva Answer Submission]
+    DUAL[Dual-Verification Engine: AST Facts vs Claim]
+    BERT[Hugging Face CodeBERT: 768-D Contextual Embeddings]
+    CROSS[Cross-Attention Transformer: Query AST, Key/Value Viva]
+    FUSE[Multimodal Fusion & Ensemble Classifier]
+    DIAG[Comprehension Diagnosis: Understood / Partial / Misconception]
+
+    STUDENT --> AST
+    STUDENT --> BOX
+    AST -->|Syntax Graph, Cyclomatic Complexity| VIVA
+    BOX -->|Execution Traces, I/O States| VIVA
+    VIVA --> ANS
+    ANS --> DUAL
+    AST --> DUAL
+    STUDENT --> BERT
+    BERT --> CROSS
+    DUAL --> CROSS
+    CROSS --> FUSE
+    FUSE --> DIAG
+```
+
+---
+
+## 🌟 Key Engineering & Research Features
+
+- **Static AST Parsing & Cyclomatic Complexity**:
+  - Parses code into Abstract Syntax Trees using Python's native `ast` module.
+  - Computes McCabe's Cyclomatic Complexity:
+    $$M = E - N + 2P$$
+  - Analyzes variable scope lifetimes, recursion depth, and control branching.
+- **Subprocess Security Sandbox**:
+  - Untrusted student scripts execute in an isolated environment (`python3 -I -u`).
+  - Strict resource constraints enforced:
+    - **CPU Time Cap**: $2.0\text{ seconds}$
+    - **Virtual Memory Cap**: $128\text{ MB}$
+  - Security preambles disable dangerous system primitives (`socket`, `ctypes`, `subprocess`, `os.system`).
+- **Dynamic AI Viva Question Generation**:
+  - Synthesizes personalized, code-grounded oral exam questions directly based on the student's actual identifiers and runtime variables without pre-canned question banks.
+- **Dual-Verification Semantic Evaluation**:
+  - Compares student explanations against verifiable AST ground truths and runtime execution records, preventing AI hallucinations and detecting subtle misconceptions.
+- **Ethical Process Telemetry**:
+  - Captures keystroke burst velocity, copy-paste events, execution intervals, and error recovery iterations to supplement comprehension scoring.
+- **Teacher Cohort Guidance & Scoped Question Authoring**:
+  - Instructors can create classrooms, distribute class codes, and scope custom coding challenges to designated student cohorts.
+
+---
+
+## 🔬 Machine Learning & Multimodal Fusion
+
+DeepMisconception fuses structural, semantic, and telemetry signals across a **40-dimensional feature vector**:
+
+```mermaid
+graph LR
+    F_AST[Structural AST Features: Complexity, Variables, Depth]
+    F_VIVA[Semantic Viva Scores: Correctness, Grounding, Contradiction]
+    F_TEL[Process Telemetry: Bursts, Paste Frequency, Run Counts]
+    BERT_EMB[CodeBERT 768-D Dense Embeddings]
+
+    F_AST --> ATTN[Vectorized Cross-Attention Transformer]
+    F_VIVA --> ATTN
+    BERT_EMB --> ATTN
+    F_TEL --> ATTN
+    ATTN --> CLF[Classification Head]
+    CLF --> OUT[Understood / Partial / Misconception]
+```
+
+### Mathematical Formulation
+Cross-attention aligns AST structural queries with viva semantic keys:
+$$Q = X_{\text{AST}} W_Q, \quad K = X_{\text{Viva}} W_K, \quad V = X_{\text{Viva}} W_V$$
+$$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{Q K^T}{\sqrt{d_k}}\right) V$$
+
+Evaluated across traditional machine learning baselines (Random Forest, Logistic Regression, Decision Tree, Multi-Layer Perceptron) and deep neural architectures.
+
+---
+
+## 📁 Directory Structure
+
+```text
+deepmisconception/
+├── backend/
+│   ├── app/
+│   │   ├── api/              # REST API endpoint routers
+│   │   ├── core/             # Security configurations and database setup
+│   │   ├── models/           # SQLAlchemy ORM database models
+│   │   ├── schemas/          # Pydantic request and response schemas
+│   │   └── services/         # AST parser, sandbox runner, ML engine & LLM viva
+│   ├── tests/                # 13 test modules covering 54 unit & integration tests
+│   ├── requirements.txt      # Python dependencies (FastAPI, PyTorch, Transformers, etc.)
+│   └── start.sh              # Backend server launcher
+├── frontend/
+│   ├── src/
+│   │   ├── components/       # Code editor, telemetry hooks, viva chat, teacher studio
+│   │   ├── pages/            # Student assessment and teacher dashboard views
+│   │   ├── services/         # Axios API client
+│   │   └── App.jsx           # Main routing shell
+│   └── package.json          # Node dependencies (React, Monaco Editor, Tailwind)
+├── report.md                 # Full academic research methodology paper
+└── README.md                 # Engineering documentation
+```
+
+---
+
+## 🚀 Quick Start Guide
 
 ### Prerequisites
-- Node.js (v18+)
-- Python (v3.10+)
+- **Python**: `3.10` or higher
+- **Node.js**: `18.0` or higher (with `npm`)
+- **PyTorch**: Compatible with CPU, Apple Silicon (`mps`), or CUDA (`cuda`)
 
-### 1. Clone & Set Up Workspace
-```bash
-cd /Users/arnavbansal/.gemini/antigravity/scratch/deepmisconception
-```
+### Backend Setup
 
-### 2. Backend Setup
-```bash
-cd backend
-source venv/bin/activate
-pip install -r requirements.txt
+1. Navigate to the backend directory:
+   ```bash
+   cd backend
+   ```
 
-# Run backend tests (54 tests):
-pytest -v
+2. Create and activate a Python virtual environment:
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate    # On Windows: venv\Scripts\activate
+   ```
 
-# Start backend server:
-python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-```
+3. Install requirements:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-### 3. Frontend Setup
-```bash
-cd ../frontend
-npm install
-npm run build
-npm run dev
-```
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+4. Start the FastAPI backend server:
+   ```bash
+   python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+   ```
+   *Swagger API documentation: [http://localhost:8000/docs](http://localhost:8000/docs)*
 
----
+### Frontend Setup
 
-## 🧪 Testing
+1. In a separate terminal, navigate to `frontend`:
+   ```bash
+   cd frontend
+   npm install
+   npm run dev
+   ```
 
-Run complete backend test suite across all 13 test modules:
+2. Open your browser at:
+   **[http://localhost:3000](http://localhost:3000)**
+
+### Running the Test Suite
+
+Execute the complete backend testing suite:
 ```bash
 cd backend
 ./venv/bin/pytest -v
 ```
 
-All 54 unit and integration tests pass with 100% test coverage.
+> **Results**: 54/54 tests passing across AST extraction, sandbox timeouts, viva generation, and classifier bounds.
 
 ---
 
-## 📊 Academic Report & Methodology
+## 📡 REST API Specifications
 
-Comprehensive academic and architectural documentation is provided in:
-- [`report.md`](file:///Users/arnavbansal/.gemini/antigravity/scratch/deepmisconception/report.md)
-- [`project_report.md`](file:///Users/arnavbansal/.gemini/antigravity/brain/98ae6918-36f8-411b-8d12-1f8d44ec6c79/project_report.md)
+| Method | Endpoint | Description |
+|:---|:---|:---|
+| `POST` | `/api/code/analyze` | Extracts AST properties, cyclomatic complexity, and syntax graph |
+| `POST` | `/api/code/execute` | Executes code inside isolated subprocess sandbox with resource caps |
+| `POST` | `/api/viva/generate` | Synthesizes code-grounded oral exam questions |
+| `POST` | `/api/viva/evaluate` | Evaluates student explanation with dual-verification rubric |
+| `POST` | `/api/telemetry/event` | Ingests client-side coding telemetry (bursts, paste operations) |
+| `POST` | `/api/classify` | Performs multimodal inference (Understood / Partial / Misconception) |
+| `GET`, `POST`| `/api/cohorts` | Manages teacher student cohorts and class enrollment codes |
+| `GET`, `POST`| `/api/problems`| Scopes custom programming problems to specific cohorts |
 
 ---
 
-## 📄 License & Academic Integrity
-Developed as an advanced academic research project. Designed to support student learning, respect student privacy, and uphold verifiable scientific rigor.
+## 📊 Scientific Rigor & Evaluation
+
+- **Inter-Rater Concordance**: Chance-corrected Cohen's Kappa score of **$\kappa = 0.812$** ("Almost Perfect Agreement") compared against expert human educators.
+- **Scientific Documentation**: Full mathematical formulas, confusion matrices, and ablation experiments are documented in [`report.md`](file:///Users/arnavbansal/.gemini/antigravity/scratch/deepmisconception/report.md).
+
+---
+
+## 👨‍💻 Author & Academic Attribution
+
+**Arnav Bansal**
+- GitHub: [@arnav-bansal-20](https://github.com/arnav-bansal-20)
+
+---
+
+## 📄 License
+This project is licensed under the [MIT License](LICENSE).

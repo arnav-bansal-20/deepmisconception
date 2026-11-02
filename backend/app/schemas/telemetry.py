@@ -63,8 +63,19 @@ class ProcessFeaturesResponse(BaseModel):
     error_recovery_rate: float = 1.0
     typing_speed_cpm: float = 0.0
     process_profile: str = "Incremental Developer"
+    # Interpretable process evaluation sub-scores
+    incremental_score: float = 0.75
+    debugging_score: float = 0.90
+    revision_score: float = 0.75
+    testing_score: float = 0.60
+    process_score: float = 0.75
+    has_process_evidence: bool = True
     ethical_disclaimer: str = (
         "Process telemetry serves as supporting contextual evidence of problem-solving habits "
         "and is never used in isolation to accuse students of misconduct or grade penalties."
+    )
+    disclosure_notice: str = (
+        "Telemetry tracks timestamps, edit volumes, execution attempts, and error recoveries within this editor session "
+        "to assess iterative development and debugging habits. No personal files or external keystrokes are recorded."
     )
     timeline_events: List[TimelineEventSummary] = []

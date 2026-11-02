@@ -228,15 +228,77 @@ export const ProcessTimeline: React.FC<ProcessTimelineProps> = ({
         </div>
       )}
 
-      {/* Ethical Academic Safeguard Notice */}
-      <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-[11px] text-slate-600 flex items-start gap-2">
-        <ShieldAlert className="w-4 h-4 text-sky-600 flex-shrink-0 mt-0.5" />
-        <div className="space-y-0.5">
-          <span className="font-bold text-slate-800">Ethical Telemetry Guarantee:</span>
-          <p className="leading-relaxed">
-            {features.ethical_disclaimer}
-          </p>
+      {/* Process Component Evaluation Pillars (20% of Overall Comprehension) */}
+      <div className="p-4 bg-slate-50/80 rounded-xl border border-slate-200 space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <TrendingUp className="w-4 h-4 text-teal-600" />
+            <span className="text-xs font-bold text-slate-800">Process Development &amp; Problem-Solving Dynamics (20% of Overall Comprehension)</span>
+          </div>
+          <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-teal-100 text-teal-800 border border-teal-200">
+            S_process: {Math.round((features.process_score ?? 0.75) * 100)}%
+          </span>
         </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1 text-xs">
+          <div className="bg-white p-2.5 rounded-lg border border-slate-200">
+            <div className="flex justify-between items-center text-[11px] text-slate-600 font-medium">
+              <span>Incremental (30%)</span>
+              <span className="font-mono font-bold text-slate-900">{Math.round((features.incremental_score ?? 0.75) * 100)}%</span>
+            </div>
+            <div className="w-full h-1.5 bg-slate-100 rounded-full mt-1.5 overflow-hidden">
+              <div className="h-full bg-sky-500 rounded-full" style={{ width: `${(features.incremental_score ?? 0.75) * 100}%` }} />
+            </div>
+          </div>
+
+          <div className="bg-white p-2.5 rounded-lg border border-slate-200">
+            <div className="flex justify-between items-center text-[11px] text-slate-600 font-medium">
+              <span>Debugging (30%)</span>
+              <span className="font-mono font-bold text-slate-900">{Math.round((features.debugging_score ?? 0.90) * 100)}%</span>
+            </div>
+            <div className="w-full h-1.5 bg-slate-100 rounded-full mt-1.5 overflow-hidden">
+              <div className="h-full bg-indigo-500 rounded-full" style={{ width: `${(features.debugging_score ?? 0.90) * 100}%` }} />
+            </div>
+          </div>
+
+          <div className="bg-white p-2.5 rounded-lg border border-slate-200">
+            <div className="flex justify-between items-center text-[11px] text-slate-600 font-medium">
+              <span>Revision (25%)</span>
+              <span className="font-mono font-bold text-slate-900">{Math.round((features.revision_score ?? 0.75) * 100)}%</span>
+            </div>
+            <div className="w-full h-1.5 bg-slate-100 rounded-full mt-1.5 overflow-hidden">
+              <div className="h-full bg-teal-500 rounded-full" style={{ width: `${(features.revision_score ?? 0.75) * 100}%` }} />
+            </div>
+          </div>
+
+          <div className="bg-white p-2.5 rounded-lg border border-slate-200">
+            <div className="flex justify-between items-center text-[11px] text-slate-600 font-medium">
+              <span>Testing (15%)</span>
+              <span className="font-mono font-bold text-slate-900">{Math.round((features.testing_score ?? 0.60) * 100)}%</span>
+            </div>
+            <div className="w-full h-1.5 bg-slate-100 rounded-full mt-1.5 overflow-hidden">
+              <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${(features.testing_score ?? 0.60) * 100}%` }} />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Ethical Academic Safeguard & Tracking Disclosure */}
+      <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-[11px] text-slate-600 space-y-1.5">
+        <div className="flex items-start gap-2">
+          <ShieldAlert className="w-4 h-4 text-sky-600 flex-shrink-0 mt-0.5" />
+          <div className="space-y-0.5">
+            <span className="font-bold text-slate-800">Ethical Telemetry &amp; Non-Punitive Guarantee:</span>
+            <p className="leading-relaxed">
+              {features.ethical_disclaimer} Pasting code or working in quick bursts is never penalized. Process dynamics provide supporting context on problem-solving habits alongside code-grounded explanations.
+            </p>
+          </div>
+        </div>
+        {features.disclosure_notice && (
+          <p className="text-[10px] text-slate-400 pl-6 border-t border-slate-200/60 pt-1.5">
+            {features.disclosure_notice}
+          </p>
+        )}
       </div>
     </div>
   );

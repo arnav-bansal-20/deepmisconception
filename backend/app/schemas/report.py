@@ -22,7 +22,7 @@ class ComprehensionReportResponse(BaseModel):
     rubric_summary: Optional[Dict[str, Any]] = None
     needs_instructor_review: bool = False
     recommended_interventions: Optional[List[str]] = None
-    multimodal_scores: Optional[Dict[str, float]] = None
+    multimodal_scores: Optional[Dict[str, Any]] = None
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)

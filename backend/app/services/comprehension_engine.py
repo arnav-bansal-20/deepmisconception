@@ -15,19 +15,20 @@ from app.models.answer_assessment import AnswerAssessment
 from app.models.process_event import ProcessEvent
 from app.models.comprehension_report import ComprehensionReport
 from app.services.process_telemetry import ProcessTelemetryService
+from app.config import settings
 
 logger = logging.getLogger(__name__)
 
 
 class ComprehensionEngine:
-    """Fuses code structure, sandbox runtime traces, viva reasoning, and telemetry into a diagnosis."""
+    """Fuses code structure, sandbox runtime traces, viva reasoning, and process telemetry into a diagnosis."""
 
-    # Weights: prioritize verbal conceptual reasoning and physical execution reality.
-    # Process telemetry is strictly descriptive context (weight = 0.0) and does not contribute to comprehension scoring.
-    WEIGHT_AST = 0.20
-    WEIGHT_EXEC = 0.30
-    WEIGHT_VIVA = 0.50
-    WEIGHT_PROC = 0.00
+    # Configurable multimodal weights from central settings:
+    # S_overall = 0.15*S_ast + 0.20*S_exec + 0.45*S_viva + 0.20*S_process
+    WEIGHT_AST = settings.weight_ast
+    WEIGHT_EXEC = settings.weight_exec
+    WEIGHT_VIVA = settings.weight_viva
+    WEIGHT_PROC = settings.weight_process
 
     @classmethod
     def evaluate_modalities(
@@ -38,8 +39,8 @@ class ComprehensionEngine:
     ) -> Tuple[Dict[str, float], float]:
         """Compute individual dimension scores and composite multimodal score.
         
-        Zero punitive deductions for pasting or brief edit sessions. Process telemetry
-        provides supportive context on problem-solving rhythm.
+        Fair and non-punitive process evaluation: S_process fuses incremental development,
+        debugging recovery, revision cycles, and sandbox testing. Pasting code is not penalized.
         """
         # 1. AST Structural Score (Evaluates syntactic validity & algorithmic constructs)
         if latest_sub:
@@ -86,33 +87,44 @@ class ComprehensionEngine:
             # When viva answers are not yet submitted, score is neutral/unverified
             viva_score = 0.50
 
-        # 4. Process Rhythm Score (Neutral & Constructive - NO paste penalties)
-        # Process telemetry reflects problem-solving habits (e.g. Iterative vs. Block Importer)
-        # Pasting code is common in software engineering and is NEVER penalized automatically.
-        recovery_rate = getattr(proc_features, "error_recovery_rate", 1.0)
-        run_count = getattr(proc_features, "run_count", 0)
-        
-        proc_score = 0.85  # Neutral baseline
-        if recovery_rate >= 0.80:
-            proc_score = min(1.0, proc_score + 0.10)
-        if run_count >= 2:
-            proc_score = min(1.0, proc_score + 0.05)
-        proc_score = max(0.50, proc_score)
+        # 4. Process Development Score (S_process)
+        # S_process = 0.30*S_incremental + 0.30*S_debugging + 0.25*S_revision + 0.15*S_testing
+        inc_score = getattr(proc_features, "incremental_score", 0.75)
+        debug_score = getattr(proc_features, "debugging_score", 0.90)
+        rev_score = getattr(proc_features, "revision_score", 0.75)
+        test_score = getattr(proc_features, "testing_score", 0.60)
+
+        proc_score = getattr(proc_features, "process_score", None)
+        if proc_score is None:
+            proc_score = round(
+                settings.weight_proc_incremental * inc_score
+                + settings.weight_proc_debugging * debug_score
+                + settings.weight_proc_revision * rev_score
+                + settings.weight_proc_testing * test_score,
+                3
+            )
 
         scores = {
             "ast_structural_score": round(ast_score, 2),
             "execution_fidelity_score": round(exec_score, 2),
             "viva_reasoning_score": round(viva_score, 2),
-            "process_rhythm_score": round(proc_score, 2),
-            "process_authenticity_score": round(proc_score, 2),  # Backward compatibility alias
+            "process_overall_score": round(proc_score, 2),
+            "process_rhythm_score": round(proc_score, 2),  # Compatibility alias
+            "process_authenticity_score": round(proc_score, 2),  # Compatibility alias
+            "process_subscores": {
+                "incremental_score": round(inc_score, 2),
+                "debugging_score": round(debug_score, 2),
+                "revision_score": round(rev_score, 2),
+                "testing_score": round(test_score, 2),
+            },
         }
 
-        # Composite score strictly fuses code structure, runtime execution, and viva conceptual reasoning.
-        # Process telemetry is returned for descriptive instructor context but has 0 weight in composite calculation.
+        # S_overall = 0.15*S_ast + 0.20*S_exec + 0.45*S_viva + 0.20*S_process
         composite = (
             cls.WEIGHT_AST * ast_score
             + cls.WEIGHT_EXEC * exec_score
             + cls.WEIGHT_VIVA * viva_score
+            + cls.WEIGHT_PROC * proc_score
         )
         return scores, round(composite, 3)
 
@@ -268,6 +280,10 @@ class ComprehensionEngine:
                 f"Development telemetry reflected a '{proc_features.process_profile}' workflow ({proc_features.run_count} test runs)."
             )
 
+        has_process_evidence = getattr(proc_features, "has_process_evidence", True)
+        if not has_process_evidence or proc_features.total_events == 0:
+            review_reasons.append("Process telemetry stream was unrecorded for this session; neutral process baseline applied without penalty.")
+
         evidence_summary = " ".join(summary_parts)
 
         # Recommended pedagogical interventions
@@ -294,6 +310,13 @@ class ComprehensionEngine:
             "exec_weight": cls.WEIGHT_EXEC,
             "viva_weight": cls.WEIGHT_VIVA,
             "proc_weight": cls.WEIGHT_PROC,
+            "process_weight": cls.WEIGHT_PROC,
+            "process_subweights": {
+                "incremental_weight": settings.weight_proc_incremental,
+                "debugging_weight": settings.weight_proc_debugging,
+                "revision_weight": settings.weight_proc_revision,
+                "testing_weight": settings.weight_proc_testing,
+            },
             "total_questions": len(questions),
             "answered_questions": len(assessments),
             "correct_answers": correct_vivas,
@@ -306,8 +329,17 @@ class ComprehensionEngine:
             "detected_contradictions": detected_contradictions,
             "review_flags": review_reasons,
             "process_profile": proc_features.process_profile,
+            "process_evidence_available": has_process_evidence,
+            "process_subscores": {
+                "incremental": round(getattr(proc_features, "incremental_score", 0.75), 2),
+                "debugging": round(getattr(proc_features, "debugging_score", 0.90), 2),
+                "revision": round(getattr(proc_features, "revision_score", 0.75), 2),
+                "testing": round(getattr(proc_features, "testing_score", 0.60), 2),
+            },
             "paste_ratio": round(proc_features.paste_ratio, 3),
             "error_recovery_rate": round(proc_features.error_recovery_rate, 3),
+            "run_count": proc_features.run_count,
+            "edit_count": proc_features.edit_count,
         }
 
         if existing_report:

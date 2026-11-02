@@ -169,7 +169,14 @@ export interface ProcessFeatures {
   error_recovery_rate?: number;
   typing_speed_cpm?: number;
   process_profile?: string;
+  incremental_score?: number;
+  debugging_score?: number;
+  revision_score?: number;
+  testing_score?: number;
+  process_score?: number;
+  has_process_evidence?: boolean;
   ethical_disclaimer?: string;
+  disclosure_notice?: string;
   timeline_events?: TimelineMilestone[];
 }
 

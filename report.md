@@ -117,13 +117,13 @@ Tracks editor events (keystrokes, edit deltas, paste operations, run attempts, r
 DeepMisconception evaluates code comprehension through a multi-tiered, multimodal decision framework. Rather than assigning a simple pass/fail grade, the system assesses whether a student's mental model matches the operational mechanics of the written code.
 
 #### 4.6.1. Multimodal Scoring Dimensions
-The overall rule-based comprehension score is computed via a transparent, weighted evidence matrix prioritizing conceptual explanation:
-$$S_{\text{composite}} = 0.15 \cdot S_{\text{ast}} + 0.25 \cdot S_{\text{exec}} + 0.45 \cdot S_{\text{viva}} + 0.15 \cdot S_{\text{proc}}$$
+The overall comprehension score is computed via a transparent, weighted evidence matrix combining submitted code reality, execution verification, conceptual oral defense, and developmental process dynamics:
+$$S_{\text{overall}} = 0.15 \cdot S_{\text{ast}} + 0.20 \cdot S_{\text{exec}} + 0.45 \cdot S_{\text{viva}} + 0.20 \cdot S_{\text{process}}$$
 
 1. **AST Structural Score ($S_{\text{ast}} \in [0.4, 1.0]$, weight = 0.15)**:
    - Evaluates syntactic validity, algorithmic constructs, and cyclomatic complexity ($M = E - N + 2P$).
    - A syntax error sets $S_{\text{ast}} = 0.40$ (treated as an active editing state, not a confirmed misconception); complete modular code with proper control structures scores $0.80 - 1.00$.
-2. **Execution Fidelity Score ($S_{\text{exec}} \in [0.4, 1.0]$, weight = 0.25)**:
+2. **Execution Fidelity Score ($S_{\text{exec}} \in [0.4, 1.0]$, weight = 0.20)**:
    - Measures actual sandbox execution output fidelity.
    - Clean exit without errors = $1.00$.
    - Runtime exception / traceback = $0.40 - 0.45$ (active debugging state).
@@ -134,9 +134,14 @@ $$S_{\text{composite}} = 0.15 \cdot S_{\text{ast}} + 0.25 \cdot S_{\text{exec}} 
      - `Partially Correct` ($0.65$): Understands the general idea but misses critical nuances or boundary edge cases.
      - `Insufficient Evidence` ($0.40$): Evasive or non-committal answers (*"idk"*, *"it just works"*, *"maybe memory"*).
      - `Incorrect` ($0.15$): Fundamentally flawed conceptual assertions or direct factual contradictions.
-4. **Process Rhythm Score ($S_{\text{proc}} \in [0.5, 1.0]$, weight = 0.15)**:
-   - Evaluates problem-solving rhythm. High error recovery ($\ge 80\%$) and active test runs grant supportive bonuses ($+0.10$). Zero penalties for pasting code.
-   - *Ethical Guarantee*: Never used alone to classify or penalize; serves strictly as contextual behavioral support ($0.15$).
+4. **Process Development Score ($S_{\text{process}} \in [0.4, 1.0]$, weight = 0.20)**:
+   - Fuses interpretable developmental process evidence:
+     $$S_{\text{process}} = 0.30 \cdot S_{\text{incremental}} + 0.30 \cdot S_{\text{debugging}} + 0.25 \cdot S_{\text{revision}} + 0.15 \cdot S_{\text{testing}}$$
+     - **$S_{\text{incremental}}$ (30%)**: Steady sequential code development across time; pasting code receives a non-punitive baseline ($0.80$).
+     - **$S_{\text{debugging}}$ (30%)**: Error recovery rate; students writing clean code without errors receive $0.90$ (never penalized for not failing).
+     - **$S_{\text{revision}}$ (25%)**: Adaptive iteration cycles (edits following runs/outputs).
+     - **$S_{\text{testing}}$ (15%)**: Sandbox verification runs prior to submission.
+   - *Fairness & Missing Evidence Guarantee*: Pasting code, typing speed, and edit volume never independently penalize students or imply misconception. When telemetry stream is unrecorded, a neutral baseline is applied with explicit missing evidence disclosure.
 
 #### 4.6.2. Diagnostic Classification Thresholds & Trigger Rules
 
@@ -270,7 +275,7 @@ Actual: Insufficient Evidence       0              2 (17%)        0             
 | **Code Embeddings** | Hugging Face CodeBERT (`microsoft/codebert-base`), PyTorch 2.15 (Apple Silicon MPS) |
 | **Machine Learning** | NumPy Vectorized Cross-Attention, Scikit-learn (RandomForest, LogisticReg, MLP) |
 | **Evaluation Metrics**| Cohen's Kappa, Confusion Matrix, Per-class Precision/Recall/Macro-F1 |
-| **Testing** | Pytest, Pytest-Asyncio, HTTPX TestClient (81 / 81 Passing Tests) |
+| **Testing** | Pytest, Pytest-Asyncio, HTTPX TestClient (82 / 82 Passing Tests) |
 
 ---
 
@@ -291,12 +296,12 @@ The platform contains an end-to-end automated test suite covering all architectu
 | `test_answer_evaluator.py` | Multi-stage answer evaluation (correct, partial, contradiction, evasive, off-topic, trace discrepancy) | ✅ PASSED |
 | `test_classrooms_api.py` | Teacher cohort guidance, code lookup, targeted assignment scoping | ✅ PASSED |
 | `test_process_telemetry.py` | Keystroke intervals, edit burstiness, typing pace, error recovery | ✅ PASSED |
-| `test_comprehension_engine.py` | Multimodal evidence fusion ($S_{\text{composite}}$), zero paste penalty, descriptive telemetry variance decoupling, Pending state | ✅ PASSED |
+| `test_comprehension_engine.py` | Multimodal evidence fusion ($S_{\text{overall}}$), configurable weights, process feature subscores, Pending state | ✅ PASSED |
 | `test_ml_pipeline.py` | 40-D feature extractors, PyTorch cross-attention transformer, zero-leakage student split | ✅ PASSED |
 | `test_novelty_pipeline.py` | Process Transformer, AST + CodeBERT, Sentence-Transformer, Cross-Attention Fusion | ✅ PASSED |
 | `test_inter_rater.py` | Cohen's Kappa, inter-rater concordance, confusion matrices, evaluation API | ✅ PASSED |
 | `test_viva_api.py` | Viva generation and evaluation end-to-end API workflows | ✅ PASSED |
-| **Total Test Suite** | **81 / 81 Unit & Integration Tests Passing (100%)** | ✅ **PASSED** |
+| **Total Test Suite** | **82 / 82 Unit & Integration Tests Passing (100%)** | ✅ **PASSED** |
 | **Frontend Production Build** | **0 errors, 1,970 modules transformed in 889ms** | ✅ **PASSED** |
 
 ---

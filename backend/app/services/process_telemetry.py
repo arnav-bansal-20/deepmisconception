@@ -1,6 +1,7 @@
 """Process Telemetry Analysis Service for student coding behavioral evidence."""
 from typing import List, Dict, Any, Optional
 from datetime import datetime, timezone
+from app.config import settings
 from app.models.process_event import ProcessEvent
 from app.schemas.telemetry import ProcessFeaturesResponse, TimelineEventSummary
 
@@ -36,6 +37,12 @@ class ProcessTelemetryService:
                 error_recovery_rate=1.0,
                 typing_speed_cpm=0.0,
                 process_profile="Uninitialized Session",
+                incremental_score=0.75,
+                debugging_score=0.90,
+                revision_score=0.75,
+                testing_score=0.60,
+                process_score=0.75,
+                has_process_evidence=False,
                 timeline_events=[],
             )
 
@@ -116,6 +123,66 @@ class ProcessTelemetryService:
         else:
             profile = "Balanced Incremental Developer"
 
+        # Interpretable Process Feature Calculations (Configurable Sub-weights)
+        # 1. Incremental development score (S_incremental, weight 0.30)
+        # Evaluates building code incrementally through sequential edits.
+        # Zero penalties for pasting; pasted logic with subsequent refinement scores highly.
+        if edit_count >= 15:
+            incremental_score = 1.00
+        elif edit_count >= 8:
+            incremental_score = 0.92
+        elif edit_count >= 3:
+            incremental_score = 0.85
+        else:
+            incremental_score = 0.80  # Non-punitive baseline for clean complete drafts
+
+        # 2. Debugging & Error recovery score (S_debugging, weight 0.30)
+        # Assesses how student handles runtime/syntax errors.
+        if error_count == 0:
+            debugging_score = 0.90  # Clean execution; never penalize students for writing correct code
+        else:
+            debugging_score = min(1.0, max(0.40, 0.50 + 0.50 * error_recovery_rate))
+
+        # 3. Revision score (S_revision, weight 0.25)
+        # Measures iteration cycles: editing after running or checking output.
+        revision_cycles = 0
+        in_edit_phase = False
+        for e in sorted_events:
+            if e.event_type == "edit":
+                in_edit_phase = True
+            elif e.event_type in ("run", "error") and in_edit_phase:
+                revision_cycles += 1
+                in_edit_phase = False
+
+        if revision_cycles >= 2:
+            revision_score = 1.00
+        elif revision_cycles == 1:
+            revision_score = 0.88
+        elif edit_count >= 5:
+            revision_score = 0.82
+        else:
+            revision_score = 0.75  # Baseline for direct clean drafts
+
+        # 4. Testing score (S_testing, weight 0.15)
+        # Measures active verification in the sandbox prior to submission.
+        if run_count >= 3:
+            testing_score = 1.00
+        elif run_count == 2:
+            testing_score = 0.90
+        elif run_count == 1:
+            testing_score = 0.82
+        else:
+            testing_score = 0.70  # Baseline when submission itself executes
+
+        # S_process = 0.30*S_incremental + 0.30*S_debugging + 0.25*S_revision + 0.15*S_testing
+        process_score = round(
+            settings.weight_proc_incremental * incremental_score
+            + settings.weight_proc_debugging * debugging_score
+            + settings.weight_proc_revision * revision_score
+            + settings.weight_proc_testing * testing_score,
+            3
+        )
+
         # Generate timeline milestone summaries
         timeline_events: List[TimelineEventSummary] = []
         for e in sorted_events:
@@ -167,5 +234,11 @@ class ProcessTelemetryService:
             error_recovery_rate=error_recovery_rate,
             typing_speed_cpm=typing_speed_cpm,
             process_profile=profile,
+            incremental_score=round(incremental_score, 2),
+            debugging_score=round(debugging_score, 2),
+            revision_score=round(revision_score, 2),
+            testing_score=round(testing_score, 2),
+            process_score=process_score,
+            has_process_evidence=True,
             timeline_events=timeline_events[:50],  # Keep top milestones
         )

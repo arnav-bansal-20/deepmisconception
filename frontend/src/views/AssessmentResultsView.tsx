@@ -258,17 +258,17 @@ export const AssessmentResultsView: React.FC<AssessmentResultsViewProps> = ({
             <div className="flex items-center justify-between text-xs">
               <span className="font-bold text-slate-700 flex items-center gap-1.5">
                 <Activity className="w-3.5 h-3.5 text-teal-600" />
-                <span>Process Rhythm</span>
+                <span>Process Development (20%)</span>
               </span>
-              <span className="font-mono font-bold text-teal-700">{Math.round((scores.process_rhythm_score ?? scores.process_authenticity_score ?? 0.85) * 100)}%</span>
+              <span className="font-mono font-bold text-teal-700">{Math.round(((scores as any).process_overall_score ?? scores.process_rhythm_score ?? scores.process_authenticity_score ?? 0.75) * 100)}%</span>
             </div>
             <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
               <div 
                 className="h-full bg-teal-500 rounded-full transition-all duration-500" 
-                style={{ width: `${(scores.process_rhythm_score ?? scores.process_authenticity_score ?? 0.85) * 100}%` }}
+                style={{ width: `${((scores as any).process_overall_score ?? scores.process_rhythm_score ?? scores.process_authenticity_score ?? 0.75) * 100}%` }}
               />
             </div>
-            <p className="text-[10px] text-slate-500">Problem-solving rhythm, error recovery pace</p>
+            <p className="text-[10px] text-slate-500">Incremental edits, error recovery, revision cycles, testing</p>
           </div>
         </div>
       </div>

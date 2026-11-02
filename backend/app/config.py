@@ -45,5 +45,19 @@ class Settings(BaseModel):
         default_factory=lambda: os.getenv("SAFE_SANDBOX_ENABLED", "true").lower() in ("true", "1")
     )
 
+    # Configurable Multimodal Evaluation Weights:
+    # S_overall = 0.15 * S_ast + 0.20 * S_exec + 0.45 * S_viva + 0.20 * S_process
+    weight_ast: float = Field(default_factory=lambda: float(os.getenv("WEIGHT_AST", "0.15")))
+    weight_exec: float = Field(default_factory=lambda: float(os.getenv("WEIGHT_EXEC", "0.20")))
+    weight_viva: float = Field(default_factory=lambda: float(os.getenv("WEIGHT_VIVA", "0.45")))
+    weight_process: float = Field(default_factory=lambda: float(os.getenv("WEIGHT_PROCESS", "0.20")))
+
+    # Configurable Process Feature Subweights:
+    # S_process = 0.30 * S_incremental + 0.30 * S_debugging + 0.25 * S_revision + 0.15 * S_testing
+    weight_proc_incremental: float = Field(default_factory=lambda: float(os.getenv("WEIGHT_PROC_INCREMENTAL", "0.30")))
+    weight_proc_debugging: float = Field(default_factory=lambda: float(os.getenv("WEIGHT_PROC_DEBUGGING", "0.30")))
+    weight_proc_revision: float = Field(default_factory=lambda: float(os.getenv("WEIGHT_PROC_REVISION", "0.25")))
+    weight_proc_testing: float = Field(default_factory=lambda: float(os.getenv("WEIGHT_PROC_TESTING", "0.15")))
+
 
 settings = Settings()

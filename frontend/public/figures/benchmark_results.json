@@ -1,0 +1,135 @@
+{
+  "experiment_1_viva_evaluation": {
+    "n_samples": 60,
+    "accuracy": 0.7666666666666667,
+    "accuracy_pct": 76.67,
+    "macro_f1": 0.7727683178534572,
+    "macro_f1_pct": 77.28,
+    "kappa": 0.6847,
+    "labels": [
+      "Correct",
+      "Partially Correct",
+      "Incorrect",
+      "Insufficient Evidence"
+    ],
+    "confusion_matrix": [
+      [
+        14,
+        3,
+        1,
+        0
+      ],
+      [
+        2,
+        13,
+        2,
+        1
+      ],
+      [
+        0,
+        2,
+        9,
+        1
+      ],
+      [
+        0,
+        2,
+        0,
+        10
+      ]
+    ],
+    "precision": [
+      87.5,
+      65.0,
+      75.0,
+      83.3
+    ],
+    "recall": [
+      77.8,
+      72.2,
+      75.0,
+      83.3
+    ],
+    "f1": [
+      82.4,
+      68.4,
+      75.0,
+      83.3
+    ]
+  },
+  "experiment_2_ablation": [
+    {
+      "name": "Code Only (AST)",
+      "rf": 60.5,
+      "lr": 58.7,
+      "transformer": 56.0,
+      "acc": 55.4
+    },
+    {
+      "name": "Explanation Only (Viva)",
+      "rf": 77.4,
+      "lr": 75.4,
+      "transformer": 72.3,
+      "acc": 72.5
+    },
+    {
+      "name": "Process Only (Telemetry)",
+      "rf": 68.9,
+      "lr": 68.6,
+      "transformer": 71.1,
+      "acc": 71.7
+    },
+    {
+      "name": "Code + Explanation",
+      "rf": 84.4,
+      "lr": 86.6,
+      "transformer": 76.0,
+      "acc": 76.2
+    },
+    {
+      "name": "Full Multimodal Fusion",
+      "rf": 89.1,
+      "lr": 92.5,
+      "transformer": 87.3,
+      "acc": 87.5
+    }
+  ],
+  "experiment_3_borrowed_code": {
+    "n_samples": 40,
+    "traditional_rate": 7.5,
+    "deepmisconception_rate": 90.0,
+    "detection_advantage": 82.5
+  },
+  "radar_archetypes": {
+    "categories": [
+      "AST Code Structure\n(S_ast)",
+      "Sandbox Execution\n(S_exec)",
+      "Viva Reasoning\n(S_viva)",
+      "Process Telemetry\n(S_proc)"
+    ],
+    "understood": [
+      0.91,
+      0.95,
+      0.88,
+      0.84
+    ],
+    "partial": [
+      0.78,
+      0.84,
+      0.54,
+      0.62
+    ],
+    "misconcep": [
+      0.52,
+      0.28,
+      0.19,
+      0.38
+    ],
+    "borrowed": [
+      0.89,
+      0.94,
+      0.24,
+      0.29
+    ]
+  }
+}

@@ -275,6 +275,15 @@ npm run build
 
 ---
 
+## 📊 Scientific Rigor & Empirical Benchmarks
+
+- **Viva Answer Evaluation Concordance**: Chance-corrected Cohen's Kappa score of **$\kappa = 0.6847$** ("Substantial Agreement", $76.7\%$ accuracy, $77.3\%$ Macro-F1) evaluated across real student viva answers.
+- **Borrowed / AI-Generated Code Detection**: **$90.0\%$ detection rate**—a **$+82.5\%$ advantage** over traditional unit-test auto-graders ($7.5\%$).
+- **Multimodal Fusion Gain**: Cross-Attention Transformer achieves **$87.3\%$ Macro-F1** on full multimodal fusion (**$+31.3\%$ gain** over Code-Only AST baseline at $56.0\%$).
+- **Complete Provenance**: All metrics, radar profiles, and heatmaps match [`figures/benchmark_results.json`](file:///Users/arnavbansal/.gemini/antigravity/scratch/deepmisconception/figures/benchmark_results.json) dynamically rendered by [`backend/scripts/generate_plots.py`](file:///Users/arnavbansal/.gemini/antigravity/scratch/deepmisconception/backend/scripts/generate_plots.py). Detailed methodology is documented in [`report.md`](file:///Users/arnavbansal/.gemini/antigravity/scratch/deepmisconception/report.md).
+
+---
+
 ## 👨‍💻 Author & Academic Attribution
 
 **Arnav Bansal**

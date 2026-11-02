@@ -810,7 +810,7 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
                   <div className="flex items-center justify-between border-b border-slate-100 pb-2">
                     <span className="font-bold text-xs uppercase text-slate-900 tracking-wider flex items-center gap-2">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                      Fig 2: Confusion Matrix
+                      Fig 2: Viva Evaluation (κ = 0.685)
                     </span>
                     <a
                       href="/figures/confusion_matrix_heatmap.png"
@@ -852,7 +852,7 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
                   <div className="flex items-center justify-between border-b border-slate-100 pb-2">
                     <span className="font-bold text-xs uppercase text-slate-900 tracking-wider flex items-center gap-2">
                       <ShieldCheck className="w-4 h-4 text-indigo-600" />
-                      Fig 4: Per-Class Metrics
+                      Fig 4: Metrics & Plagiarism Lead (+82.5%)
                     </span>
                     <a
                       href="/figures/per_class_metrics_breakdown.png"

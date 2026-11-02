@@ -190,20 +190,20 @@ $$Z = [H_{\text{cross}} \,\|\, X_{\text{Proc}}] W_{\text{head}} + b_{\text{head}
 $$\hat{y} = \text{Softmax}(Z)$$
 
 ### 5.3. Empirical Modality Ablation Results
-To scientifically validate the necessity of each modality, an ablation suite evaluates five configurations across standard test sets ($N=180$ students):
+To scientifically validate the necessity of each modality, an ablation suite evaluates five configurations across 5-fold cross-validated benchmark cohorts ($N=240$ student instances):
 
 | Modality Configuration | Active Dimensions | Random Forest (Macro-F1) | Logistic Reg. (Macro-F1) | Cross-Attention Transformer (Macro-F1) |
 |---|---|---|---|---|
-| **Code Only (AST)** | 16-D | 63.8% | 59.2% | 68.5% |
-| **Explanation Only (Viva)** | 16-D | 71.4% | 68.0% | 76.2% |
-| **Process Only (Telemetry)**| 8-D  | 54.1% | 51.5% | 58.0% |
-| **Code + Explanation** | 32-D | 84.7% | 79.5% | 88.1% |
-| **Full Multimodal Fusion** | **40-D** | **91.2%** | **85.3%** | **94.6%** |
+| **Code Only (AST)** | 16-D | 60.5% | 58.7% | 56.0% |
+| **Explanation Only (Viva)** | 16-D | 77.4% | 75.4% | 72.3% |
+| **Process Only (Telemetry)**| 8-D  | 68.9% | 68.6% | 71.1% |
+| **Code + Explanation** | 32-D | 84.4% | 86.6% | 76.0% |
+| **Full Multimodal Fusion** | **40-D** | **89.1%** | **92.5%** | **87.3%** |
 
-**Scientific Takeaway**: Single modalities reach an empirical ceiling between 58% and 76% Macro-F1. Process telemetry alone cannot identify semantic flaws, while code structure alone cannot detect borrowed solutions. **Full multimodal fusion achieves 94.6% Macro-F1**, demonstrating that holistic comprehension diagnosis requires cross-modal synergy.
+**Scientific Takeaway**: Single modalities reach an empirical ceiling between 56% and 77% Macro-F1. Process telemetry alone cannot identify semantic flaws, while code structure alone cannot detect borrowed solutions. **Full multimodal fusion achieves 87.3% Macro-F1 in the Cross-Attention Transformer (a +31.3% gain over the Code-Only AST baseline at 56.0%)** and up to 92.5% with Logistic Regression, demonstrating that holistic comprehension diagnosis requires cross-modal synergy.
 
 ![Figure 1: Empirical Modality Ablation Benchmarks](figures/modality_ablation_comparison.png)
-*Figure 1: Comparative Macro-F1 performance across five modality combinations evaluating Random Forest, Logistic Regression, and the proposed Cross-Attention Transformer ($N=180$ students, stratified test split).*
+*Figure 1: Comparative Macro-F1 performance across five modality combinations evaluating Random Forest, Logistic Regression, and the Cross-Attention Transformer ($N=240$ student instances, 5-fold cross-validated, showing +31.3% multimodal gain over Code-Only AST).*
 
 ---
 
@@ -217,34 +217,36 @@ where:
 - $P_o = \frac{1}{N} \sum_{i=1}^k c_{ii}$ is the observed proportionate agreement.
 - $P_e = \sum_{j=1}^k \left(\frac{R_j}{N} \cdot \frac{C_j}{N}\right)$ is the hypothetical probability of chance agreement based on marginal frequencies.
 
-### 6.2. Empirical Inter-Rater Findings
-Evaluation on the combined institutional review corpus and benchmark cohort ($N \ge 120$) demonstrates:
+### 6.2. Empirical Inter-Rater Concordance on Real Viva Answer Test Corpus ($N=60$)
+Evaluation across 60 real student viva answers against expert human instructor annotations demonstrates substantial concordance:
 
 | Evaluation Metric | Measured Value | Standard Interpretation (Landis & Koch, 1977) |
 |---|---|---|
-| **Cohen's Kappa ($\kappa$)** | **0.812** | **Almost Perfect Agreement** ($0.81 \le \kappa \le 1.00$) |
-| **Observed Agreement ($P_o$)** | **88.3%** | High inter-rater concordance |
-| **Macro-F1 Score** | **90.1%** | Balanced across all three diagnostic classes |
-| **Flagged for Human Review Rate** | **12.5%** | Ambiguous/contradictory cases safely routed to faculty |
+| **Cohen's Kappa ($\kappa$)** | **0.6847** | **Substantial Agreement** ($0.61 \le \kappa \le 0.80$) |
+| **Overall Accuracy ($P_o$)** | **76.7%** | High inter-rater concordance across diverse conceptual topics |
+| **Macro-F1 Score** | **77.3%** | Balanced across all four viva response tiers |
+| **Plagiarism / Borrowed Code Detection** | **90.0%** | +82.5% advantage over traditional unit-test auto-graders (7.5%) |
 
-### 6.3. Empirical 3x3 Confusion Matrix
+### 6.3. Empirical 4x4 Confusion Matrix (Viva Answer Evaluation)
 
 ```
-                     Predicted: Understood   Predicted: Partial   Predicted: Misconception
-Actual: Understood            38                     2                      0
-Actual: Partial                3                    35                      2
-Actual: Misconception          0                     2                     38
+Ground-Truth \ Predicted        Correct    Partially Correct    Incorrect    Insufficient Evidence
+Actual: Correct                    14 (78%)        3 (17%)        1 (6%)               0
+Actual: Partially Correct           2 (11%)       13 (72%)        2 (11%)              1 (6%)
+Actual: Incorrect                   0              2 (17%)        9 (75%)              1 (8%)
+Actual: Insufficient Evidence       0              2 (17%)        0                   10 (83%)
 ```
 
-- **Understood Class**: Precision = 92.7%, Recall = 95.0%, F1 = 93.8%
-- **Partial Understanding**: Precision = 89.7%, Recall = 87.5%, F1 = 88.6%
-- **Possible Misconception**: Precision = 95.0%, Recall = 95.0%, F1 = 95.0%
+- **Correct Class**: Precision = 87.5%, Recall = 77.8%, F1 = 82.4% (Support = 18)
+- **Partially Correct**: Precision = 65.0%, Recall = 72.2%, F1 = 68.4% (Support = 18)
+- **Incorrect**: Precision = 75.0%, Recall = 75.0%, F1 = 75.0% (Support = 12)
+- **Insufficient Evidence**: Precision = 83.3%, Recall = 83.3%, F1 = 83.3% (Support = 12)
 
 ![Figure 2: Empirical Diagnostic Confusion Matrix](figures/confusion_matrix_heatmap.png)
-*Figure 2: Heatmap of observed vs. predicted student diagnoses with normalized cell proportions and Landis-Koch concordance metrics ($\kappa = 0.812$).*
+*Figure 2: Heatmap of observed vs. predicted student viva answer evaluations with normalized cell proportions and Landis-Koch concordance metrics (Accuracy = 76.7%, Cohen's κ = 0.6847, Substantial Agreement).*
 
 ![Figure 4: Diagnostic Reliability Across Student Comprehension Categories](figures/per_class_metrics_breakdown.png)
-*Figure 4: Per-class Precision, Recall, and F1-score breakdown affirming balanced diagnostic fidelity across all three target comprehension tiers.*
+*Figure 4: Two-panel empirical breakdown. Panel (A): Per-class Precision, Recall, and F1-score across all four viva response tiers. Panel (B): Comparative borrowed/AI code detection rate demonstrating DeepMisconception's 90.0% detection rate (+82.5% lead over unit-test auto-graders at 7.5%).*
 
 ---
 

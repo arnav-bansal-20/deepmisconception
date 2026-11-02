@@ -105,51 +105,85 @@ class MockLLMProvider(BaseLLMProvider):
         if ans_marker in prompt.lower():
             student_ans = prompt.lower().split(ans_marker)[-1].strip()
 
-        # Check for empty or vague answers
-        if len(student_ans) < 15 or "idk" in student_ans or "dont know" in student_ans or "not sure" in student_ans:
+        # Check for empty or evasive answers
+        evasive_markers = [
+            "idk", "dont know", "don't know", "not sure", "followed the instructions",
+            "chatgpt", "geeksforgeeks", "guess", "it just works", "i don't remember",
+            "maybe it is", "honestly"
+        ]
+        if len(student_ans) < 15 or any(m in student_ans for m in evasive_markers):
             return {
                 "answer_label": "Insufficient Evidence",
                 "concepts_correct": [],
                 "concepts_missed": ["Incomplete explanation", "No mechanistic reasoning provided"],
                 "contradictions": [],
                 "supporting_evidence": [student_ans],
-                "evaluation_explanation": "The student response is too brief or evasive to demonstrate conceptual comprehension of the referenced code construct.",
+                "evaluation_explanation": "The student response is evasive, non-committal, or lacks mechanistic explanation of the referenced code construct.",
                 "uncertainty_score": 0.85,
                 "needs_instructor_review": True
             }
 
-        # Check for glaring misconception: confusing break with continue
-        if "stops the loop" in student_ans or "ends the loop" in student_ans or "terminates the loop" in student_ans:
-            return {
-                "answer_label": "Incorrect",
-                "concepts_correct": ["Recognizes conditional triggering"],
-                "concepts_missed": ["Distinction between break and continue control flow"],
-                "contradictions": ["Claims continue stops the loop completely, but continue only advances to the next iteration."],
-                "supporting_evidence": [student_ans],
-                "evaluation_explanation": "The student displays a classic control-flow misconception by confusing 'continue' with 'break'. The 'continue' statement skips the remainder of the current iteration, rather than terminating the entire loop.",
-                "uncertainty_score": 0.1,
-                "needs_instructor_review": False
-            }
+        # Check for common programming misconceptions & direct factual contradictions
+        misconception_patterns = [
+            ("stops the loop", "Confuses continue with break / loop termination"),
+            ("ends the loop", "Confuses continue with break / loop termination"),
+            ("terminates the loop", "Confuses continue with break / loop termination"),
+            ("pauses execution", "Misinterprets continue as time delay"),
+            ("quotient", "Confuses modulo % with integer division"),
+            ("automatically detect", "Believes recursion terminates without explicit base case"),
+            ("base case is optional", "Believes recursion terminates without explicit base case"),
+            ("restarts the function", "Misinterprets base case as loop restart"),
+            ("reverses the sorted array", "Misunderstands binary search pointer manipulation"),
+            ("always greater than high", "Misinterprets binary search while loop condition"),
+            ("copy of the list", "Believes Python passes lists by value rather than object reference"),
+            ("untouched", "Fails to recognize in-place mutable object modification"),
+            ("identically regarding in-place mutation", "Believes immutable types behave like mutable lists"),
+            ("includes n + 1", "Fails to understand that range stop bound is exclusive"),
+            ("starts at 1 by default", "Believes range starts at 1 instead of 0"),
+            ("identical lookup speed", "Fails to recognize O(1) hash lookup vs O(n) linear scan"),
+            ("binary search is used inside python sets", "Confuses hash table bucket lookup with binary search")
+        ]
+        for pattern, mis_desc in misconception_patterns:
+            if pattern in student_ans:
+                return {
+                    "answer_label": "Incorrect",
+                    "concepts_correct": ["Recognized focal code region"],
+                    "concepts_missed": [mis_desc],
+                    "contradictions": [f"Student assertion contradicts Python semantics: '{pattern}'."],
+                    "supporting_evidence": [student_ans],
+                    "evaluation_explanation": f"The student displays an active programming misconception: {mis_desc}.",
+                    "uncertainty_score": 0.1,
+                    "needs_instructor_review": False
+                }
 
-        # Check for partial answer
-        if "skips" in student_ans and not ("multiple" in student_ans or "remainder" in student_ans or "divisib" in student_ans):
+        # Check for partial answer (surface level explanation lacking deep invariants)
+        partial_markers = [
+            "skips numbers", "skips adding", "skips the calculation", "stops the function",
+            "return early", "small", "shifts the search", "moves the low pointer", "cuts the array",
+            "changes the list", "keeps the new item", "goes from 1 to n", "reaches n",
+            "counts up to n", "faster for checking", "fast because it's a set", "set lookup is faster"
+        ]
+        if any(pm in student_ans for pm in partial_markers) or len(student_ans) < 95:
             return {
                 "answer_label": "Partially Correct",
-                "concepts_correct": ["Understands that continue skips execution"],
-                "concepts_missed": ["Did not articulate that the modulo condition % 3 filters multiples of 3"],
+                "concepts_correct": ["Understands high-level functional purpose of construct"],
+                "concepts_missed": ["Omitted formal algorithmic invariant or boundary condition"],
                 "contradictions": [],
                 "supporting_evidence": [student_ans],
-                "evaluation_explanation": "The student correctly understands that the continue statement skips code execution, but omitted an explanation of why the modulo operation (% 3 == 0) isolates multiples of 3.",
-                "uncertainty_score": 0.3,
+                "evaluation_explanation": "The student correctly understands the overarching intent of the code, but provides an incomplete explanation lacking precise boundary conditions or state invariants.",
+                "uncertainty_score": 0.25,
                 "needs_instructor_review": False
             }
 
-        # Check for relevant programming concept keywords
+        # Check for relevant programming concept keywords across all CS1/CS2 topics
         relevant_keywords = [
             "continue", "skip", "modulo", "remainder", "multiple", "divisib", 
             "accumulat", "total", "reset", "loop", "iteration", "range", 
-            "bound", "inclusive", "off-by-one", "condition", "invariant",
-            "preserve", "overwrite", "scope", "step"
+            "bound", "inclusive", "exclusive", "off-by-one", "condition", "invariant",
+            "preserve", "overwrite", "scope", "step", "recursion", "base case", "call stack",
+            "unwind", "overflow", "binary search", "pointer", "half", "sorted", "mutable",
+            "immutable", "reference", "in-place", "hash", "set", "dictionary", "o(1)", "o(n)",
+            "constant", "linear"
         ]
         has_relevant_concept = any(kw in student_ans for kw in relevant_keywords)
 
@@ -168,19 +202,19 @@ class MockLLMProvider(BaseLLMProvider):
                 "needs_instructor_review": True
             }
 
-        # Standard correct answer when relevant concepts are present
+        # Standard correct answer when relevant concepts are present with mechanistic detail
         return {
             "answer_label": "Correct",
             "concepts_correct": [
-                "Identified condition filters multiples of 3 via modulo remainder",
-                "Explained that continue skips the accumulator step for that cycle",
-                "Accurately tracked execution invariant"
+                "Accurately articulated core language semantics and runtime mechanics",
+                "Correctly tracked state transformation and execution invariants",
+                "Identified operational boundary conditions without contradiction"
             ],
             "concepts_missed": [],
             "contradictions": [],
             "supporting_evidence": [student_ans[:120]],
-            "evaluation_explanation": "The student explanation accurately articulates the mathematical modulo condition, the control-flow mechanism of the continue statement, and its impact on the accumulator variable.",
-            "uncertainty_score": 0.1,
+            "evaluation_explanation": "The student demonstrates sound conceptual comprehension with accurate mechanistic reasoning consistent with actual execution behavior.",
+            "uncertainty_score": 0.05,
             "needs_instructor_review": False
         }
 

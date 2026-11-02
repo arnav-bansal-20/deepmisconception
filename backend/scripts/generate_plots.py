@@ -282,3 +282,4 @@ if __name__ == "__main__":
     plot_radar_profiles()
     plot_per_class_metrics()
     print("All plots successfully generated in figures/ and frontend/public/figures/!")
+

@@ -1,18 +1,29 @@
 """Isolated and resource-bounded Python code execution sandbox.
 
 Executes student code strictly outside the main API process using isolated
-subprocesses with strict CPU limits, memory limits, output caps, and dangerous
-API restrictions.
+subprocesses with strict CPU limits, memory limits, output caps, sanitized
+environments, and dangerous API restrictions.
+
+SECURITY NOTICE:
+Subprocess isolation with POSIX resource limits and clean environment sanitization
+provides practical resource-bounding and basic containment for introductory programming
+environments. It is NOT equivalent to a hardened OS-level hypervisor or container sandbox
+(such as gVisor, Firecracker, or isolated ephemeral Docker containers). It should not be
+represented as fully secure against arbitrary adversarial exploits without external containerization.
 """
 import sys
 import os
 import time
+import signal
+import logging
 import subprocess
 import tempfile
 import resource
 from typing import Optional, Dict, Any
 from app.config import settings
 from app.schemas.submission import CodeRunResponse
+
+logger = logging.getLogger(__name__)
 
 
 class SafeExecutor:
@@ -29,17 +40,36 @@ class SafeExecutor:
         self.max_output_bytes = max_output_bytes
         self.sandbox_enabled = settings.safe_sandbox_enabled
 
+    @staticmethod
+    def get_sanitized_env() -> Dict[str, str]:
+        """Construct a minimal clean environment containing only essential system variables.
+        
+        Strictly excludes API keys, secrets, database credentials, tokens, or unrelated host configuration.
+        """
+        clean_env = {
+            "PATH": os.environ.get("PATH", "/usr/bin:/bin:/usr/local/bin:/opt/homebrew/bin"),
+            "LANG": "en_US.UTF-8",
+            "LC_ALL": "en_US.UTF-8",
+            "PYTHONIOENCODING": "utf-8",
+        }
+        if os.name == "nt":
+            for k in ("SYSTEMROOT", "WINDIR", "PATHEXT", "TEMP", "TMP"):
+                if k in os.environ:
+                    clean_env[k] = os.environ[k]
+        return clean_env
+
     def execute(self, code: str) -> CodeRunResponse:
         """Run student code in a sandboxed child process and capture results."""
         if not self.sandbox_enabled:
             return CodeRunResponse(
                 success=False,
                 stdout="",
-                stderr="Code execution is disabled by server security policy.",
+                stderr="Code execution is disabled by server security policy. Static AST analysis remains fully operational.",
                 exit_code=-1,
                 execution_time_ms=0.0,
                 sandbox_used=False,
-                error_type="SandboxDisabled"
+                error_type="SandboxDisabled",
+                static_analysis_only=True,
             )
 
         start_time = time.perf_counter()
@@ -53,8 +83,15 @@ class SafeExecutor:
                 f.write(sandboxed_code)
                 temp_file = f.name
 
-            # Pre-exec resource limiter for Unix/macOS child process
+            clean_env = self.get_sanitized_env()
+
+            # Pre-exec resource limiter and process group session for Unix/macOS child process
             def set_limits():
+                if os.name != "nt":
+                    try:
+                        os.setsid()
+                    except Exception:
+                        pass
                 # CPU time limit in seconds
                 cpu_limit = max(1, int(self.timeout_seconds) + 1)
                 try:
@@ -78,6 +115,7 @@ class SafeExecutor:
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True,
+                env=clean_env,
                 preexec_fn=set_limits if os.name != "nt" else None
             )
 
@@ -104,16 +142,35 @@ class SafeExecutor:
                     exit_code=proc.returncode,
                     execution_time_ms=round(elapsed_ms, 2),
                     sandbox_used=True,
-                    error_type=error_type
+                    error_type=error_type,
+                    static_analysis_only=False,
                 )
 
             except subprocess.TimeoutExpired:
-                # Forcefully terminate child process immediately
-                proc.kill()
+                # Forcefully terminate the entire process group
+                if os.name != "nt":
+                    try:
+                        pgid = os.getpgid(proc.pid)
+                        os.killpg(pgid, signal.SIGKILL)
+                    except ProcessLookupError:
+                        pass
+                    except Exception as e:
+                        logger.warning(f"Failed to killpg for pid {proc.pid}: {e}")
+                        try:
+                            proc.kill()
+                        except Exception:
+                            pass
+                else:
+                    try:
+                        proc.kill()
+                    except Exception:
+                        pass
+
                 try:
                     proc.communicate(timeout=0.5)
                 except Exception:
                     pass
+
                 elapsed_ms = (time.perf_counter() - start_time) * 1000.0
                 return CodeRunResponse(
                     success=False,
@@ -126,7 +183,8 @@ class SafeExecutor:
                     exit_code=124,
                     execution_time_ms=round(elapsed_ms, 2),
                     sandbox_used=True,
-                    error_type="TimeoutError"
+                    error_type="TimeoutError",
+                    static_analysis_only=False,
                 )
 
         except Exception as e:
@@ -138,7 +196,8 @@ class SafeExecutor:
                 exit_code=-1,
                 execution_time_ms=round(elapsed_ms, 2),
                 sandbox_used=True,
-                error_type="SystemError"
+                error_type="SystemError",
+                static_analysis_only=False,
             )
 
         finally:

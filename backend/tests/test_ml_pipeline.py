@@ -141,3 +141,59 @@ def test_ml_api_endpoints():
     assert "confidence" in pred
     assert "class_probabilities" in pred
     assert pred["feature_dimensions"]["total_dim"] == 40
+
+
+def test_pytorch_transformer_checkpoints_and_missing_modality(tmp_path):
+    """Verify PyTorch model checkpoint saving/loading and missing modality robustness."""
+    import os
+    from app.ml.multimodal_transformer import MultimodalCrossAttentionFusion
+
+    model = MultimodalCrossAttentionFusion(seed=123)
+    X = np.random.randn(20, 40).astype(np.float32)
+    y = np.random.randint(0, 3, size=20)
+
+    # Train briefly
+    train_res = model.fit(X, y, epochs=5, lr=0.01)
+    assert train_res["framework"] == "PyTorch"
+    assert model.is_trained is True
+
+    # Save checkpoint
+    chk_path = str(tmp_path / "model_chk.pt")
+    model.save_checkpoint(chk_path)
+    assert os.path.exists(chk_path)
+
+    # Load into fresh model
+    new_model = MultimodalCrossAttentionFusion(seed=999)
+    assert new_model.is_trained is False
+    new_model.load_checkpoint(chk_path)
+    assert new_model.is_trained is True
+
+    # Missing modality test (process slice is completely zeroed out)
+    X_missing_proc = X.copy()
+    X_missing_proc[:, 32:40] = 0.0
+    probs = new_model.predict_proba(X_missing_proc)
+    assert probs.shape == (20, 3)
+    assert np.allclose(probs.sum(axis=-1), 1.0, atol=1e-5)
+
+
+def test_student_level_split_zero_leakage():
+    """Verify student-grouped data split strictly prevents cross-session leakage."""
+    X, y, records = BenchmarkDatasetGenerator.generate(n_samples=120, seed=42)
+    X_train, X_test, y_train, y_test, rec_train, rec_test = BenchmarkDatasetGenerator.split_by_student(
+        X, y, records, test_size=0.3, seed=42
+    )
+
+    train_students = {r["student_id"] for r in rec_train}
+    test_students = {r["student_id"] for r in rec_test}
+
+    # Strict assertion: zero cross-student contamination across train and test sets
+    overlap = train_students.intersection(test_students)
+    assert len(overlap) == 0, f"Found leaking students between train and test: {overlap}"
+    assert len(train_students) > 0
+    assert len(test_students) > 0
+
+    # Verify metadata integrity
+    metadata = BenchmarkDatasetGenerator.get_metadata(120)
+    assert metadata["is_synthetic"] is True
+    assert metadata["dataset_type"] == "synthetic_benchmark"
+    assert "Notice: This dataset contains mathematically synthesized" in metadata["disclaimer"]

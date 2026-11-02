@@ -1,0 +1,12 @@
+# Optional Machine Learning & Deep Learning Dependencies for DeepMisconception
+# Install with: pip install -r requirements-ml.txt
+#
+# The base DeepMisconception platform (FastAPI, SQLite, AST Analysis, Dynamic Viva,
+# and Process Telemetry) runs without these large dependencies.
+# Install these when hardware acceleration and local transformer embeddings are enabled.
+
+torch>=2.0.0
+transformers>=4.40.0
+sentence-transformers>=2.7.0
+accelerate>=0.28.0
+

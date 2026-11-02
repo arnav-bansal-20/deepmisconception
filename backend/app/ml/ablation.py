@@ -46,10 +46,10 @@ class AblationRunner:
         test_size: float = 0.25,
         seed: int = 42,
     ) -> Dict[str, Any]:
-        """Run complete ablation matrix across all modality configurations."""
-        X, y, _ = BenchmarkDatasetGenerator.generate(n_samples=n_samples, seed=seed)
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=test_size, random_state=seed, stratify=y
+        """Run complete ablation matrix across all modality configurations with zero cross-student leakage."""
+        X, y, records = BenchmarkDatasetGenerator.generate(n_samples=n_samples, seed=seed)
+        X_train, X_test, y_train, y_test, _, _ = BenchmarkDatasetGenerator.split_by_student(
+            X, y, records, test_size=test_size, seed=seed
         )
 
         configs = [
@@ -78,7 +78,7 @@ class AblationRunner:
 
             # 3. Multimodal Cross-Attention Transformer
             transformer = MultimodalCrossAttentionFusion(seed=seed)
-            transformer.fit(X_tr_masked, y_train, epochs=35, lr=0.03)
+            transformer.fit(X_tr_masked, y_train, epochs=25, lr=0.005)
             tf_eval = transformer.evaluate(X_te_masked, y_test)
 
             results.append({
@@ -99,8 +99,14 @@ class AblationRunner:
                 },
             })
 
+        metadata = BenchmarkDatasetGenerator.get_metadata(n_samples)
         return {
+            "is_synthetic": True,
+            "dataset_type": metadata["dataset_type"],
+            "disclaimer": metadata["disclaimer"],
+            "split_method": "student_level_group_split (zero cross-student leakage)",
             "n_samples": n_samples,
+            "train_samples": len(X_train),
             "test_samples": len(X_test),
             "modalities_evaluated": len(configs),
             "results": results,

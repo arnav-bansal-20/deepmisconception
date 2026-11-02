@@ -25,6 +25,7 @@ class CodeRunResponse(BaseModel):
     execution_time_ms: float = 0.0
     sandbox_used: bool = True
     error_type: Optional[str] = None
+    static_analysis_only: bool = False
 
 
 class CodeSubmissionResponse(BaseModel):

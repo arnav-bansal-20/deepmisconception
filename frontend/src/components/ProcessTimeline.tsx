@@ -84,15 +84,13 @@ export const ProcessTimeline: React.FC<ProcessTimelineProps> = ({
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
           <div className="text-[10px] font-mono uppercase text-slate-500 flex items-center gap-1 mb-1 font-bold">
-            <Clipboard className="w-3 h-3 text-amber-600" />
-            <span>Paste Ratio</span>
+            <Clipboard className="w-3 h-3 text-sky-600" />
+            <span>Editing Activity</span>
           </div>
-          <div className={`text-lg font-bold font-mono ${
-            pastePct > 50 ? 'text-rose-600' : pastePct > 25 ? 'text-amber-600' : 'text-emerald-700'
-          }`}>
-            {pastePct}%
+          <div className="text-lg font-bold font-mono text-slate-900">
+            {pastePct}% <span className="text-xs font-normal text-slate-500">external</span>
           </div>
-          <div className="text-[10px] text-slate-400 mt-0.5">{features.total_chars_pasted} pasted chars</div>
+          <div className="text-[10px] text-slate-400 mt-0.5">{features.total_chars_pasted} external / {features.total_events} events</div>
         </div>
 
         <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">

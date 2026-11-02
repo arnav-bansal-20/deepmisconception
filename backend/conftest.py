@@ -39,3 +39,4 @@ def setup_test_db():
     yield
     app.dependency_overrides.pop(get_db, None)
     Base.metadata.drop_all(bind=test_engine)
+

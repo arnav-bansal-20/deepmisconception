@@ -13,6 +13,7 @@ import {
   AblationStudyResponse,
   MLPredictionResponse,
   InterRaterMetricsResponse,
+  MLStatusResponse,
 } from '../types';
 
 const API_BASE = '/api';
@@ -253,4 +254,6 @@ export const api = {
     const qs = q.toString() ? `?${q.toString()}` : '';
     return request<InterRaterMetricsResponse>(`/instructor/evaluation-metrics${qs}`);
   },
+
+  getMLStatus: () => request<MLStatusResponse>('/ml/status'),
 };

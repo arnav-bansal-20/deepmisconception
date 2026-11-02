@@ -79,10 +79,35 @@ class AnswerEvaluator:
                 needs_instructor_review=True,
             )
 
+        # Detect off-topic responses
+        off_topic_indicators = ["weather", "pizza", "movie", "song", "vacation", "football", "baseball", "cat", "dog"]
+        code_words = set(re.findall(r"\w+", (submitted_code + " " + (focal_code or "") + " " + question_text).lower()))
+        ans_words = set(re.findall(r"\w+", clean_ans.lower()))
+        common_words = {"the", "a", "an", "is", "it", "to", "in", "of", "and", "or", "for", "with", "this", "that", "i", "my", "we"}
+        domain_overlap = (ans_words & code_words) - common_words
+        if any(w in clean_ans.lower() for w in off_topic_indicators) and len(domain_overlap) == 0:
+            return EvaluationResult(
+                answer_label="Insufficient Evidence",
+                expected_reasoning=expected_reasoning or "Clear conceptual explanation required.",
+                concepts_correct=[],
+                concepts_missed=["Response is off-topic and does not address the question"],
+                contradictions=[],
+                supporting_evidence=[clean_ans[:100]],
+                evaluation_explanation="The student response appears off-topic and fails to discuss the code logic or targeted concept.",
+                uncertainty_score=0.90,
+                needs_instructor_review=True,
+            )
+
         # --- Stage 2: Code & Execution Fact-Checking ---
         contradictions = self._detect_code_contradictions(
             clean_ans, focal_code, submitted_code, execution_output
         )
+        llm_discrepancy = self._detect_llm_execution_discrepancy(
+            expected_reasoning, execution_output
+        )
+
+        # Check if execution output was unavailable
+        execution_unavailable = not execution_output or not execution_output.strip()
 
         # --- Stage 3: Semantic LLM Evaluation ---
         system_instruction = (
@@ -138,6 +163,17 @@ class AnswerEvaluator:
                 if c not in c_contradictions:
                     c_contradictions.append(c)
 
+            # If LLM expected reasoning contradicts physical sandbox execution, flag it and prioritize reality
+            if llm_discrepancy:
+                needs_review = True
+                evidence.append(llm_discrepancy)
+                explanation += f" Note: {llm_discrepancy} Sandbox execution reality takes precedence."
+
+            # If execution trace was unavailable, record explicit uncertainty
+            if execution_unavailable:
+                uncertainty = max(uncertainty, 0.40)
+                explanation += " Note: Program execution output was unavailable; evaluated using static structure and rubric."
+
             # If contradictions exist, cannot be fully Correct
             if c_contradictions and label == "Correct":
                 label = "Incorrect"
@@ -162,7 +198,30 @@ class AnswerEvaluator:
         except Exception as e:
             logger.error(f"Error during LLM answer evaluation: {e}")
             # Fallback deterministic evaluation
-            return self._fallback_evaluation(clean_ans, concept, expected_reasoning, contradictions)
+            return self._fallback_evaluation(
+                clean_ans, concept, expected_reasoning, contradictions, execution_unavailable, llm_discrepancy
+            )
+
+    def _detect_llm_execution_discrepancy(
+        self,
+        expected_reasoning: Optional[str],
+        execution_output: Optional[str]
+    ) -> Optional[str]:
+        """Detect when LLM-generated expected reasoning conflicts with sandbox execution reality."""
+        if not expected_reasoning or not execution_output:
+            return None
+        match = re.search(r"computed total:\s*(\d+)", execution_output.lower())
+        if match:
+            verified_num = match.group(1)
+            exp_nums = re.findall(r"outputs?\s+(\d+)|returns?\s+(\d+)|result is\s+(\d+)", expected_reasoning.lower())
+            for groups in exp_nums:
+                for num in groups:
+                    if num and num != verified_num and abs(int(num) - int(verified_num)) > 5:
+                        return (
+                            f"LLM expected reasoning claimed output {num}, "
+                            f"but verified sandbox execution produced {verified_num}."
+                        )
+        return None
 
     def _detect_code_contradictions(
         self,
@@ -210,10 +269,18 @@ class AnswerEvaluator:
         student_answer: str,
         concept: str,
         expected_reasoning: Optional[str],
-        contradictions: List[str]
+        contradictions: List[str],
+        execution_unavailable: bool = False,
+        llm_discrepancy: Optional[str] = None,
     ) -> EvaluationResult:
         """Deterministic rule-based fallback when external provider fails."""
         ans_lower = student_answer.lower()
+        evidence = [student_answer[:80]]
+        uncertainty = 0.45
+        if execution_unavailable:
+            uncertainty = max(uncertainty, 0.40)
+        if llm_discrepancy:
+            evidence.append(llm_discrepancy)
 
         if contradictions:
             return EvaluationResult(
@@ -222,7 +289,7 @@ class AnswerEvaluator:
                 concepts_correct=[],
                 concepts_missed=["Control flow and execution invariants"],
                 contradictions=contradictions,
-                supporting_evidence=[student_answer[:80]],
+                supporting_evidence=evidence,
                 evaluation_explanation="The student answer directly conflicts with verified code behavior.",
                 uncertainty_score=0.2,
                 needs_instructor_review=False,
@@ -234,8 +301,8 @@ class AnswerEvaluator:
             concepts_correct=["Provided explanatory text related to the concept"],
             concepts_missed=["Deep mechanistic trace verification required"],
             contradictions=[],
-            supporting_evidence=[student_answer[:80]],
+            supporting_evidence=evidence,
             evaluation_explanation="Response demonstrates partial awareness of the code section. Marked for instructor review.",
-            uncertainty_score=0.45,
+            uncertainty_score=uncertainty,
             needs_instructor_review=True,
         )

@@ -20,6 +20,51 @@ router = APIRouter(prefix="/ml", tags=["Machine Learning"])
 _model_instance = MultimodalCrossAttentionFusion(seed=42)
 
 
+@router.get("/status")
+def get_ml_status() -> Dict[str, Any]:
+    """Expose explicit ML model availability, device acceleration, and training status."""
+    from app.ml.codebert_embedder import CodeBERTEmbedder, get_optimal_device
+    from app.ml.sentence_transformer_embedder import SentenceTransformerEmbedder
+    from app.ml.multimodal_transformer import TORCH_AVAILABLE
+
+    codebert_stat = CodeBERTEmbedder.get_status()
+    st_stat = SentenceTransformerEmbedder.get_status()
+    device = get_optimal_device()
+
+    return {
+        "status": "healthy",
+        "pytorch_available": TORCH_AVAILABLE,
+        "compute_device": device,
+        "models": {
+            "codebert": {
+                "name": codebert_stat["model_name"],
+                "is_available": codebert_stat["is_available"],
+                "status": codebert_stat["status"],
+                "device": codebert_stat["device"],
+                "dimension": codebert_stat["dimension"],
+                "fallback_feature": "AST structural representation" if not codebert_stat["is_available"] else None,
+            },
+            "sentence_transformer": {
+                "name": st_stat["model_name"],
+                "is_available": st_stat["is_available"],
+                "status": st_stat["status"],
+                "device": st_stat["device"],
+                "dimension": st_stat["dimension"],
+                "fallback_feature": "Rubric semantic score" if not st_stat["is_available"] else None,
+            },
+            "multimodal_transformer": {
+                "name": _model_instance.model_name,
+                "framework": _model_instance.model_framework,
+                "is_available": TORCH_AVAILABLE,
+                "is_trained": _model_instance.is_trained,
+                "device": str(_model_instance.device),
+                "num_classes": _model_instance.num_classes,
+                "class_labels": ["Understood", "Partial Understanding", "Possible Misconception"],
+            },
+        },
+    }
+
+
 @router.get("/ablation")
 def get_ablation_benchmarks(
     samples: int = Query(180, ge=30, le=600, description="Number of synthetic student samples"),

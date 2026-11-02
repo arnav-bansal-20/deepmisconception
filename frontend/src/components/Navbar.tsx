@@ -12,6 +12,7 @@ import {
   Cpu
 } from 'lucide-react';
 import { CodingSession, AuthUser } from '../types';
+import { MLHealthStatusPill } from './MLHealthStatusPill';
 
 export type ActiveTab = 'landing' | 'workspace' | 'viva' | 'assessment' | 'history' | 'instructor';
 
@@ -110,6 +111,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Right Session & User Profile Controls */}
         <div className="flex items-center gap-3">
+          <MLHealthStatusPill />
           {currentUser && (
             <div className={`flex items-center gap-2 px-3 py-1 rounded-full border text-xs ${
               isTeacher 

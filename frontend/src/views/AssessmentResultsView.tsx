@@ -4,6 +4,7 @@ import {
   CheckCircle2, 
   AlertTriangle, 
   XCircle, 
+  HelpCircle,
   ShieldCheck, 
   Activity, 
   Brain, 
@@ -152,10 +153,13 @@ export const AssessmentResultsView: React.FC<AssessmentResultsViewProps> = ({
                   ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
                   : verdict === 'Partial Understanding'
                   ? 'bg-amber-50 text-amber-800 border-amber-300'
+                  : verdict === 'Pending / Insufficient Evidence'
+                  ? 'bg-slate-100 text-slate-800 border-slate-300'
                   : 'bg-rose-50 text-rose-800 border-rose-300'
               }`}>
                 {verdict === 'Understood' && <CheckCircle2 className="w-5 h-5 text-emerald-600" />}
                 {verdict === 'Partial Understanding' && <AlertTriangle className="w-5 h-5 text-amber-600" />}
+                {verdict === 'Pending / Insufficient Evidence' && <HelpCircle className="w-5 h-5 text-slate-600" />}
                 {verdict === 'Possible Misconception' && <XCircle className="w-5 h-5 text-rose-600" />}
                 <span>{verdict}</span>
               </div>
@@ -256,15 +260,15 @@ export const AssessmentResultsView: React.FC<AssessmentResultsViewProps> = ({
                 <Activity className="w-3.5 h-3.5 text-teal-600" />
                 <span>Process Rhythm</span>
               </span>
-              <span className="font-mono font-bold text-teal-700">{Math.round(scores.process_authenticity_score * 100)}%</span>
+              <span className="font-mono font-bold text-teal-700">{Math.round((scores.process_rhythm_score ?? scores.process_authenticity_score ?? 0.85) * 100)}%</span>
             </div>
             <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
               <div 
                 className="h-full bg-teal-500 rounded-full transition-all duration-500" 
-                style={{ width: `${scores.process_authenticity_score * 100}%` }}
+                style={{ width: `${(scores.process_rhythm_score ?? scores.process_authenticity_score ?? 0.85) * 100}%` }}
               />
             </div>
-            <p className="text-[10px] text-slate-500">Incremental typing pace, error recovery</p>
+            <p className="text-[10px] text-slate-500">Problem-solving rhythm, error recovery pace</p>
           </div>
         </div>
       </div>

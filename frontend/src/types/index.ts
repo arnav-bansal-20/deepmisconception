@@ -213,7 +213,7 @@ export interface AnswerAssessment {
 export interface ComprehensionReport {
   id: string;
   session_id: string;
-  overall_label: 'Understood' | 'Partial Understanding' | 'Possible Misconception';
+  overall_label: 'Understood' | 'Partial Understanding' | 'Possible Misconception' | 'Pending / Insufficient Evidence';
   confidence_score: number;
   evidence_summary: string;
   evidence_breakdown?: Record<string, any> | null;
@@ -317,4 +317,29 @@ export interface InterRaterMetricsResponse {
     benchmark_samples: number;
   };
   classes: string[];
+}
+
+export interface MLModelDetail {
+  name: string;
+  is_available: boolean;
+  status: string;
+  device?: string | null;
+  dimension?: number;
+  fallback_feature?: string | null;
+  framework?: string;
+  is_trained?: boolean;
+}
+
+export interface MLStatusResponse {
+  status: string;
+  pytorch_available: boolean;
+  compute_device: string;
+  models: {
+    codebert: MLModelDetail;
+    sentence_transformer: MLModelDetail;
+    multimodal_transformer: MLModelDetail & {
+      num_classes: number;
+      class_labels: string[];
+    };
+  };
 }

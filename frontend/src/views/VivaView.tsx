@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { RefreshCw, AlertCircle, ArrowRight } from 'lucide-react';
+import { RefreshCw, AlertCircle, ArrowRight, Sparkles } from 'lucide-react';
 import { VivaInterface } from '../components/VivaInterface';
 import { CodingSession, VivaQuestion } from '../types';
 import { api } from '../services/api';
@@ -16,6 +16,7 @@ export const VivaView: React.FC<VivaViewProps> = ({
   const [questions, setQuestions] = useState<VivaQuestion[]>([]);
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -32,6 +33,21 @@ export const VivaView: React.FC<VivaViewProps> = ({
       setError(err.message || 'Failed to load viva questions.');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleRegenerateQuestions = async () => {
+    if (!session) return;
+    setIsGenerating(true);
+    setError(null);
+    try {
+      const newQs = await api.generateVivaQuestions(session.id);
+      setQuestions(newQs);
+      setActiveQuestionIndex(0);
+    } catch (err: any) {
+      setError(err.message || 'Failed to generate dynamic AI questions. Make sure code has been submitted.');
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -105,10 +121,20 @@ export const VivaView: React.FC<VivaViewProps> = ({
 
         <div className="flex items-center gap-3">
           <button
+            onClick={handleRegenerateQuestions}
+            disabled={isLoading || isGenerating}
+            className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-sky-50 to-indigo-50 hover:from-sky-100 hover:to-indigo-100 text-sky-800 border border-sky-300 transition-all text-xs font-bold flex items-center gap-1.5 shadow-sm"
+            title="Dynamically generate brand-new AI viva questions tailored to your current code submission"
+          >
+            <Sparkles className={`w-3.5 h-3.5 text-sky-600 ${isGenerating ? 'animate-spin' : ''}`} />
+            <span>{isGenerating ? 'Synthesizing with AI...' : 'Regenerate Questions (AI)'}</span>
+          </button>
+
+          <button
             onClick={fetchQuestions}
-            disabled={isLoading}
+            disabled={isLoading || isGenerating}
             className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-colors text-xs font-medium flex items-center gap-1.5"
-            title="Refresh questions"
+            title="Refresh questions list"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
             <span className="hidden sm:inline">Refresh</span>
@@ -158,6 +184,8 @@ export const VivaView: React.FC<VivaViewProps> = ({
         onSelectQuestion={setActiveQuestionIndex}
         onSubmitAnswer={handleSubmitAnswer}
         isSubmittingAnswer={isSubmitting}
+        onRegenerateQuestions={handleRegenerateQuestions}
+        isGeneratingQuestions={isGenerating}
       />
     </div>
   );

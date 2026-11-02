@@ -61,3 +61,33 @@ while count > 0:
 
     assert len(questions) >= 1
     assert questions[0].question_text != ""
+
+
+def test_dynamic_code_grounded_questions_for_arbitrary_code():
+    """Verify that different student programs dynamically produce questions tailored to their constructs."""
+    code_prime = """def check_prime(num):
+    if num <= 1:
+        return False
+    for i in range(2, int(num ** 0.5) + 1):
+        if num % i == 0:
+            return False
+    return True
+"""
+    analyzer = ASTAnalyzer(code_prime)
+    ast_result = analyzer.analyze()
+    generator = QuestionGenerator(provider=MockLLMProvider())
+    questions = generator.generate_questions(
+        code=code_prime,
+        ast_result=ast_result,
+        execution_output="check_prime(17) -> True",
+        count=3
+    )
+
+    assert len(questions) >= 1
+    # Ensure questions are NOT hard-coded accumulator questions
+    all_texts = " ".join(q.question_text.lower() for q in questions)
+    assert "sum_of_squares" not in all_texts
+    # Must reference the student's actual function or constructs
+    assert any("check_prime" in q.question_text or "loop" in q.question_text or "line" in q.question_text for q in questions)
+    assert any(q.focal_code and ("check_prime" in q.focal_code or "range" in q.focal_code or "num" in q.focal_code) for q in questions)
+

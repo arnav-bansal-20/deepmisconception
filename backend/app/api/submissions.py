@@ -50,12 +50,28 @@ def submit_code(sub_in: CodeSubmissionCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(submission)
 
-    # Auto-generate viva questions if none exist yet for this session
+    # Auto-generate dynamic code-grounded viva questions for this submission
     from app.models.viva_question import VivaQuestion
+    from app.models.answer_assessment import AnswerAssessment
     from app.services.question_generator import QuestionGenerator
-    existing_q_count = db.query(VivaQuestion).filter(VivaQuestion.session_id == session.id).count()
-    if existing_q_count == 0 and ast_result.is_syntax_valid:
+
+    if ast_result.is_syntax_valid:
         try:
+            # Clean up previous unanswered questions in this session so the student
+            # is questioned specifically on the freshly submitted code snapshot.
+            answered_q_ids = [
+                row[0] for row in db.query(AnswerAssessment.question_id).filter(AnswerAssessment.session_id == session.id).all()
+            ]
+            unanswered_qs = (
+                db.query(VivaQuestion)
+                .filter(VivaQuestion.session_id == session.id)
+                .filter(~VivaQuestion.id.in_(answered_q_ids))
+                .all()
+            )
+            for old_q in unanswered_qs:
+                db.delete(old_q)
+            db.flush()
+
             q_gen = QuestionGenerator()
             qs = q_gen.generate_questions(
                 code=submission.code,
@@ -77,8 +93,10 @@ def submit_code(sub_in: CodeSubmissionCreate, db: Session = Depends(get_db)):
                 ))
             db.commit()
         except Exception as e:
-            # Question generation error should not fail submission save
-            pass
+            # Log question generation warning without breaking submission persistence
+            import logging
+            logging.getLogger(__name__).warning(f"Could not auto-generate viva questions for submission {submission.id}: {e}")
+            db.rollback()
 
     return submission
 

@@ -49,6 +49,20 @@ def generate_viva_questions(req: VivaGenerateRequest, db: Session = Depends(get_
         analyzer = ASTAnalyzer(submission.code)
         ast_result = analyzer.analyze()
 
+    # Clean up previous unanswered questions for this session to ensure clean regeneration
+    answered_q_ids = [
+        row[0] for row in db.query(AnswerAssessment.question_id).filter(AnswerAssessment.session_id == session.id).all()
+    ]
+    unanswered_qs = (
+        db.query(VivaQuestion)
+        .filter(VivaQuestion.session_id == session.id)
+        .filter(~VivaQuestion.id.in_(answered_q_ids))
+        .all()
+    )
+    for old_q in unanswered_qs:
+        db.delete(old_q)
+    db.flush()
+
     generator = QuestionGenerator()
     generated = generator.generate_questions(
         code=submission.code,

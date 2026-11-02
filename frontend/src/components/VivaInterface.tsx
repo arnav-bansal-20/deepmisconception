@@ -7,7 +7,8 @@ import {
   AlertCircle, 
   FileCode, 
   BrainCircuit, 
-  ShieldAlert
+  ShieldAlert,
+  Sparkles
 } from 'lucide-react';
 import { VivaQuestion } from '../types';
 
@@ -17,6 +18,8 @@ interface VivaInterfaceProps {
   onSelectQuestion: (index: number) => void;
   onSubmitAnswer: (questionId: string, answerText: string) => Promise<void>;
   isSubmittingAnswer: boolean;
+  onRegenerateQuestions?: () => void;
+  isGeneratingQuestions?: boolean;
 }
 
 export const VivaInterface: React.FC<VivaInterfaceProps> = ({
@@ -25,6 +28,8 @@ export const VivaInterface: React.FC<VivaInterfaceProps> = ({
   onSelectQuestion,
   onSubmitAnswer,
   isSubmittingAnswer,
+  onRegenerateQuestions,
+  isGeneratingQuestions = false,
 }) => {
   const [answerInput, setAnswerInput] = useState('');
   const activeQuestion = questions[activeQuestionIndex];
@@ -42,10 +47,20 @@ export const VivaInterface: React.FC<VivaInterfaceProps> = ({
         <div className="w-16 h-16 rounded-2xl bg-sky-50 border border-sky-200 flex items-center justify-center text-sky-600 mb-4 shadow-sm">
           <BrainCircuit className="w-8 h-8" />
         </div>
-        <h3 className="text-xl font-bold text-slate-900 mb-2">No Viva Questions Generated Yet</h3>
+        <h3 className="text-xl font-bold text-slate-900 mb-2">No Viva Questions Available</h3>
         <p className="text-sm text-slate-600 mb-6 leading-relaxed">
-          Submit your Python program from the Workspace to initiate the AST analysis and dynamic viva question generation pipeline.
+          Submit your Python program from the Workspace or click below to trigger the AI dynamic question synthesis pipeline for your active code.
         </p>
+        {onRegenerateQuestions && (
+          <button
+            onClick={onRegenerateQuestions}
+            disabled={isGeneratingQuestions}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-bold text-xs shadow-md transition-all cursor-pointer disabled:opacity-50"
+          >
+            <Sparkles className={`w-4 h-4 ${isGeneratingQuestions ? 'animate-spin' : ''}`} />
+            <span>{isGeneratingQuestions ? 'Synthesizing with AI...' : 'Generate Dynamic Questions (AI)'}</span>
+          </button>
+        )}
       </div>
     );
   }

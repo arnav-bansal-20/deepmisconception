@@ -74,65 +74,8 @@ class MockLLMProvider(BaseLLMProvider):
         return ""
 
     def _mock_question_generation(self, prompt: str) -> Dict[str, Any]:
-        """Construct code-grounded viva questions based on student code."""
+        """Construct code-grounded viva questions dynamically from student code."""
         code = self._extract_code_from_prompt(prompt)
-
-        # If the code is the default accumulator problem, preserve classic questions for unit test compatibility
-        if "sum_of_squares_skipping_threes" in code or ("total" in code and "skipping" in code):
-            return {
-                "questions": [
-                    {
-                        "question_text": "In the provided function, what is the exact condition under which an iteration skips the accumulator step, and why?",
-                        "focal_code": "if i % 3 == 0:\n    continue",
-                        "concept": "modulo-conditional-filtering",
-                        "difficulty": "medium",
-                        "expected_reasoning": "The modulo operator (%) evaluates the remainder of i divided by 3. When the remainder is 0 (i.e. multiples of 3 like 3, 6, 9), the 'continue' keyword immediately halts the current loop cycle and advances to the next iteration without adding i * i to total.",
-                        "rubric": {
-                            "identifies_modulo": "Explains that % 3 == 0 identifies numbers divisible by 3",
-                            "explains_continue": "Explains that continue skips the remaining lines in the loop body",
-                            "identifies_effect_on_accumulator": "Notes that total += i * i is skipped for those values"
-                        },
-                        "misconception_indicators": [
-                            "Confusing continue with break (thinking the loop stops completely)",
-                            "Misinterpreting i % 3 as division result rather than remainder",
-                            "Assuming multiples of 3 are included in the sum"
-                        ]
-                    },
-                    {
-                        "question_text": "What is the initial value of 'total', and what would be the consequence if 'total = 0' were defined inside the 'for' loop instead of before it?",
-                        "focal_code": "total = 0\nfor i in range(1, n + 1):",
-                        "concept": "variable-accumulator-invariants",
-                        "difficulty": "medium",
-                        "expected_reasoning": "Total is initialized to 0 outside the loop to accumulate values across all iterations. If total = 0 were placed inside the loop body, it would reset to 0 on every single iteration, destroying previously accumulated values and only retaining the calculation from the final iteration.",
-                        "rubric": {
-                            "identifies_accumulator_role": "Understands state preservation across loop iterations",
-                            "identifies_reset_bug": "Correctly diagnoses that putting it inside resets total on every cycle"
-                        },
-                        "misconception_indicators": [
-                            "Failing to understand that variable scope or re-assignment inside a loop overwrites prior states",
-                            "Believing python loops preserve previous assignment values even if overwritten"
-                        ]
-                    },
-                    {
-                        "question_text": "Why does the loop use range(1, n + 1) instead of range(1, n) or range(n)? What values of i are traversed when n = 5?",
-                        "focal_code": "for i in range(1, n + 1):",
-                        "concept": "loop-bounds-and-range-invariants",
-                        "difficulty": "easy",
-                        "expected_reasoning": "Python's range(start, stop) generates integers up to but excluding 'stop'. Therefore, range(1, n + 1) traverses from 1 up to n inclusive. For n = 5, the values traversed are 1, 2, 3, 4, 5. Using range(1, n) would omit 5 (an off-by-one error), and range(n) would start at 0 instead of 1.",
-                        "rubric": {
-                            "range_stop_exclusive": "Recognizes that Python range stops at stop - 1",
-                            "exact_values_n_5": "Correctly lists 1, 2, 3, 4, 5 for n=5",
-                            "off_by_one_awareness": "Explains why n + 1 is required for inclusive upper bound"
-                        },
-                        "misconception_indicators": [
-                            "Believing range(1, n + 1) stops at n + 1 (inclusive stop misconception)",
-                            "Off-by-one boundary confusion"
-                        ]
-                    }
-                ]
-            }
-
-        # Otherwise, dynamically parse the student's code using AST to construct grounded questions
         questions = self._synthesize_ast_questions(code)
         return {"questions": questions}
 
@@ -280,19 +223,6 @@ class MockLLMProvider(BaseLLMProvider):
                 "needs_instructor_review": False
             }
 
-        # Check for partial answer for accumulator task
-        if "skips" in student_ans and not ("multiple" in student_ans or "remainder" in student_ans or "divisib" in student_ans):
-            return {
-                "answer_label": "Partially Correct",
-                "concepts_correct": ["Understands that control skips execution"],
-                "concepts_missed": ["Did not articulate the underlying condition or mathematical divisor"],
-                "contradictions": [],
-                "supporting_evidence": [student_ans],
-                "evaluation_explanation": "The student correctly understands that execution skips code, but omitted an explanation of the underlying condition.",
-                "uncertainty_score": 0.3,
-                "needs_instructor_review": False
-            }
-
         # Check for relevant programming concept keywords
         relevant_keywords = [
             "continue", "skip", "modulo", "remainder", "multiple", "divisib", 
@@ -304,6 +234,19 @@ class MockLLMProvider(BaseLLMProvider):
             "prime", "divisible", "factor", "check", "true", "false", "branch"
         ]
         has_relevant_concept = any(kw in student_ans for kw in relevant_keywords)
+
+        # Check for brief or partial explanation
+        if len(student_ans) < 65 and has_relevant_concept:
+            return {
+                "answer_label": "Partially Correct",
+                "concepts_correct": ["Mentions high-level control or computational mechanism"],
+                "concepts_missed": ["Omitted detailed explanation of underlying invariants or boundary edge cases"],
+                "contradictions": [],
+                "supporting_evidence": [student_ans],
+                "evaluation_explanation": "The student identifies the general algorithmic mechanism but provides an incomplete explanation of state invariants.",
+                "uncertainty_score": 0.35,
+                "needs_instructor_review": False
+            }
 
         if not has_relevant_concept:
             return {

@@ -28,8 +28,8 @@ export const LandingView: React.FC<LandingViewProps> = ({
   currentSession,
   currentUser,
 }) => {
-  const [studentId, setStudentId] = useState(currentUser?.id || 'STU-2026-042');
-  const [studentName, setStudentName] = useState(currentUser?.name || 'Alex Rivera');
+  const [studentId, setStudentId] = useState(currentUser?.id || '');
+  const [studentName, setStudentName] = useState(currentUser?.name || '');
   const [taskTitle, setTaskTitle] = useState('Accumulator with Modulo Filtering');
 
   useEffect(() => {

@@ -55,7 +55,7 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
   const [isLoadingReport, setIsLoadingReport] = useState(false);
 
   // Annotation Form State
-  const reviewerName = currentUser?.name || 'Dr. Ada Smith';
+  const reviewerName = currentUser?.name || 'Instructor';
   const [assignedLabel, setAssignedLabel] = useState('Understood');
   const [agreeWithAi, setAgreeWithAi] = useState(true);
   const [feedbackNotes, setFeedbackNotes] = useState('');

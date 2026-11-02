@@ -29,13 +29,13 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
   const [customCodeError, setCustomCodeError] = useState<string | null>(null);
 
   // Student form fields
-  const [studentId, setStudentId] = useState('STU-2026-042');
-  const [studentName, setStudentName] = useState('Alex Rivera');
+  const [studentId, setStudentId] = useState('');
+  const [studentName, setStudentName] = useState('');
   
   // Teacher form fields
-  const [teacherId, setTeacherId] = useState('FAC-CS-804');
-  const [teacherName, setTeacherName] = useState('Dr. Ada Smith');
-  const [department, setDepartment] = useState('Computer Science & Engineering');
+  const [teacherId, setTeacherId] = useState('');
+  const [teacherName, setTeacherName] = useState('');
+  const [department, setDepartment] = useState('');
 
   // Load classrooms on mount
   useEffect(() => {
@@ -91,46 +91,6 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
         id: teacherId.trim(),
         name: teacherName.trim(),
         department: department.trim(),
-      });
-    }
-  };
-
-  const handleQuickDemo = (type: 'student-alpha' | 'student-beta' | 'teacher-smith' | 'teacher-turing') => {
-    if (type === 'student-alpha') {
-      onLogin({
-        role: 'student',
-        id: 'STU-2026-042',
-        name: 'Alex Rivera',
-        classroomId: 'class-alpha-101',
-        classroomName: 'CS101: Python Foundations - Group Alpha',
-        classroomCode: 'CS101-ALPHA',
-        teacherId: 'FAC-CS-804',
-        teacherName: 'Dr. Ada Smith',
-      });
-    } else if (type === 'student-beta') {
-      onLogin({
-        role: 'student',
-        id: 'STU-2026-088',
-        name: 'Maya Lin',
-        classroomId: 'class-beta-201',
-        classroomName: 'CS201: Algorithms & Data Structures - Group Beta',
-        classroomCode: 'CS201-BETA',
-        teacherId: 'FAC-CS-901',
-        teacherName: 'Prof. Alan Turing',
-      });
-    } else if (type === 'teacher-smith') {
-      onLogin({
-        role: 'teacher',
-        id: 'FAC-CS-804',
-        name: 'Dr. Ada Smith',
-        department: 'Computer Science & Engineering',
-      });
-    } else {
-      onLogin({
-        role: 'teacher',
-        id: 'FAC-CS-901',
-        name: 'Prof. Alan Turing',
-        department: 'Computer Science & Engineering',
       });
     }
   };
@@ -379,47 +339,6 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>
-
-          {/* Quick Demo Credentials */}
-          <div className="mt-6 pt-5 border-t border-slate-200">
-            <div className="text-[10px] font-mono uppercase tracking-wider text-slate-400 font-semibold mb-2.5 text-center">
-              Quick Test / Demo Profiles
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => handleQuickDemo('student-alpha')}
-                className="py-1.5 px-2 bg-slate-100 hover:bg-sky-50 hover:text-sky-800 text-slate-600 border border-slate-200 hover:border-sky-300 rounded-lg text-[10px] font-semibold text-center transition-all truncate"
-                title="Student in Dr. Ada Smith's CS101-ALPHA"
-              >
-                Alex (Dr. Smith CS101)
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickDemo('student-beta')}
-                className="py-1.5 px-2 bg-slate-100 hover:bg-sky-50 hover:text-sky-800 text-slate-600 border border-slate-200 hover:border-sky-300 rounded-lg text-[10px] font-semibold text-center transition-all truncate"
-                title="Student in Prof. Turing's CS201-BETA"
-              >
-                Maya (Prof. Turing CS201)
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickDemo('teacher-smith')}
-                className="py-1.5 px-2 bg-slate-100 hover:bg-indigo-50 hover:text-indigo-800 text-slate-600 border border-slate-200 hover:border-indigo-300 rounded-lg text-[10px] font-semibold text-center transition-all truncate"
-                title="Teacher: Dr. Ada Smith"
-              >
-                Teacher: Dr. Ada Smith
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickDemo('teacher-turing')}
-                className="py-1.5 px-2 bg-slate-100 hover:bg-indigo-50 hover:text-indigo-800 text-slate-600 border border-slate-200 hover:border-indigo-300 rounded-lg text-[10px] font-semibold text-center transition-all truncate"
-                title="Teacher: Prof. Alan Turing"
-              >
-                Teacher: Prof. Alan Turing
-              </button>
-            </div>
-          </div>
         </div>
 
         {/* Footer info */}

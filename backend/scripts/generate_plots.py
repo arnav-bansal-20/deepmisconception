@@ -92,7 +92,8 @@ def plot_modality_ablation(ablation_data, output_dir=FIGURES_DIR):
                  fontsize=13, fontweight='bold', pad=28, color='#0f172a')
     ax.set_xticks(x)
     ax.set_xticklabels(names, fontsize=9.5, fontweight='bold', color='#334155')
-    ax.set_ylim(40, 118)  # Headroom for value annotations without clipping
+    ax.set_ylim(40, 120)  # Generous headroom for value annotations and callout without clipping
+    ax.set_xlim(-0.6, 4.6)
     ax.grid(axis='y', linestyle='--', alpha=0.6, color='#e2e8f0')
     ax.set_axisbelow(True)
 
@@ -109,15 +110,17 @@ def plot_modality_ablation(ablation_data, output_dir=FIGURES_DIR):
                         xytext=(0, 4), textcoords="offset points",
                         ha='center', va='bottom', fontsize=8.5, fontweight=weight, color=color)
 
-    # Dynamic annotation for multimodal gain
+    # Dynamic annotation for multimodal gain (placed cleanly above the proposed full fusion bar)
     gain = tf_vals[-1] - tf_vals[0]
+    target_x = x[-1] + width
+    target_y = tf_vals[-1]
     ax.annotate(
-        f'+{gain:.1f}% Gain over Code-Only',
-        xy=(x[0] + width, tf_vals[0]),
-        xytext=(x[0] + 0.15, tf_vals[0] + 18),
-        arrowprops=dict(facecolor='#4338ca', shrink=0.08, width=1.5, headwidth=5, edgecolor='#312e81'),
-        fontsize=9, fontweight='bold', color='#4338ca',
-        bbox=dict(boxstyle='round,pad=0.4', facecolor='#eef2ff', edgecolor='#c7d2fe', linewidth=1.0)
+        f'+{gain:.1f}% Multimodal Gain\n(vs. Code-Only AST)',
+        xy=(target_x, target_y + 5.5),
+        xytext=(target_x - 0.25, 107),
+        arrowprops=dict(facecolor='#4338ca', shrink=0.05, width=1.4, headwidth=5, edgecolor='#312e81'),
+        fontsize=9, fontweight='bold', color='#4338ca', ha='center',
+        bbox=dict(boxstyle='round,pad=0.45', facecolor='#eef2ff', edgecolor='#c7d2fe', linewidth=1.1)
     )
 
     plt.tight_layout()

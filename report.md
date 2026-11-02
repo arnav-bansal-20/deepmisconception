@@ -153,6 +153,9 @@ In the neural architecture, evaluation criteria are modeled continuously:
 - **Code Queries ($Q = X_{\text{AST}} W_Q$)** attend to **Explanation Keys/Values ($K = X_{\text{Viva}} W_K, V = X_{\text{Viva}} W_V$)**.
 - When code constructs (e.g., a dictionary lookup on line 4) are contradicted or omitted in the explanation (e.g., the student discusses linear list scans), the cross-attention dot product $Q K^T$ collapses, lowering alignment weights and pushing the classification head toward **`Possible Misconception`**.
 
+![Figure 3: Multimodal Diagnostic Archetype Vectors](figures/multimodal_radar_profiles.png)
+*Figure 3: Spider/Radar chart illustrating 4-dimensional normalized student assessment profiles ($S_{\text{ast}}, S_{\text{exec}}, S_{\text{viva}}, S_{\text{proc}}$) across Understood, Partial Understanding, Possible Misconception, and the Borrowed Code Anomaly archetype.*
+
 ### 4.7. Teacher Guidance & Cohort Isolation
 - **Classrooms/Cohorts**: Teachers create student cohorts with custom enrollment codes (e.g., `CS101-ALPHA`).
 - **Targeted Question Authoring**: Teachers publish coding problems assigned strictly to their designated cohorts.
@@ -191,6 +194,9 @@ To scientifically validate the necessity of each modality, an ablation suite eva
 
 **Scientific Takeaway**: Single modalities reach an empirical ceiling between 58% and 76% Macro-F1. Process telemetry alone cannot identify semantic flaws, while code structure alone cannot detect borrowed solutions. **Full multimodal fusion achieves 94.6% Macro-F1**, demonstrating that holistic comprehension diagnosis requires cross-modal synergy.
 
+![Figure 1: Empirical Modality Ablation Benchmarks](figures/modality_ablation_comparison.png)
+*Figure 1: Comparative Macro-F1 performance across five modality combinations evaluating Random Forest, Logistic Regression, and the proposed Cross-Attention Transformer ($N=180$ students, stratified test split).*
+
 ---
 
 ## 6. Scientific Evaluation & Inter-Rater Reliability (Phase 9)
@@ -225,6 +231,12 @@ Actual: Misconception          0                     2                     38
 - **Understood Class**: Precision = 92.7%, Recall = 95.0%, F1 = 93.8%
 - **Partial Understanding**: Precision = 89.7%, Recall = 87.5%, F1 = 88.6%
 - **Possible Misconception**: Precision = 95.0%, Recall = 95.0%, F1 = 95.0%
+
+![Figure 2: Empirical Diagnostic Confusion Matrix](figures/confusion_matrix_heatmap.png)
+*Figure 2: Heatmap of observed vs. predicted student diagnoses with normalized cell proportions and Landis-Koch concordance metrics ($\kappa = 0.812$).*
+
+![Figure 4: Diagnostic Reliability Across Student Comprehension Categories](figures/per_class_metrics_breakdown.png)
+*Figure 4: Per-class Precision, Recall, and F1-score breakdown affirming balanced diagnostic fidelity across all three target comprehension tiers.*
 
 ---
 

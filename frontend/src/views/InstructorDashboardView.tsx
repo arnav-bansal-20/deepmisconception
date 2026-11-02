@@ -568,6 +568,32 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
                   </p>
                 </div>
               </div>
+
+              {/* Publication Figure 1 Preview */}
+              <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm space-y-3">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <div className="flex items-center gap-2">
+                    <BarChart3 className="w-4 h-4 text-indigo-600" />
+                    <h4 className="font-bold text-xs uppercase text-slate-900 tracking-wider">
+                      Figure 1: Empirical Modality Ablation Benchmark Comparison
+                    </h4>
+                  </div>
+                  <a
+                    href="/figures/modality_ablation_comparison.png"
+                    download="modality_ablation_comparison.png"
+                    className="text-xs font-mono font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1"
+                  >
+                    <span>Download Publication PNG (300 DPI)</span>
+                  </a>
+                </div>
+                <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 flex justify-center items-center overflow-hidden">
+                  <img
+                    src="/figures/modality_ablation_comparison.png"
+                    alt="Modality Ablation Comparison Plot"
+                    className="max-h-[420px] w-auto object-contain rounded-lg shadow-sm"
+                  />
+                </div>
+              </div>
             </div>
           ) : (
             <div className="bg-white border border-slate-200 p-8 rounded-2xl text-center">
@@ -775,6 +801,72 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
                     <span className="font-bold text-slate-900 block mb-0.5">Statistical Landis &amp; Koch Interpretation:</span>
                     Cohen&apos;s Kappa accounts for chance agreement (P_e). A score above 0.75 denotes substantial to almost-perfect inter-rater agreement, affirming that the multimodal system reliably mirrors experienced human programming instructors.
                   </div>
+                </div>
+              </div>
+
+              {/* Publication Figures Gallery */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+                <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm space-y-3">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                    <span className="font-bold text-xs uppercase text-slate-900 tracking-wider flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                      Fig 2: Confusion Matrix
+                    </span>
+                    <a
+                      href="/figures/confusion_matrix_heatmap.png"
+                      download="confusion_matrix_heatmap.png"
+                      className="text-[11px] font-mono font-bold text-indigo-600 hover:text-indigo-800"
+                    >
+                      PNG ↓
+                    </a>
+                  </div>
+                  <img
+                    src="/figures/confusion_matrix_heatmap.png"
+                    alt="Confusion Matrix Heatmap"
+                    className="w-full h-auto rounded-xl border border-slate-100 shadow-sm"
+                  />
+                </div>
+
+                <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm space-y-3">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                    <span className="font-bold text-xs uppercase text-slate-900 tracking-wider flex items-center gap-2">
+                      <Activity className="w-4 h-4 text-violet-600" />
+                      Fig 3: Radar Profiles
+                    </span>
+                    <a
+                      href="/figures/multimodal_radar_profiles.png"
+                      download="multimodal_radar_profiles.png"
+                      className="text-[11px] font-mono font-bold text-indigo-600 hover:text-indigo-800"
+                    >
+                      PNG ↓
+                    </a>
+                  </div>
+                  <img
+                    src="/figures/multimodal_radar_profiles.png"
+                    alt="Multimodal Diagnostic Radar Profiles"
+                    className="w-full h-auto rounded-xl border border-slate-100 shadow-sm"
+                  />
+                </div>
+
+                <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm space-y-3">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                    <span className="font-bold text-xs uppercase text-slate-900 tracking-wider flex items-center gap-2">
+                      <ShieldCheck className="w-4 h-4 text-indigo-600" />
+                      Fig 4: Per-Class Metrics
+                    </span>
+                    <a
+                      href="/figures/per_class_metrics_breakdown.png"
+                      download="per_class_metrics_breakdown.png"
+                      className="text-[11px] font-mono font-bold text-indigo-600 hover:text-indigo-800"
+                    >
+                      PNG ↓
+                    </a>
+                  </div>
+                  <img
+                    src="/figures/per_class_metrics_breakdown.png"
+                    alt="Per-Class Reliability Breakdown"
+                    className="w-full h-auto rounded-xl border border-slate-100 shadow-sm"
+                  />
                 </div>
               </div>
             </div>

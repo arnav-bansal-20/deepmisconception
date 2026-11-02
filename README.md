@@ -32,21 +32,21 @@ DeepMisconception is an academic research platform and pedagogical tool designed
 
 ```mermaid
 graph TD
-    STUDENT[Student Code & Telemetry Input]
-    AST[Static AST Analyzer: Python ast Engine]
-    BOX[Subprocess Security Sandbox: Sanitized Environment & Process Groups]
-    VIVA[Dynamic AI Viva Generator: Grounded Conceptual Questions]
-    ANS[Student Viva Answer Submission]
-    DUAL[Dual-Verification Engine: Verified Trace vs Claim]
-    BERT[Hugging Face CodeBERT: Dense Embeddings or AST Fallback]
-    CROSS[Cross-Attention Transformer: Query AST, Key/Value Viva]
-    FUSE[Multimodal Fusion & Classification Head]
-    DIAG[Comprehension Diagnosis: Understood / Partial / Misconception / Pending]
+    STUDENT["Student Code & Telemetry Input"]
+    AST["Static AST Analyzer: Python ast Engine"]
+    BOX["Subprocess Security Sandbox: Sanitized Environment & Process Groups"]
+    VIVA["Dynamic AI Viva Generator: Grounded Conceptual Questions"]
+    ANS["Student Viva Answer Submission"]
+    DUAL["Dual-Verification Engine: Verified Trace vs Claim"]
+    BERT["Hugging Face CodeBERT: Dense Embeddings or AST Fallback"]
+    CROSS["Cross-Attention Transformer: Query AST, Key/Value Viva"]
+    FUSE["Multimodal Fusion & Classification Head"]
+    DIAG["Comprehension Diagnosis: Understood / Partial / Misconception / Pending"]
 
     STUDENT --> AST
     STUDENT --> BOX
-    AST -->|Syntax Graph, Cyclomatic Complexity| VIVA
-    BOX -->|Execution Traces, I/O Realities| VIVA
+    AST -->|"Syntax Graph, Cyclomatic Complexity"| VIVA
+    BOX -->|"Execution Traces, I/O Realities"| VIVA
     VIVA --> ANS
     ANS --> DUAL
     AST --> DUAL
@@ -90,29 +90,29 @@ DeepMisconception fuses structural, semantic, and telemetry signals across a **4
 
 ```mermaid
 graph LR
-    F_AST[Structural AST: Complexity, Loops, Functions, Recursion 16-D]
-    F_VIVA[Semantic Viva: Conceptual Depth, Invariants, Factuality 16-D]
-    F_TEL[Process Telemetry: Rhythms, Recovery Pace, Test Frequency 8-D]
-    BERT_EMB[CodeBERT 768-D Contextual Embeddings or AST Fallback]
-    ST_EMB[Sentence-Transformer 384-D Embeddings or Rubric Fallback]
+    F_AST["Structural AST: Complexity, Loops, Functions, Recursion (16-D)"]
+    F_VIVA["Semantic Viva: Conceptual Depth, Invariants, Factuality (16-D)"]
+    F_TEL["Process Telemetry: Rhythms, Recovery Pace, Test Frequency (8-D)"]
+    BERT_EMB["CodeBERT 768-D Contextual Embeddings or AST Fallback"]
+    ST_EMB["Sentence-Transformer 384-D Embeddings or Rubric Fallback"]
 
-    F_AST --> PROJ_C[Code Projection Layer -> 32-D]
+    F_AST --> PROJ_C["Code Projection Layer to 32-D"]
     BERT_EMB --> PROJ_C
-    F_VIVA --> PROJ_V[Viva Projection Layer -> 32-D]
+    F_VIVA --> PROJ_V["Viva Projection Layer to 32-D"]
     ST_EMB --> PROJ_V
-    F_TEL --> PROJ_P[Process Projection Layer -> 32-D]
+    F_TEL --> PROJ_P["Process Projection Layer to 32-D"]
 
-    PROJ_C --> T_ENC[PyTorch TransformerEncoder: 2 Layers, GELU, LayerNorm]
+    PROJ_C --> T_ENC["PyTorch TransformerEncoder: 2 Layers, GELU, LayerNorm"]
     PROJ_V --> T_ENC
     PROJ_P --> T_ENC
 
-    PROJ_C --> CROSS[PyTorch MultiheadAttention: Q=Code, K/V=Viva]
+    PROJ_C --> CROSS["PyTorch MultiheadAttention: Q=Code, K/V=Viva"]
     PROJ_V --> CROSS
 
-    T_ENC --> FUSE[Concatenated Fusion: Attended Code || Tokens || Process 96-D]
+    T_ENC --> FUSE["Concatenated Fusion: Attended Code + Tokens + Process (96-D)"]
     CROSS --> FUSE
-    FUSE --> CLF[Linear Classification Head: 3 Classes]
-    CLF --> OUT[Understood / Partial Understanding / Possible Misconception]
+    FUSE --> CLF["Linear Classification Head: 3 Classes"]
+    CLF --> OUT["Understood / Partial Understanding / Possible Misconception"]
 ```
 
 ### Mathematical Formulation

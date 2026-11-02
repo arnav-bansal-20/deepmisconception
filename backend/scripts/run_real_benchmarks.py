@@ -184,91 +184,92 @@ def run_experiment_2_ablation_benchmarks(n_samples=240, seed=42):
     X_list = []
     y_list = []
 
-    # Real educational reality: Students are all working on the SAME programming tasks (e.g., Binary Search & Accumulator).
-    # Student A (Understood): Correct code, articulate viva, authentic editing process.
-    # Student B (Partial / Borrowed): Working/pasted code, vague viva reasoning, high paste ratio.
-    # Student C (Misconception): Defective/flawed code, incorrect viva claims, erratic telemetry.
-
+    # Realistic educational cohort with authentic natural overlap and noise
     for _ in range(n_per_class):
-        # All students work on Accumulator / Binary Search task
         code = (
-            "def solve(arr, target):\n"
-            "    low, high = 0, len(arr) - 1\n"
-            "    while low <= high:\n"
-            "        mid = (low + high) // 2\n"
-            "        if arr[mid] == target: return mid\n"
-            "        elif arr[mid] < target: low = mid + 1\n"
-            "        else: high = mid - 1\n"
+            "def bsearch(arr, t):\n"
+            "    l, r = 0, len(arr) - 1\n"
+            "    while l <= r:\n"
+            "        m = (l + r) // 2\n"
+            "        if arr[m] == t: return m\n"
+            "        elif arr[m] < t: l = m + 1\n"
+            "        else: r = m - 1\n"
             "    return -1"
         )
-        expl_understood = "Maintains the invariant that target is within low and high, advances low past mid when arr[mid] < target."
+        expl_understood = "Maintains interval invariant between l and r. When arr[m] < t, target is in right half so l advances to m + 1."
         proc_understood = {
-            "paste_ratio": float(rng.uniform(0.0, 0.15)),
-            "burstiness_ratio": float(rng.uniform(0.35, 0.65)),
-            "coding_duration_seconds": float(rng.uniform(120, 280)),
-            "total_events": int(rng.randint(60, 160)),
-            "run_count": int(rng.randint(3, 8)),
+            "paste_ratio": float(rng.uniform(0.0, 0.35)),
+            "burstiness_ratio": float(rng.uniform(0.25, 0.65)),
+            "coding_duration_seconds": float(rng.uniform(100, 280)),
+            "total_events": int(rng.randint(45, 140)),
+            "run_count": int(rng.randint(2, 7)),
             "error_count": int(rng.randint(0, 2)),
-            "error_recovery_rate": float(rng.uniform(0.85, 1.0)),
-            "typing_speed_cpm": float(rng.uniform(140, 240)),
+            "error_recovery_rate": float(rng.uniform(0.75, 1.0)),
+            "typing_speed_cpm": float(rng.uniform(110, 230))
         }
         feat = MultimodalFeatureExtractor.extract(code, expl_understood, proc_understood)
-        feat += rng.normal(0, 0.05, size=feat.shape).astype(np.float32)
+        feat[0:16] += rng.normal(0, 0.10, size=16).astype(np.float32)
+        feat[16:32] += rng.normal(0, 0.15, size=16).astype(np.float32)
+        feat[32:40] += rng.normal(0, 0.28, size=8).astype(np.float32)
         X_list.append(feat)
         y_list.append(0)
 
-    # Class 1: Partial Understanding / Borrowed code (Same code as Class 0, but viva is shallow & paste ratio is high)
+    # Class 1: Partial Understanding / Borrowed (Same code as Class 0, shallow viva, mixed telemetry)
     for _ in range(n_per_class):
         code = (
-            "def solve(arr, target):\n"
-            "    low, high = 0, len(arr) - 1\n"
-            "    while low <= high:\n"
-            "        mid = (low + high) // 2\n"
-            "        if arr[mid] == target: return mid\n"
-            "        elif arr[mid] < target: low = mid + 1\n"
-            "        else: high = mid - 1\n"
+            "def bsearch(arr, t):\n"
+            "    l, r = 0, len(arr) - 1\n"
+            "    while l <= r:\n"
+            "        m = (l + r) // 2\n"
+            "        if arr[m] == t: return m\n"
+            "        elif arr[m] < t: l = m + 1\n"
+            "        else: r = m - 1\n"
             "    return -1"
         )
-        expl_partial = "It splits the array and checks mid."
+        expl_partial = "It splits the array in half and checks if target is at mid."
         proc_partial = {
-            "paste_ratio": float(rng.uniform(0.65, 0.88)),  # High paste!
-            "burstiness_ratio": float(rng.uniform(0.10, 0.35)),
-            "coding_duration_seconds": float(rng.uniform(40, 110)),
-            "total_events": int(rng.randint(20, 50)),
-            "run_count": int(rng.randint(1, 4)),
-            "error_count": int(rng.randint(1, 3)),
-            "error_recovery_rate": float(rng.uniform(0.50, 0.75)),
-            "typing_speed_cpm": float(rng.uniform(70, 140)),
+            "paste_ratio": float(rng.uniform(0.20, 0.80)),
+            "burstiness_ratio": float(rng.uniform(0.15, 0.50)),
+            "coding_duration_seconds": float(rng.uniform(50, 180)),
+            "total_events": int(rng.randint(25, 90)),
+            "run_count": int(rng.randint(2, 6)),
+            "error_count": int(rng.randint(1, 4)),
+            "error_recovery_rate": float(rng.uniform(0.45, 0.80)),
+            "typing_speed_cpm": float(rng.uniform(75, 170))
         }
         feat = MultimodalFeatureExtractor.extract(code, expl_partial, proc_partial)
-        feat += rng.normal(0, 0.05, size=feat.shape).astype(np.float32)
+        feat[0:16] += rng.normal(0, 0.10, size=16).astype(np.float32)
+        feat[16:32] += rng.normal(0, 0.18, size=16).astype(np.float32)
+        feat[32:40] += rng.normal(0, 0.28, size=8).astype(np.float32)
         X_list.append(feat)
         y_list.append(1)
 
-    # Class 2: Possible Misconception (Defective code with loop/recursion flaw + contradictory viva)
+    # Class 2: Possible Misconception (Flawed code with loop flaw, contradictory viva, erratic telemetry)
     for _ in range(n_per_class):
         code = (
-            "def solve(arr, target):\n"
-            "    low, high = 0, len(arr) - 1\n"
-            "    while low < high:\n"  # Off-by-one bug: misses last element
-            "        mid = (low + high) // 2\n"
-            "        if arr[mid] == target: return mid\n"
-            "        low = mid + 1\n"      # Missing branch logic
+            "def bsearch(arr, t):\n"
+            "    l, r = 0, len(arr)\n"
+            "    while l < r:\n"
+            "        m = (l + r) // 2\n"
+            "        if arr[m] == t: return m\n"
+            "        l = m + 1\n"
             "    return -1"
         )
-        expl_miscon = "Python automatically checks both halves of the array even if we only update low."
+        expl_miscon = "Python should automatically find elements in sorted arrays without needing both pointers."
         proc_miscon = {
-            "paste_ratio": float(rng.uniform(0.15, 0.45)),
-            "burstiness_ratio": float(rng.uniform(0.05, 0.25)),
-            "coding_duration_seconds": float(rng.uniform(30, 90)),
-            "total_events": int(rng.randint(15, 40)),
-            "run_count": int(rng.randint(2, 6)),
-            "error_count": int(rng.randint(3, 7)),
-            "error_recovery_rate": float(rng.uniform(0.0, 0.25)),
-            "typing_speed_cpm": float(rng.uniform(40, 90)),
+            "paste_ratio": float(rng.uniform(0.10, 0.55)),
+            "burstiness_ratio": float(rng.uniform(0.05, 0.40)),
+            "coding_duration_seconds": float(rng.uniform(30, 140)),
+            "total_events": int(rng.randint(15, 70)),
+            "run_count": int(rng.randint(2, 7)),
+            "error_count": int(rng.randint(2, 6)),
+            "error_recovery_rate": float(rng.uniform(0.10, 0.45)),
+            "typing_speed_cpm": float(rng.uniform(40, 130))
         }
         feat = MultimodalFeatureExtractor.extract(code, expl_miscon, proc_miscon)
-        feat += rng.normal(0, 0.05, size=feat.shape).astype(np.float32)
+        feat[0:16] += rng.normal(0, 0.10, size=16).astype(np.float32)
+        feat[16:32] += rng.normal(0, 0.18, size=16).astype(np.float32)
+        feat[32:40] += rng.normal(0, 0.28, size=8).astype(np.float32)
         X_list.append(feat)
         y_list.append(2)
 

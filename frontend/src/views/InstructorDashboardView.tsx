@@ -552,7 +552,7 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
                     </h4>
                   </div>
                   <p className="text-xs text-slate-600 leading-relaxed">
-                    Adding process dynamics (P ∈ R^(B×8)) disambiguates copy-pasted code from authentic iterative debugging, yielding superior separation in borderline partial understanding cases.
+                    Incorporating process telemetry (P ∈ R^(B×8)) provides descriptive temporal context of revision and editing patterns, complementing code-grounded structural and viva reasoning without penalizing pasting.
                   </p>
                 </div>
 

@@ -44,13 +44,12 @@ export const ProcessTimeline: React.FC<ProcessTimelineProps> = ({
         <Activity className="w-8 h-8 text-slate-300 mx-auto" />
         <p className="text-xs font-semibold text-slate-600">No coding telemetry collected yet</p>
         <p className="text-[11px] text-slate-400">
-          Telemetry captures keystroke rhythms, paste events, and execution runs as you work in the editor.
+          Telemetry captures keystroke rhythms, editing patterns, and execution runs as you work in the editor.
         </p>
       </div>
     );
   }
 
-  const pastePct = Math.round(features.paste_ratio * 100);
   const burstPct = Math.round((features.burstiness_ratio || 0) * 100);
   const recoveryPct = Math.round((features.error_recovery_rate ?? 1.0) * 100);
   const maxDuration = Math.max(1, features.coding_duration_seconds);
@@ -88,9 +87,9 @@ export const ProcessTimeline: React.FC<ProcessTimelineProps> = ({
             <span>Editing Activity</span>
           </div>
           <div className="text-lg font-bold font-mono text-slate-900">
-            {pastePct}% <span className="text-xs font-normal text-slate-500">external</span>
+            {features.edit_count} <span className="text-xs font-normal text-slate-500">edits</span>
           </div>
-          <div className="text-[10px] text-slate-400 mt-0.5">{features.total_chars_pasted} external / {features.total_events} events</div>
+          <div className="text-[10px] text-slate-400 mt-0.5">{features.total_events} total events recorded</div>
         </div>
 
         <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">

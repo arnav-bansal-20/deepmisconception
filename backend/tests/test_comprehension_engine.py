@@ -612,3 +612,168 @@ def test_paste_telemetry_does_not_penalize_comprehension_verdict():
     finally:
         db.close()
 
+
+def test_process_telemetry_variance_does_not_affect_comprehension_verdict_or_score():
+    """Regression test: Process telemetry variance does NOT alter composite score or verdict."""
+    db = SessionLocal()
+    try:
+        # Session A: Zero telemetry events
+        session_a = CodingSession(
+            student_id="STU-TELEMETRY-A",
+            student_name="Telemetry Control Student",
+            title="Tele Control A",
+        )
+        db.add(session_a)
+        db.commit()
+        db.refresh(session_a)
+
+        sub_a = CodeSubmission(
+            session_id=session_a.id,
+            code="def is_even(n):\n    return n % 2 == 0\n",
+            is_valid=True,
+            ast_summary={"cyclomatic_complexity": 2, "functions": [{"name": "is_even"}]},
+            execution_output="True\n",
+        )
+        db.add(sub_a)
+        db.commit()
+
+        q_a = VivaQuestion(
+            session_id=session_a.id,
+            question_text="Explain the modulo operation n % 2.",
+            concept="Modulo Arithmetic",
+        )
+        db.add(q_a)
+        db.commit()
+
+        a_a = AnswerAssessment(
+            question_id=q_a.id,
+            session_id=session_a.id,
+            student_answer="n % 2 calculates remainder after division by 2; remainder 0 means even.",
+            answer_label="Correct",
+            evaluation_explanation="Clear and correct explanation.",
+        )
+        db.add(a_a)
+        db.commit()
+
+        # Session B: Identical code & viva, but 50 massive paste & edit telemetry events
+        session_b = CodingSession(
+            student_id="STU-TELEMETRY-B",
+            student_name="Telemetry Varied Student",
+            title="Tele Varied B",
+        )
+        db.add(session_b)
+        db.commit()
+        db.refresh(session_b)
+
+        sub_b = CodeSubmission(
+            session_id=session_b.id,
+            code="def is_even(n):\n    return n % 2 == 0\n",
+            is_valid=True,
+            ast_summary={"cyclomatic_complexity": 2, "functions": [{"name": "is_even"}]},
+            execution_output="True\n",
+        )
+        db.add(sub_b)
+        db.commit()
+
+        for i in range(25):
+            db.add(ProcessEvent(
+                session_id=session_b.id,
+                event_type="paste",
+                paste_length=120,
+                delta_chars=120,
+            ))
+            db.add(ProcessEvent(
+                session_id=session_b.id,
+                event_type="edit",
+                paste_length=0,
+                delta_chars=1,
+            ))
+        db.commit()
+
+        q_b = VivaQuestion(
+            session_id=session_b.id,
+            question_text="Explain the modulo operation n % 2.",
+            concept="Modulo Arithmetic",
+        )
+        db.add(q_b)
+        db.commit()
+
+        a_b = AnswerAssessment(
+            question_id=q_b.id,
+            session_id=session_b.id,
+            student_answer="n % 2 calculates remainder after division by 2; remainder 0 means even.",
+            answer_label="Correct",
+            evaluation_explanation="Clear and correct explanation.",
+        )
+        db.add(a_b)
+        db.commit()
+
+        # Synthesize both reports
+        report_a = ComprehensionEngine.synthesize_report(session_a.id, db)
+        report_b = ComprehensionEngine.synthesize_report(session_b.id, db)
+
+        # Both must produce identical classification verdicts and confidence scores
+        assert report_a.overall_label == report_b.overall_label
+        assert report_a.overall_label == "Understood"
+        assert report_a.confidence_score == report_b.confidence_score
+        assert report_a.needs_instructor_review == report_b.needs_instructor_review
+
+        # Multimodal substantive scores must match identically
+        assert report_a.multimodal_scores["ast_structural_score"] == report_b.multimodal_scores["ast_structural_score"]
+        assert report_a.multimodal_scores["execution_fidelity_score"] == report_b.multimodal_scores["execution_fidelity_score"]
+        assert report_a.multimodal_scores["viva_reasoning_score"] == report_b.multimodal_scores["viva_reasoning_score"]
+    finally:
+        db.close()
+
+
+def test_partially_correct_explanation_results_in_partial_understanding():
+    """Verify that a partially correct viva explanation leads to Partial Understanding."""
+    db = SessionLocal()
+    try:
+        session = CodingSession(
+            student_id="STU-PARTIAL-EXPL",
+            student_name="Partial Student",
+            title="Partial Understanding Session",
+        )
+        db.add(session)
+        db.commit()
+        db.refresh(session)
+
+        sub = CodeSubmission(
+            session_id=session.id,
+            code="def find_first_negative(nums):\n    for i, n in enumerate(nums):\n        if n < 0:\n            return i\n    return -1\n",
+            is_valid=True,
+            ast_summary={"cyclomatic_complexity": 3, "functions": [{"name": "find_first_negative"}]},
+            execution_output="2\n",
+        )
+        db.add(sub)
+        db.commit()
+
+        q = VivaQuestion(
+            session_id=session.id,
+            question_text="What does enumerate(nums) provide in the loop?",
+            concept="Enumeration and Indexing",
+        )
+        db.add(q)
+        db.commit()
+
+        # Answer is only Partially Correct (omits indexing mechanism)
+        a = AnswerAssessment(
+            question_id=q.id,
+            session_id=session.id,
+            student_answer="It loops over the numbers in the list.",
+            answer_label="Partially Correct",
+            concepts_missed=["index tracking tuple unpacking"],
+            evaluation_explanation="Mentions iteration but fails to explain the index variable i.",
+        )
+        db.add(a)
+        db.commit()
+
+        report = ComprehensionEngine.synthesize_report(session.id, db)
+        assert report.overall_label == "Partial Understanding"
+        assert report.overall_label != "Understood"
+        assert report.overall_label != "Possible Misconception"
+    finally:
+        db.close()
+
+

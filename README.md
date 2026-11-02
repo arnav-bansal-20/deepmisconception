@@ -4,7 +4,7 @@
 [![FastAPI](https://img.shields.io/badge/Framework-FastAPI-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![React](https://img.shields.io/badge/Frontend-React%2018%20%7C%20Vite%20%7C%20TypeScript-61DAFB?logo=react&logoColor=black)](https://react.dev/)
 [![PyTorch](https://img.shields.io/badge/Architecture-PyTorch%20Transformer-EE4C2C?logo=pytorch&logoColor=white)](https://pytorch.org/)
-[![Tests](https://img.shields.io/badge/Tests-79%2F79%20Passing-brightgreen?logo=pytest&logoColor=white)](https://pytest.org/)
+[![Tests](https://img.shields.io/badge/Tests-81%2F81%20Passing-brightgreen?logo=pytest&logoColor=white)](https://pytest.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 > **AI-Assisted Code Comprehension Verification and Student Misconception Detection**
@@ -76,9 +76,10 @@ graph TD
     - `Possible Misconception`: Repeated verified conceptual errors or direct contradictions with code execution reality.
     - `Pending / Insufficient Evidence`: Explicit review state triggered when viva answers are missing, empty, or evasive.
   - Syntax errors or runtime crashes alone are treated as active debugging states, never as automatic proof of conceptual misconception.
-- **Ethical Process Telemetry (Contextual, Never Punitive)**:
-  - Telemetry is treated strictly as descriptive context—never as an accusation of misconduct or proof of poor understanding.
-  - **Zero Paste Penalties**: Pasting code is common in software engineering and is never penalized automatically. A student who imports code but demonstrates thorough understanding receives an `Understood` verdict.
+  - If viva evidence is missing or insufficient, the system assigns `Pending / Insufficient Evidence` and flags `needs_instructor_review = True`, never guessing a substantive diagnosis without evidence.
+- **Ethical Process Telemetry (Descriptive Context Only, Never Evaluative)**:
+  - Process telemetry (editing activity, rhythms, run frequency) is treated strictly as descriptive instructor context—it has a weight of **0.0** in the comprehension diagnosis formula ($W_{\text{ast}} = 0.20, W_{\text{exec}} = 0.30, W_{\text{viva}} = 0.50, W_{\text{proc}} = 0.00$).
+  - **Zero Paste Penalties & Neutral UI**: Pasting code is standard in software engineering and is never penalized automatically. The UI displays neutral editing activity and never infers student comprehension or misconduct from paste events. A student who imports code and demonstrates thorough understanding receives an `Understood` verdict.
 - **Teacher Supervision Portal**:
   - Instructors can review student sessions, audit flagged uncertainty cases, override AI verdicts, and author scoped programming assignments.
 
@@ -174,7 +175,7 @@ deepmisconception/
 │   │   ├── schemas/          # Pydantic schemas (annotation, telemetry, report, viva)
 │   │   ├── services/         # ComprehensionEngine, SafeExecutor, ASTAnalyzer, Telemetry
 │   │   └── ml/               # PyTorch Transformer, CodeBERT, Sentence-Transformer, Ablation
-│   ├── tests/                # 16 test modules covering 79 passing unit & integration tests
+│   ├── tests/                # 16 test modules covering 81 passing unit & integration tests
 │   ├── requirements.txt      # Core application requirements
 │   ├── requirements-ml.txt   # Optional deep learning dependencies (PyTorch, Transformers)
 │   └── start.sh              # Backend server launcher
@@ -245,7 +246,7 @@ cd backend
 ./venv/bin/pytest -v
 ```
 
-> **Results**: **79/79 tests passing** across AST parsing, sandbox process isolation, viva generation, answer evaluation, ML status, zero-leakage splits, and comprehension classification.
+> **Results**: **81/81 tests passing** across AST parsing, sandbox process isolation, viva generation, answer evaluation, ML status, zero-leakage splits, descriptive telemetry decoupling, and comprehension classification.
 
 ### Building Frontend for Production
 
@@ -277,9 +278,10 @@ npm run build
 
 ## 📊 Scientific Rigor & Empirical Benchmarks
 
-- **Viva Answer Evaluation Concordance**: Chance-corrected Cohen's Kappa score of **$\kappa = 0.6847$** ("Substantial Agreement", $76.7\%$ accuracy, $77.3\%$ Macro-F1) evaluated across real student viva answers.
-- **Borrowed / AI-Generated Code Detection**: **$90.0\%$ detection rate**—a **$+82.5\%$ advantage** over traditional unit-test auto-graders ($7.5\%$).
-- **Multimodal Fusion Gain**: Cross-Attention Transformer achieves **$87.3\%$ Macro-F1** on full multimodal fusion (**$+31.3\%$ gain** over Code-Only AST baseline at $56.0\%$).
+- **Viva Answer Evaluation Concordance (Real Annotated Corpus, $N=60$)**: Chance-corrected Cohen's Kappa score of **$\kappa = 0.6847$** ("Substantial Agreement", $76.7\%$ accuracy, $77.3\%$ Macro-F1) evaluated across 60 annotated student viva answers on a 4-tier rubric.
+- **Borrowed / Unexplained Code Detection Benchmark (Synthetic Control, $N=40$)**: In an experimental control benchmark of $N=40$ submissions with high code sophistication but lack of verbal understanding, DeepMisconception flagged **$90.0\%$ (36/40)** of cases through oral viva defense, compared to **$7.5\%$ (3/40)** flagged by unit-test auto-graders alone.
+- **Multimodal Ablation Study (Synthetic Benchmark Corpus, $N=240$, 5-Fold CV)**: Cross-Attention Transformer achieves **$87.3\%$ Macro-F1** on full multimodal fusion (**$+31.3\%$ gain** over Code-Only AST baseline at $56.0\%$). Zero student leakage across train/validation/test folds is programmatically verified.
+- **Descriptive Telemetry Isolation**: Process telemetry is strictly descriptive instructor context ($W_{\text{proc}} = 0.0$ in the diagnostic formula; $W_{\text{ast}} = 0.20, W_{\text{exec}} = 0.30, W_{\text{viva}} = 0.50$), guaranteeing that pasting code never reduces scores or alters comprehension verdicts.
 - **Complete Provenance**: All metrics, radar profiles, and heatmaps match [`figures/benchmark_results.json`](file:///Users/arnavbansal/.gemini/antigravity/scratch/deepmisconception/figures/benchmark_results.json) dynamically rendered by [`backend/scripts/generate_plots.py`](file:///Users/arnavbansal/.gemini/antigravity/scratch/deepmisconception/backend/scripts/generate_plots.py). Detailed methodology is documented in [`report.md`](file:///Users/arnavbansal/.gemini/antigravity/scratch/deepmisconception/report.md).
 
 ---

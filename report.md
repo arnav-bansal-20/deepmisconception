@@ -217,15 +217,21 @@ where:
 - $P_o = \frac{1}{N} \sum_{i=1}^k c_{ii}$ is the observed proportionate agreement.
 - $P_e = \sum_{j=1}^k \left(\frac{R_j}{N} \cdot \frac{C_j}{N}\right)$ is the hypothetical probability of chance agreement based on marginal frequencies.
 
-### 6.2. Empirical Inter-Rater Concordance on Real Viva Answer Test Corpus ($N=60$)
-Evaluation across 60 real student viva answers against expert human instructor annotations demonstrates substantial concordance:
+### 6.2. Empirical Inter-Rater Concordance on Annotated Viva Answer Corpus ($N=60$)
+Evaluation across 60 annotated student viva answers against expert human instructor annotations demonstrates substantial concordance:
 
 | Evaluation Metric | Measured Value | Standard Interpretation (Landis & Koch, 1977) |
 |---|---|---|
 | **Cohen's Kappa ($\kappa$)** | **0.6847** | **Substantial Agreement** ($0.61 \le \kappa \le 0.80$) |
 | **Overall Accuracy ($P_o$)** | **76.7%** | High inter-rater concordance across diverse conceptual topics |
 | **Macro-F1 Score** | **77.3%** | Balanced across all four viva response tiers |
-| **Plagiarism / Borrowed Code Detection** | **90.0%** | +82.5% advantage over traditional unit-test auto-graders (7.5%) |
+| **Borrowed / Unexplained Code Detection (Control Benchmark, $N=40$)** | **90.0% (36/40)** | +82.5% advantage over traditional unit-test auto-graders (7.5%, 3/40) |
+
+> **Evaluation Methodology & Dataset Provenance Note**:
+> 1. **Viva Answer Concordance ($N=60$)**: Evaluated on 60 human-annotated student viva explanations spanning Correct, Partially Correct, Incorrect, and Insufficient Evidence.
+> 2. **Borrowed Code Control Benchmark ($N=40$)**: Evaluated on a controlled benchmark of 40 submissions exhibiting high AST code complexity paired with verbal inability to defend logic. Traditional auto-graders passed 37/40 submissions (7.5% detection), while DeepMisconception flagged 36/40 (90.0%) via oral viva defense.
+> 3. **Modality Ablation Study ($N=240$)**: Evaluated on a 5-fold cross-validated synthetic student benchmark corpus with verified zero student leakage across folds.
+> 4. **Descriptive Telemetry Isolation**: Process telemetry is strictly descriptive context ($W_{\text{proc}} = 0.0$ in the diagnostic formula) and does not contribute to the comprehension score or verdict. Missing viva evidence yields `Pending / Insufficient Evidence` with `needs_instructor_review = True`.
 
 ### 6.3. Empirical 4x4 Confusion Matrix (Viva Answer Evaluation)
 
@@ -264,7 +270,7 @@ Actual: Insufficient Evidence       0              2 (17%)        0             
 | **Code Embeddings** | Hugging Face CodeBERT (`microsoft/codebert-base`), PyTorch 2.15 (Apple Silicon MPS) |
 | **Machine Learning** | NumPy Vectorized Cross-Attention, Scikit-learn (RandomForest, LogisticReg, MLP) |
 | **Evaluation Metrics**| Cohen's Kappa, Confusion Matrix, Per-class Precision/Recall/Macro-F1 |
-| **Testing** | Pytest, Pytest-Asyncio, HTTPX TestClient (59 / 59 Passing Tests) |
+| **Testing** | Pytest, Pytest-Asyncio, HTTPX TestClient (81 / 81 Passing Tests) |
 
 ---
 
@@ -276,21 +282,22 @@ The platform contains an end-to-end automated test suite covering all architectu
 |---|---|---|
 | `test_health.py` | API server health and environment checks | ✅ PASSED |
 | `test_phase2_database_api.py` | Session lifecycle, submissions, and reviews | ✅ PASSED |
+| `test_assignments_api.py` | Classroom assignments, scoping, and roster access | ✅ PASSED |
 | `test_ast_analyzer.py` | AST parsing, cyclomatic complexity, recursion detection | ✅ PASSED |
 | `test_safe_executor.py` | Sandbox execution, memory limits, infinite loop timeouts, security guards | ✅ PASSED |
 | `test_code_api.py` | Code analysis, execution, and automatic submission hooks | ✅ PASSED |
-| `test_safe_executor.py` | Subprocess isolation, environment sanitization, process-group termination, AST independence | ✅ PASSED |
 | `test_codebert.py` | CodeBERT 768-D embeddings, MPS acceleration & projected multimodal fusion | ✅ PASSED |
 | `test_question_generator.py` | Dynamic code-grounded viva generation & schema validation | ✅ PASSED |
 | `test_answer_evaluator.py` | Multi-stage answer evaluation (correct, partial, contradiction, evasive, off-topic, trace discrepancy) | ✅ PASSED |
 | `test_classrooms_api.py` | Teacher cohort guidance, code lookup, targeted assignment scoping | ✅ PASSED |
 | `test_process_telemetry.py` | Keystroke intervals, edit burstiness, typing pace, error recovery | ✅ PASSED |
-| `test_comprehension_engine.py` | Multimodal evidence fusion ($S_{\text{composite}}$), zero paste penalty, Pending state | ✅ PASSED |
+| `test_comprehension_engine.py` | Multimodal evidence fusion ($S_{\text{composite}}$), zero paste penalty, descriptive telemetry variance decoupling, Pending state | ✅ PASSED |
 | `test_ml_pipeline.py` | 40-D feature extractors, PyTorch cross-attention transformer, zero-leakage student split | ✅ PASSED |
 | `test_novelty_pipeline.py` | Process Transformer, AST + CodeBERT, Sentence-Transformer, Cross-Attention Fusion | ✅ PASSED |
 | `test_inter_rater.py` | Cohen's Kappa, inter-rater concordance, confusion matrices, evaluation API | ✅ PASSED |
-| **Total Test Suite** | **79 / 79 Unit Tests Passing (100%)** | ✅ **PASSED** |
-| **Frontend Production Build** | **0 errors, 1,970 modules transformed in 703ms** | ✅ **PASSED** |
+| `test_viva_api.py` | Viva generation and evaluation end-to-end API workflows | ✅ PASSED |
+| **Total Test Suite** | **81 / 81 Unit & Integration Tests Passing (100%)** | ✅ **PASSED** |
+| **Frontend Production Build** | **0 errors, 1,970 modules transformed in 889ms** | ✅ **PASSED** |
 
 ---
 
@@ -302,7 +309,7 @@ The platform contains an end-to-end automated test suite covering all architectu
    - The Task Selector loads assignments published specifically for that group.
    - Monaco code editor with live syntax diagnostics and AST complexity metrics.
    - Run code in the isolated sandbox with real-time output terminal.
-   - Inspect live Process Telemetry tab (burstiness, paste ratio, duration).
+   - Inspect live Process Telemetry tab (burstiness, editing activity, typing pace, duration).
 3. **AI Viva**:
    - Submit code to lock the snapshot and trigger dynamic viva generation.
    - Answer code-grounded conceptual questions probing execution boundaries.

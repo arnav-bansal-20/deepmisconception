@@ -22,11 +22,12 @@ logger = logging.getLogger(__name__)
 class ComprehensionEngine:
     """Fuses code structure, sandbox runtime traces, viva reasoning, and telemetry into a diagnosis."""
 
-    # Weights: prioritize verbal conceptual reasoning and physical execution reality
-    WEIGHT_AST = 0.15
-    WEIGHT_EXEC = 0.25
-    WEIGHT_VIVA = 0.45
-    WEIGHT_PROC = 0.15
+    # Weights: prioritize verbal conceptual reasoning and physical execution reality.
+    # Process telemetry is strictly descriptive context (weight = 0.0) and does not contribute to comprehension scoring.
+    WEIGHT_AST = 0.20
+    WEIGHT_EXEC = 0.30
+    WEIGHT_VIVA = 0.50
+    WEIGHT_PROC = 0.00
 
     @classmethod
     def evaluate_modalities(
@@ -106,11 +107,12 @@ class ComprehensionEngine:
             "process_authenticity_score": round(proc_score, 2),  # Backward compatibility alias
         }
 
+        # Composite score strictly fuses code structure, runtime execution, and viva conceptual reasoning.
+        # Process telemetry is returned for descriptive instructor context but has 0 weight in composite calculation.
         composite = (
             cls.WEIGHT_AST * ast_score
             + cls.WEIGHT_EXEC * exec_score
             + cls.WEIGHT_VIVA * viva_score
-            + cls.WEIGHT_PROC * proc_score
         )
         return scores, round(composite, 3)
 
@@ -214,9 +216,15 @@ class ComprehensionEngine:
             overall_label = "Possible Misconception"
             confidence = round(max(0.70, min(0.95, 0.60 + 0.15 * incorrect_vivas)), 2)
 
-        # Rule 3: Understood requires solid composite score AND zero incorrect viva answers
+        # Rule 3: Understood requires solid composite score, zero errors/contradictions, and all valid answers are Correct
         # A student who pastes code but explains it correctly is NOT penalized and can receive 'Understood'.
-        elif composite_score >= 0.72 and incorrect_vivas == 0 and len(detected_contradictions) == 0 and len(valid_answers) > 0:
+        elif (
+            composite_score >= 0.72 
+            and incorrect_vivas == 0 
+            and len(detected_contradictions) == 0 
+            and len(valid_answers) > 0
+            and all(a.answer_label == "Correct" for a in valid_answers)
+        ):
             overall_label = "Understood"
             confidence = round(max(0.75, min(0.98, composite_score)), 2)
 

@@ -50,7 +50,7 @@ export const api = {
   // Health
   getHealth: () => request<{ status: string; app: string; version: string; sandbox_enabled: boolean }>('/health'),
 
-  // Classrooms & Cohorts
+  // Classrooms & Groups
   listClassrooms: (teacherId?: string) => {
     const query = teacherId ? `?teacher_id=${encodeURIComponent(teacherId)}` : '';
     return request<Classroom[]>(`/classrooms${query}`);

@@ -264,7 +264,7 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
           </div>
           <h2 className="text-2xl font-black text-slate-900 mt-1">Academic Supervision Dashboard</h2>
           <p className="text-xs text-slate-500 mt-0.5">
-            Supervise designated student cohorts, publish targeted coding questions, and review comprehension reports.
+            Supervise designated student groups, publish targeted coding questions, and review comprehension reports.
           </p>
         </div>
 
@@ -307,19 +307,19 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
 
       {activeTab === 'reports' && (
         <div className="space-y-6">
-          {/* Cohort Selector / Filter Bar */}
+          {/* Group Selector / Filter Bar */}
           <div className="bg-white border border-slate-200 p-4 rounded-2xl shadow-sm flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <span className="text-xs font-mono font-bold uppercase text-slate-500 flex items-center gap-1.5">
                 <Users className="w-4 h-4 text-indigo-600" />
-                <span>Filter by Student Cohort:</span>
+                <span>Filter by Student Group:</span>
               </span>
               <select
                 value={selectedClassroomId}
                 onChange={(e) => setSelectedClassroomId(e.target.value)}
                 className="bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
-                <option value="all">All Guided Cohorts ({classrooms.length} groups)</option>
+                <option value="all">All Guided Groups ({classrooms.length} groups)</option>
                 {classrooms.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.code} — {c.name}
@@ -329,7 +329,7 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
             </div>
 
             <div className="text-xs text-slate-500 font-mono">
-              Showing reports for: <strong className="text-slate-800">{selectedClassroomId === 'all' ? 'All Guided Cohorts' : classrooms.find((c) => c.id === selectedClassroomId)?.name}</strong>
+              Showing reports for: <strong className="text-slate-800">{selectedClassroomId === 'all' ? 'All Guided Groups' : classrooms.find((c) => c.id === selectedClassroomId)?.name}</strong>
             </div>
           </div>
 
@@ -381,7 +381,7 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
             </div>
           </div>
 
-          {/* Student Cohorts Table */}
+          {/* Student Groups Table */}
           <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
             <div className="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
               <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
@@ -398,7 +398,7 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
                 <thead className="bg-slate-50 text-slate-500 font-mono uppercase text-[10px] border-b border-slate-200">
                   <tr>
                     <th className="p-4">Student</th>
-                    <th className="p-4">Cohort Group</th>
+                    <th className="p-4">Student Group</th>
                     <th className="p-4">Problem Task</th>
                     <th className="p-4">Submissions</th>
                     <th className="p-4">Viva Qs</th>
@@ -411,7 +411,7 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
                   {sessions.length === 0 ? (
                     <tr>
                       <td colSpan={8} className="p-8 text-center text-slate-400 italic">
-                        No student sessions recorded yet for this cohort. Students can join using the class code and submit code.
+                        No student sessions recorded yet for this group. Students can join using the class code and submit code.
                       </td>
                     </tr>
                   ) : (
@@ -494,7 +494,7 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
             {assignmentSuccess && (
               <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs flex items-center gap-2 animate-fadeIn font-semibold">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                <span>Coding question successfully published to designated student cohort!</span>
+                <span>Coding question successfully published to designated student group!</span>
               </div>
             )}
 
@@ -502,7 +502,7 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
               {/* Target Classroom Selection */}
               <div>
                 <label className="block font-mono font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Assign to Student Cohort / Group:
+                  Assign to Student Group:
                 </label>
                 <select
                   value={targetClassroomId}
@@ -514,7 +514,7 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
                       {c.name} ({c.code}) — {c.teacher_name}
                     </option>
                   ))}
-                  <option value="">All Cohorts (Open Global Access)</option>
+                  <option value="">All Groups (Open Global Access)</option>
                 </select>
                 <p className="text-[10px] text-slate-500 mt-1">
                   Only students enrolled in this group will see this problem in their task selector.
@@ -639,7 +639,7 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
                 className="w-full py-3 px-4 rounded-xl font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-500/20 transition-all flex items-center justify-center gap-2"
               >
                 <PlusCircle className="w-4 h-4" />
-                <span>{isCreatingAssignment ? 'Publishing...' : 'Publish to Target Cohort'}</span>
+                <span>{isCreatingAssignment ? 'Publishing...' : 'Publish to Target Group'}</span>
               </button>
             </form>
           </div>
@@ -656,7 +656,7 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
                 <BookOpen className="w-8 h-8 text-slate-300 mx-auto" />
                 <p className="text-xs font-semibold text-slate-700">No coding questions published by you yet</p>
                 <p className="text-[11px] text-slate-400 max-w-sm mx-auto">
-                  Use the authoring form on the left to create and publish programming questions with sample test inputs and outputs for your student cohorts.
+                  Use the authoring form on the left to create and publish programming questions with sample test inputs and outputs for your student groups.
                 </p>
               </div>
             ) : (
@@ -750,7 +750,7 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
                 <FolderPlus className="w-5 h-5 text-indigo-600" />
-                <h3 className="font-bold text-slate-900 text-base">Create Student Cohort</h3>
+                <h3 className="font-bold text-slate-900 text-base">Create Student Group</h3>
               </div>
               <button
                 onClick={() => setShowCreateClassModal(false)}
@@ -769,7 +769,7 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
             <form onSubmit={handleCreateNewClassroom} className="space-y-3 text-xs">
               <div>
                 <label className="block font-mono font-semibold uppercase text-slate-700 mb-1">
-                  Cohort / Class Name
+                  Group / Class Name
                 </label>
                 <input
                   type="text"
@@ -797,13 +797,13 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
 
               <div>
                 <label className="block font-mono font-semibold uppercase text-slate-700 mb-1">
-                  Cohort Description (Optional)
+                  Group Description (Optional)
                 </label>
                 <textarea
                   rows={2}
                   value={newClassDesc}
                   onChange={(e) => setNewClassDesc(e.target.value)}
-                  placeholder="Cohort objectives, syllabus focus..."
+                  placeholder="Group objectives, syllabus focus..."
                   className="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
@@ -821,7 +821,7 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
                   disabled={isCreatingClass}
                   className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-sm"
                 >
-                  {isCreatingClass ? 'Creating...' : 'Create Cohort'}
+                  {isCreatingClass ? 'Creating...' : 'Create Group'}
                 </button>
               </div>
             </form>
@@ -840,7 +840,7 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
                   <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-sky-50 text-sky-700 border border-sky-200">
                     Comprehensive Student Report
                   </span>
-                  <span className="text-xs text-slate-500 font-mono">Cohort: {inspectingSession.classroom_name || 'Group Alpha'}</span>
+                  <span className="text-xs text-slate-500 font-mono">Group: {inspectingSession.classroom_name || 'Group Alpha'}</span>
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 mt-1">
                   {inspectingSession.student_name} <span className="text-slate-500 text-sm font-normal">({inspectingSession.student_id})</span>

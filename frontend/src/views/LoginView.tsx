@@ -166,7 +166,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
             {role === 'student' ? (
               <>
                 <GraduationCap className="w-4 h-4 text-sky-600 flex-shrink-0" />
-                <span>Join your teacher's cohort to access assigned coding tasks and AI viva evaluations.</span>
+                <span>Join your teacher's group to access assigned coding tasks and AI viva evaluations.</span>
               </>
             ) : (
               <>
@@ -180,7 +180,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
           <form onSubmit={handleSubmit} className="space-y-4">
             {role === 'student' ? (
               <>
-                {/* Classroom / Teacher Cohort Selector */}
+                {/* Classroom / Teacher Group Selector */}
                 <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
                   <div className="flex items-center justify-between">
                     <label className="text-[11px] font-mono font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">

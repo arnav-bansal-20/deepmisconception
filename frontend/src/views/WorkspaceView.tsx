@@ -264,7 +264,7 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
             </span>
             {currentUser?.classroomCode && (
               <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-800 border border-indigo-200 font-semibold">
-                Cohort: {currentUser.classroomCode}
+                Group: {currentUser.classroomCode}
               </span>
             )}
             <span className="text-xs text-slate-500 font-mono">

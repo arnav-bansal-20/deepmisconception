@@ -124,7 +124,7 @@ export const AssessmentResultsView: React.FC<AssessmentResultsViewProps> = ({
                 Diagnosis Report
               </span>
               <span className="text-xs text-slate-500 font-mono">
-                Cohort: {session.classroom_name || 'Group Alpha'} &bull; ID: {session.id.slice(0, 8)}...
+                Group: {session.classroom_name || 'Group Alpha'} &bull; ID: {session.id.slice(0, 8)}...
               </span>
             </div>
             <h2 className="text-2xl font-black text-slate-900 mt-1">

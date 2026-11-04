@@ -24,7 +24,7 @@ def seed_default_classrooms_if_empty(db: Session):
             teacher_id="FAC-CS-804",
             teacher_name="Dr. Ada Smith",
             department="Computer Science & Engineering",
-            description="Morning cohort exploring program control flow, accumulator patterns, and loop invariants.",
+            description="Morning group exploring program control flow, accumulator patterns, and loop invariants.",
         ),
         Classroom(
             id="class-beta-201",
@@ -33,7 +33,7 @@ def seed_default_classrooms_if_empty(db: Session):
             teacher_id="FAC-CS-901",
             teacher_name="Prof. Alan Turing",
             department="Computer Science & Engineering",
-            description="Intermediate cohort focusing on recursion, state transitions, and computational complexity.",
+            description="Intermediate group focusing on recursion, state transitions, and computational complexity.",
         ),
     ]
     for c in defaults:
@@ -54,7 +54,7 @@ def list_classrooms(
     teacher_id: Optional[str] = Query(None, description="Filter by teacher identifier"),
     db: Session = Depends(get_db),
 ):
-    """List classrooms/cohorts with student and assignment counts."""
+    """List classrooms/groups with student and assignment counts."""
     seed_default_classrooms_if_empty(db)
 
     query = db.query(Classroom)

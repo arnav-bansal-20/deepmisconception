@@ -110,9 +110,6 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
           </div>
           <div className="flex items-center justify-center gap-2">
             <h1 className="text-2xl font-black text-slate-900 tracking-tight">DeepMisconception</h1>
-            <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-sky-50 text-sky-700 border border-sky-200">
-              v1.0
-            </span>
           </div>
           <p className="text-xs text-slate-500 max-w-sm mx-auto">
             AI-Assisted Code Comprehension Verification & Student Misconception Detection

@@ -547,7 +547,7 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
 
                 <div>
                   <label className="block font-mono font-semibold uppercase tracking-wider text-slate-700 mb-1">
-                    Concept Tags (comma separated)
+                    Concept Tags
                   </label>
                   <input
                     type="text"
@@ -756,7 +756,7 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
 
               <div>
                 <label className="block font-mono font-semibold uppercase text-slate-700 mb-1">
-                  Group Description (Optional)
+                  Group Description
                 </label>
                 <textarea
                   rows={2}

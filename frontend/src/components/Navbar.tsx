@@ -46,9 +46,6 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div>
             <div className="flex items-center gap-2">
               <span className="font-bold text-lg tracking-tight text-slate-900">DeepMisconception</span>
-              <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-sky-50 text-sky-700 border border-sky-200">
-                Academic AI
-              </span>
             </div>
             <p className="text-xs text-slate-500 font-mono">Code Comprehension & Diagnosis</p>
           </div>

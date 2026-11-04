@@ -565,9 +565,6 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
                   <label className="block font-mono font-bold uppercase tracking-wider text-slate-800 text-[11px]">
                     Sample Test Case (Input &amp; Expected Output)
                   </label>
-                  <span className="text-[10px] font-mono text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded font-semibold border border-indigo-100">
-                    Optional
-                  </span>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>

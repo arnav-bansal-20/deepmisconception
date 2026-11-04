@@ -165,6 +165,8 @@ class ComprehensionEngine:
         # Collect diagnosed misconceptions and contradictions
         detected_contradictions: List[str] = []
         detected_misconceptions: List[str] = []
+
+        # 1. Contradictions between code and explanation
         for a in assessments:
             if a.contradictions:
                 for c in a.contradictions:
@@ -172,11 +174,36 @@ class ComprehensionEngine:
                         detected_contradictions.append(c)
                         if c not in detected_misconceptions:
                             detected_misconceptions.append(c)
-            if a.concepts_missed and a.answer_label in ("Incorrect", "Partially Correct"):
+
+        # 2. Concepts missed from ANY non-Correct answer
+        for a in assessments:
+            if a.concepts_missed and a.answer_label != "Correct":
                 for m in a.concepts_missed:
-                    item = f"Missing: {m}"
+                    item = m if m.lower().startswith("missing") else f"Missing: {m}"
                     if item not in detected_misconceptions:
                         detected_misconceptions.append(item)
+
+        # 3. Sophistication vs. Reasoning Gap
+        if scores["ast_structural_score"] >= 0.85 and scores["viva_reasoning_score"] < 0.45:
+            gap_item = "Code Sophistication vs. Reasoning Gap: Working code structure present, but candidate failed to explain underlying mechanisms during viva."
+            if gap_item not in detected_misconceptions:
+                detected_misconceptions.append(gap_item)
+
+        # 4. If student has Incorrect or Insufficient Evidence answers, ensure descriptive misconception is captured
+        for a in assessments:
+            if a.answer_label in ("Incorrect", "Insufficient Evidence") and a.student_answer and a.student_answer.strip():
+                q_obj = next((q for q in questions if q.id == a.question_id), None)
+                q_concept = q_obj.concept if (q_obj and q_obj.concept) else (q_obj.question_text[:35] if q_obj else "Target Logic")
+                if not any(q_concept.lower() in m.lower() for m in detected_misconceptions):
+                    desc = f"Unverified reasoning for '{q_concept}': explanation was insufficient or contradictory to code execution"
+                    if desc not in detected_misconceptions:
+                        detected_misconceptions.append(desc)
+
+        # 5. Syntax / Execution runtime failure
+        if latest_sub and not latest_sub.is_valid and latest_sub.error_output:
+            err_line = latest_sub.error_output.strip().split("\n")[-1]
+            if err_line and err_line not in detected_misconceptions:
+                detected_misconceptions.append(f"Syntax/Parser Error: {err_line}")
 
         # Contradiction and review flags
         needs_review = False
@@ -188,7 +215,11 @@ class ComprehensionEngine:
             if a.answer_label not in ("Insufficient Evidence",) 
             and a.student_answer and a.student_answer.strip()
         ]
-        if not assessments or len(valid_answers) == 0:
+        submitted_answers = [
+            a for a in assessments 
+            if a.student_answer and a.student_answer.strip()
+        ]
+        if not assessments or len(submitted_answers) == 0:
             needs_review = True
             review_reasons.append("Insufficient viva evidence: Conceptual understanding has not been verbally verified or answers are empty.")
 
@@ -211,22 +242,33 @@ class ComprehensionEngine:
         )
 
         # Classification Logic:
-        # Rule 1: Missing or Insufficient Evidence -> Explicit Pending Status
-        # Never prematurely assign a substantive classification without valid viva answers
-        if len(assessments) == 0 or len(valid_answers) == 0:
-            overall_label = "Pending / Insufficient Evidence"
-            confidence = 0.35
-            needs_review = True
-
-        # Rule 2: Possible Misconception requires repeated errors or verified contradictions
-        # A single incorrect answer alone or a syntax/execution crash NEVER determines a misconception.
-        elif (
+        # Rule 1: Possible Misconception triggers when there are repeated errors, verified contradictions,
+        # or multiple diagnosed conceptual flaws where the student cannot explain sophisticated code
+        has_misconception_evidence = (
             incorrect_vivas >= 2
             or len(detected_contradictions) >= 2
             or (incorrect_vivas == 1 and len(detected_contradictions) >= 1)
-        ):
+            or (
+                scores["ast_structural_score"] >= 0.85 
+                and scores["viva_reasoning_score"] < 0.45 
+                and correct_vivas == 0 
+                and len(submitted_answers) >= 2
+                and len(detected_misconceptions) >= 2
+            )
+            or (composite_score < 0.45 and len(submitted_answers) > 0 and len(detected_misconceptions) >= 1)
+        )
+
+        if has_misconception_evidence:
             overall_label = "Possible Misconception"
-            confidence = round(max(0.70, min(0.95, 0.60 + 0.15 * incorrect_vivas)), 2)
+            confidence = round(max(0.70, min(0.95, 0.60 + 0.10 * max(incorrect_vivas, len(detected_misconceptions)))), 2)
+
+        # Rule 2: Missing or Insufficient Evidence -> Explicit Pending Status
+        # Appears when viva answers have not been submitted or are empty whitespace,
+        # or single non-committal answer without substantive verification
+        elif len(assessments) == 0 or len(submitted_answers) == 0 or (len(valid_answers) == 0 and len(assessments) <= 1):
+            overall_label = "Pending / Insufficient Evidence"
+            confidence = 0.35
+            needs_review = True
 
         # Rule 3: Understood requires solid composite score, zero errors/contradictions, and all valid answers are Correct
         # A student who pastes code but explains it correctly is NOT penalized and can receive 'Understood'.
@@ -260,7 +302,7 @@ class ComprehensionEngine:
         elif overall_label == "Possible Misconception":
             summary_parts.append(
                 f"Definite conceptual gaps identified (Composite Index: {int(composite_score*100)}%). "
-                f"The candidate's explanations contradict the operational reality of the executed code."
+                f"The candidate's explanations contradict or fail to substantiate the operational reality of the executed code."
             )
             if detected_misconceptions:
                 summary_parts.append(f"Specific identified flaws: {', '.join(detected_misconceptions[:3])}.")
@@ -269,11 +311,15 @@ class ComprehensionEngine:
                 f"Candidate evaluation is pending sufficient viva explanation evidence (Composite Index: {int(composite_score*100)}%). "
                 "Syntactic code snapshot is present, but verbal/conceptual justification has not been completed or is insufficient."
             )
+            if detected_misconceptions:
+                summary_parts.append(f"Preliminary flagged points: {', '.join(detected_misconceptions[:3])}.")
         else:
             summary_parts.append(
                 f"Candidate demonstrated partial comprehension (Composite Index: {int(composite_score*100)}%). "
                 f"Foundational code structures are present, but nuanced edge-case handling or state transformations remain incomplete."
             )
+            if detected_misconceptions:
+                summary_parts.append(f"Identified areas for reinforcement: {', '.join(detected_misconceptions[:3])}.")
 
         if proc_features.process_profile != "Uninitialized Session":
             summary_parts.append(

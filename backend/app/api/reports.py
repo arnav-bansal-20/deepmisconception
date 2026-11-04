@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.session import CodingSession
 from app.models.submission import CodeSubmission
+from app.models.answer_assessment import AnswerAssessment
 from app.models.comprehension_report import ComprehensionReport
 from app.schemas.report import ComprehensionReportResponse, ReportGenerateRequest
 from app.services.comprehension_engine import ComprehensionEngine
@@ -43,10 +44,20 @@ def get_session_report(
         .order_by(ComprehensionReport.created_at.desc())
         .first()
     )
-    if not report and auto_generate:
-        # Check if session has code submissions or viva answers to synthesize from
+
+    ans_count = db.query(AnswerAssessment).filter(AnswerAssessment.session_id == session_id).count()
+    rep_answered = (report.rubric_summary or {}).get("answered_questions", 0) if report else 0
+
+    if auto_generate:
+        # Check if session needs initial synthesis OR re-synthesis because new viva answers were submitted
         sub_count = db.query(CodeSubmission).filter(CodeSubmission.session_id == session_id).count()
-        if sub_count > 0:
+        needs_synth = (not report and sub_count > 0) or (
+            report is not None and (
+                ans_count > rep_answered or 
+                (report.overall_label == "Pending / Insufficient Evidence" and ans_count > 0)
+            )
+        )
+        if needs_synth:
             try:
                 report = ComprehensionEngine.synthesize_report(session_id, db)
             except Exception:

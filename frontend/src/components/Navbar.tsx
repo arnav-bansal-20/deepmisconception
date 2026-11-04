@@ -68,6 +68,18 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
 
               <button
+                onClick={() => setActiveTab('assessment')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  activeTab === 'assessment'
+                    ? 'bg-sky-50 text-sky-700 font-bold border border-sky-200'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                }`}
+              >
+                <Award className="w-4 h-4" />
+                <span>Results</span>
+              </button>
+
+              <button
                 onClick={() => setActiveTab('history')}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                   activeTab === 'history'

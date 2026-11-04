@@ -226,13 +226,19 @@ export const App: React.FC = () => {
           {activeTab === 'assessment' && (
             <AssessmentResultsView
               session={currentSession}
+              currentUser={currentUser}
               onNavigateToWorkspace={() => setActiveTab('workspace')}
+              onSelectSession={handleSelectSession}
             />
           )}
 
           {activeTab === 'history' && (
             <SessionHistoryView
               onSelectSession={handleSelectSession}
+              onViewReport={(session) => {
+                handleSelectSession(session);
+                setActiveTab('assessment');
+              }}
               currentSessionId={currentSession?.id}
               currentUser={currentUser}
             />

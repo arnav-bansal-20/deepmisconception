@@ -9,19 +9,22 @@ import {
   XCircle, 
   ArrowRight,
   RefreshCw,
-  Trash2
+  Trash2,
+  Award
 } from 'lucide-react';
 import { CodingSession, AuthUser } from '../types';
 import { api } from '../services/api';
 
 interface SessionHistoryViewProps {
   onSelectSession: (session: CodingSession) => void;
+  onViewReport?: (session: CodingSession) => void;
   currentSessionId?: string;
   currentUser?: AuthUser | null;
 }
 
 export const SessionHistoryView: React.FC<SessionHistoryViewProps> = ({
   onSelectSession,
+  onViewReport,
   currentSessionId,
   currentUser,
 }) => {
@@ -170,9 +173,25 @@ export const SessionHistoryView: React.FC<SessionHistoryViewProps> = ({
 
                 <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 font-mono">
                   <span>{new Date(s.created_at).toLocaleDateString()}</span>
-                  <div className="flex items-center gap-1 text-sky-700 font-bold group">
-                    <span>{isCurrent ? 'Active Now' : 'Open Session'}</span>
-                    <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+                  <div className="flex items-center gap-3">
+                    {onViewReport && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onViewReport(s);
+                        }}
+                        className="flex items-center gap-1 text-indigo-600 hover:text-indigo-800 font-bold hover:underline"
+                        title="View multimodal comprehension report"
+                      >
+                        <Award className="w-3.5 h-3.5" />
+                        <span>View Report</span>
+                      </button>
+                    )}
+                    <div className="flex items-center gap-1 text-sky-700 font-bold group">
+                      <span>{isCurrent ? 'Active Now' : 'Open Workspace'}</span>
+                      <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+                    </div>
                   </div>
                 </div>
               </div>

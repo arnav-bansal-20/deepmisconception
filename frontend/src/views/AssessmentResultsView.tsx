@@ -20,23 +20,42 @@ import {
   Terminal,
   Compass
 } from 'lucide-react';
-import { CodingSession, ComprehensionReport, ProcessFeatures } from '../types';
+import { CodingSession, ComprehensionReport, ProcessFeatures, AuthUser } from '../types';
 import { api } from '../services/api';
 import { ProcessTimeline } from '../components/ProcessTimeline';
 
 interface AssessmentResultsViewProps {
   session: CodingSession | null;
+  currentUser?: AuthUser | null;
   onNavigateToWorkspace: () => void;
+  onSelectSession?: (session: CodingSession) => void;
 }
 
 export const AssessmentResultsView: React.FC<AssessmentResultsViewProps> = ({
   session,
+  currentUser,
   onNavigateToWorkspace,
+  onSelectSession,
 }) => {
   const [report, setReport] = useState<ComprehensionReport | null>(null);
   const [features, setFeatures] = useState<ProcessFeatures | null>(null);
+  const [studentSessions, setStudentSessions] = useState<CodingSession[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isRegenerating, setIsRegenerating] = useState(false);
+
+  // Fetch all sessions belonging to the student
+  useEffect(() => {
+    if (currentUser?.id) {
+      api.listSessions({ student_id: currentUser.id })
+        .then((list) => {
+          setStudentSessions(list);
+          if (!session && list.length > 0 && onSelectSession) {
+            onSelectSession(list[0]);
+          }
+        })
+        .catch((e) => console.error('Failed loading student sessions for report:', e));
+    }
+  }, [currentUser, session]);
 
   const loadData = async (forceGenerate: boolean = false) => {
     if (!session) return;
@@ -66,8 +85,21 @@ export const AssessmentResultsView: React.FC<AssessmentResultsViewProps> = ({
 
   if (!session) {
     return (
-      <div className="text-center py-20 text-slate-500">
-        No active session selected.
+      <div className="max-w-md mx-auto py-20 px-4 text-center space-y-4">
+        <div className="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 border border-sky-200 flex items-center justify-center mx-auto">
+          <Award className="w-6 h-6" />
+        </div>
+        <h3 className="text-lg font-bold text-slate-900">No Assessment Report Yet</h3>
+        <p className="text-xs text-slate-500 leading-relaxed">
+          Complete a coding task and AI viva evaluation in the Workspace to generate your comprehension diagnosis report.
+        </p>
+        <button
+          onClick={onNavigateToWorkspace}
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs transition-colors shadow-sm"
+        >
+          <span>Go to Workspace</span>
+          <ChevronRight className="w-4 h-4" />
+        </button>
       </div>
     );
   }
@@ -83,6 +115,25 @@ export const AssessmentResultsView: React.FC<AssessmentResultsViewProps> = ({
         <p className="text-sm text-slate-600 leading-relaxed">
           Synthesize a multi-modal report combining your code AST structure, isolated execution output, viva reasoning, and editor telemetry.
         </p>
+        {studentSessions.length > 1 && (
+          <div className="flex items-center justify-center gap-2 pt-1">
+            <span className="text-xs font-mono text-slate-500 font-bold uppercase">Switch Task:</span>
+            <select
+              value={session.id}
+              onChange={(e) => {
+                const found = studentSessions.find((s) => s.id === e.target.value);
+                if (found && onSelectSession) onSelectSession(found);
+              }}
+              className="bg-white border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm"
+            >
+              {studentSessions.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.title} ({new Date(s.created_at).toLocaleDateString()})
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
         <div className="pt-2 flex items-center justify-center gap-3">
           <button
             onClick={() => loadData(true)}
@@ -130,9 +181,30 @@ export const AssessmentResultsView: React.FC<AssessmentResultsViewProps> = ({
             <h2 className="text-2xl font-black text-slate-900 mt-1">
               Comprehension & Misconception Evaluation
             </h2>
-            <p className="text-xs text-slate-500">
-              Evaluated Candidate: <strong className="text-slate-800">{session.student_name}</strong> ({session.student_id})
-            </p>
+            <div className="flex items-center gap-3 flex-wrap mt-1">
+              <p className="text-xs text-slate-500">
+                Evaluated Candidate: <strong className="text-slate-800">{session.student_name}</strong> ({session.student_id})
+              </p>
+              {studentSessions.length > 1 && (
+                <div className="flex items-center gap-1.5 pl-3 border-l border-slate-200">
+                  <span className="text-[11px] font-mono text-slate-500 font-semibold uppercase">Task:</span>
+                  <select
+                    value={session.id}
+                    onChange={(e) => {
+                      const found = studentSessions.find((s) => s.id === e.target.value);
+                      if (found && onSelectSession) onSelectSession(found);
+                    }}
+                    className="bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                  >
+                    {studentSessions.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.title} ({new Date(s.created_at).toLocaleDateString()})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Classification Badge & Re-evaluate */}

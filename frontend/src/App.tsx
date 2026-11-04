@@ -115,25 +115,25 @@ export const App: React.FC = () => {
     }
   }, []);
 
-  // Ensure an active session is auto-created whenever a student is logged in without one
-  useEffect(() => {
-    if (currentUser?.role === 'student' && !currentSession) {
-      api.createSession({
+  const handleStartProblem = async (assignment: import('./types').Assignment) => {
+    if (!currentUser) return;
+    try {
+      const session = await api.createSession({
         student_id: currentUser.id,
         student_name: currentUser.name,
         classroom_id: currentUser.classroomId,
         classroom_name: currentUser.classroomName,
         teacher_id: currentUser.teacherId,
         teacher_name: currentUser.teacherName,
-        title: 'Code Comprehension Assessment',
-      }).then((sess) => {
-        setCurrentSession(sess);
-        localStorage.setItem('deepmisconception_active_session', JSON.stringify(sess));
-      }).catch((e) => {
-        console.error('Failed auto-creating student session:', e);
+        title: assignment.title,
       });
+      setCurrentSession(session);
+      localStorage.setItem('deepmisconception_active_session', JSON.stringify(session));
+      setActiveTab('workspace');
+    } catch (err: any) {
+      alert(`Could not start problem: ${err.message}`);
     }
-  }, [currentUser, currentSession]);
+  };
 
   const handleLogin = async (user: AuthUser) => {
     setCurrentUser(user);
@@ -141,24 +141,6 @@ export const App: React.FC = () => {
     if (user.role === 'teacher') {
       setActiveTab('instructor');
     } else {
-      let session = currentSession;
-      if (!session || session.student_id !== user.id) {
-        try {
-          session = await api.createSession({
-            student_id: user.id,
-            student_name: user.name,
-            classroom_id: user.classroomId,
-            classroom_name: user.classroomName,
-            teacher_id: user.teacherId,
-            teacher_name: user.teacherName,
-            title: 'Code Comprehension Assessment',
-          });
-          setCurrentSession(session);
-          localStorage.setItem('deepmisconception_active_session', JSON.stringify(session));
-        } catch (err) {
-          console.error('Failed to create session on login', err);
-        }
-      }
       setActiveTab('history');
     }
   };
@@ -172,7 +154,11 @@ export const App: React.FC = () => {
   const handleSelectSession = (session: CodingSession) => {
     setCurrentSession(session);
     localStorage.setItem('deepmisconception_active_session', JSON.stringify(session));
-    setActiveTab('workspace');
+    if (session.status === 'completed' || session.status === 'reviewed' || session.has_report) {
+      setActiveTab('assessment');
+    } else {
+      setActiveTab('workspace');
+    }
   };
 
   const handleCodeSubmitted = (submission: CodeSubmission) => {
@@ -183,7 +169,7 @@ export const App: React.FC = () => {
   const handleTabChange = (targetTab: ActiveTab) => {
     if (targetTab === 'instructor' && currentUser?.role !== 'teacher') {
       // Students cannot enter instructor studio
-      setActiveTab('workspace');
+      setActiveTab('history');
       return;
     }
     setActiveTab(targetTab);
@@ -213,6 +199,8 @@ export const App: React.FC = () => {
               currentUser={currentUser}
               onCodeSubmitted={handleCodeSubmitted}
               onNavigateToViva={() => setActiveTab('viva')}
+              onNavigateToResults={() => setActiveTab('assessment')}
+              onStartProblem={handleStartProblem}
             />
           )}
 

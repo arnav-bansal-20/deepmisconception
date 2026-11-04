@@ -4,18 +4,22 @@ import {
   Send, 
   Sparkles, 
   CheckCircle, 
+  CheckCircle2,
   AlertCircle, 
   FileCode, 
   Activity, 
   Layers, 
   RotateCcw,
   Zap,
-  BookOpen
+  BookOpen,
+  Award,
+  PlusCircle,
+  ArrowRight
 } from 'lucide-react';
 import { MonacoEditor } from '../components/MonacoEditor';
 import { ExecutionTerminal } from '../components/ExecutionTerminal';
 import { ProcessTimeline } from '../components/ProcessTimeline';
-import { CodingSession, CodeSubmission, ProcessEventItem, AuthUser, ProcessFeatures } from '../types';
+import { CodingSession, CodeSubmission, ProcessEventItem, AuthUser, ProcessFeatures, Assignment } from '../types';
 import { api } from '../services/api';
 
 interface WorkspaceViewProps {
@@ -23,6 +27,8 @@ interface WorkspaceViewProps {
   currentUser?: AuthUser | null;
   onCodeSubmitted: (submission: CodeSubmission) => void;
   onNavigateToViva: () => void;
+  onNavigateToResults?: () => void;
+  onStartProblem?: (assignment: Assignment) => void;
 }
 
 const DEFAULT_PYTHON_CODE = `# Python Code Comprehension Task
@@ -42,11 +48,24 @@ result = sum_of_squares_skipping_threes(5)
 print(f"Computed total: {result}")
 `;
 
+const DEFAULT_ASSIGNMENT: Assignment = {
+  id: 'default-task-accumulator',
+  title: 'Accumulator with Modulo Filtering',
+  description: 'Implement an accumulator function that computes the sum of squares up to n, skipping multiples of 3. Ensure your loop preserves invariant state across cycles and correctly handles control-flow skipping.',
+  difficulty: 'medium',
+  concept_tags: ['modulo-filtering', 'accumulator-invariants', 'loop-control'],
+  starter_code: DEFAULT_PYTHON_CODE,
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
+};
+
 export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
   session,
   currentUser,
   onCodeSubmitted,
   onNavigateToViva,
+  onNavigateToResults,
+  onStartProblem,
 }) => {
   const [code, setCode] = useState(DEFAULT_PYTHON_CODE);
   const [stdout, setStdout] = useState<string | null>(null);
@@ -60,8 +79,9 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
   const [activeRightTab, setActiveRightTab] = useState<'terminal' | 'ast' | 'telemetry'>('terminal');
   const [processFeatures, setProcessFeatures] = useState<ProcessFeatures | null>(null);
   const [isLoadingFeatures, setIsLoadingFeatures] = useState(false);
-  const [assignments, setAssignments] = useState<import('../types').Assignment[]>([]);
-  const [selectedAssignment, setSelectedAssignment] = useState<import('../types').Assignment | null>(null);
+  const [assignments, setAssignments] = useState<Assignment[]>([]);
+  const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
+  const [isSelectingProblem, setIsSelectingProblem] = useState(false);
 
   // Load teacher-authored assignments for student's classroom on mount
   useEffect(() => {
@@ -70,15 +90,18 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
         const list = await api.listAssignments(currentUser?.classroomId);
         setAssignments(list);
         if (list.length > 0 && !selectedAssignment) {
-          setSelectedAssignment(list[0]);
-          setCode(list[0].starter_code);
+          // If session has title matching one of the assignments, pick it
+          const matching = session ? list.find((a) => a.title.toLowerCase() === session.title.toLowerCase()) : null;
+          const target = matching || list[0];
+          setSelectedAssignment(target);
+          setCode(target.starter_code);
         }
       } catch (err) {
         console.error('Failed to load assignments', err);
       }
     };
     loadAssignments();
-  }, [currentUser?.classroomId]);
+  }, [currentUser?.classroomId, session?.id]);
 
   const handleSelectAssignment = (assignmentId: string) => {
     const found = assignments.find((a) => a.id === assignmentId);
@@ -221,14 +244,144 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
     setStderr(null);
   };
 
-  if (!session) {
+  const handleLaunchProblem = (assignment: Assignment) => {
+    setSelectedAssignment(assignment);
+    setCode(assignment.starter_code || DEFAULT_PYTHON_CODE);
+    setIsSelectingProblem(false);
+    if (onStartProblem) {
+      onStartProblem(assignment);
+    }
+  };
+
+  const isCompleted = Boolean(session && (session.status === 'completed' || session.status === 'reviewed'));
+  const displayAssignments = assignments.length > 0 ? assignments : [DEFAULT_ASSIGNMENT];
+
+  // If completed and not actively choosing another problem, show completed summary
+  if (isCompleted && !isSelectingProblem && session) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-center max-w-md mx-auto">
-        <AlertCircle className="w-12 h-12 text-amber-500 mb-3" />
-        <h3 className="text-xl font-bold text-slate-900 mb-2">No Active Session Selected</h3>
-        <p className="text-sm text-slate-500 mb-6">
-          Please create or select a student session to enter the coding workspace.
-        </p>
+      <div className="max-w-2xl mx-auto py-12 px-4 space-y-6 text-center">
+        <div className="bg-white border border-slate-200 p-8 rounded-2xl shadow-sm space-y-4">
+          <div className="w-16 h-16 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center mx-auto shadow-sm">
+            <CheckCircle2 className="w-8 h-8" />
+          </div>
+          <h3 className="text-xl font-black text-slate-900">
+            Problem Completed: "{session.title}"
+          </h3>
+          <p className="text-xs text-slate-600 max-w-md mx-auto leading-relaxed">
+            You have successfully completed this coding problem and finished its AI viva evaluation. Your multimodal comprehension report is ready to view.
+          </p>
+          <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
+            {onNavigateToResults && (
+              <button
+                onClick={onNavigateToResults}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-bold text-xs shadow-md transition-all"
+              >
+                <Award className="w-4 h-4" />
+                <span>View Diagnosis Report</span>
+              </button>
+            )}
+            <button
+              onClick={() => setIsSelectingProblem(true)}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition-all"
+            >
+              <PlusCircle className="w-4 h-4" />
+              <span>Start Another Problem</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // If no active session or student clicked to select/change problem, show Problem Catalog
+  if (!session || isSelectingProblem) {
+    return (
+      <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 space-y-6">
+        <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-mono px-2.5 py-0.5 rounded-full bg-sky-50 text-sky-700 border border-sky-200 font-bold uppercase">
+                Problem Catalog
+              </span>
+              {currentUser?.classroomCode && (
+                <span className="text-xs text-slate-500 font-mono">
+                  Group: {currentUser.classroomCode}
+                </span>
+              )}
+            </div>
+            <h2 className="text-2xl font-black text-slate-900 mt-1">
+              Start a Coding Problem
+            </h2>
+            <p className="text-xs text-slate-500 mt-1">
+              Choose an assigned problem below to start solving it in the interactive code editor.
+            </p>
+          </div>
+          {session && !isCompleted && (
+            <button
+              onClick={() => setIsSelectingProblem(false)}
+              className="text-xs font-bold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-3.5 py-2 rounded-xl transition-colors"
+            >
+              Resume Current ({session.title})
+            </button>
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {displayAssignments.map((a) => (
+            <div
+              key={a.id}
+              className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex flex-col justify-between hover:border-sky-300 hover:shadow-md transition-all"
+            >
+              <div className="space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                  <span className={`text-[11px] font-mono uppercase px-2.5 py-0.5 rounded-full font-bold border ${
+                    a.difficulty === 'easy'
+                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                      : a.difficulty === 'hard'
+                      ? 'bg-rose-50 text-rose-700 border-rose-200'
+                      : 'bg-amber-50 text-amber-700 border-amber-200'
+                  }`}>
+                    {a.difficulty}
+                  </span>
+                  {a.concept_tags && a.concept_tags.length > 0 && (
+                    <span className="text-[10px] font-mono text-slate-400 truncate max-w-[140px]">
+                      {a.concept_tags.join(', ')}
+                    </span>
+                  )}
+                </div>
+
+                <h3 className="font-bold text-slate-900 text-base leading-snug">
+                  {a.title}
+                </h3>
+
+                <p className="text-xs text-slate-600 line-clamp-3 leading-relaxed">
+                  {a.description}
+                </p>
+
+                {(a.sample_input || a.sample_output) && (
+                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-[11px] font-mono space-y-1">
+                    {a.sample_input && (
+                      <div className="truncate"><span className="text-slate-400 font-bold">Input:</span> {a.sample_input}</div>
+                    )}
+                    {a.sample_output && (
+                      <div className="truncate"><span className="text-slate-400 font-bold">Output:</span> {a.sample_output}</div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <div className="pt-4 mt-4 border-t border-slate-100 flex items-center justify-end">
+                <button
+                  onClick={() => handleLaunchProblem(a)}
+                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-bold text-xs shadow-md shadow-sky-500/10 transition-all"
+                >
+                  <Play className="w-3.5 h-3.5 fill-current" />
+                  <span>Start Problem</span>
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
@@ -288,6 +441,15 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
                 </select>
               </div>
             )}
+
+            <button
+              onClick={() => setIsSelectingProblem(true)}
+              className="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-colors text-xs font-semibold flex items-center gap-1.5"
+              title="Start another problem or view problem catalog"
+            >
+              <PlusCircle className="w-3.5 h-3.5 text-indigo-600" />
+              <span className="hidden sm:inline">Change Problem</span>
+            </button>
 
             <button
               onClick={handleResetCode}

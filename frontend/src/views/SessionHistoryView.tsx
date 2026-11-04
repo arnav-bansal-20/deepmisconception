@@ -126,10 +126,17 @@ export const SessionHistoryView: React.FC<SessionHistoryViewProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {filteredSessions.map((s) => {
             const isCurrent = s.id === currentSessionId;
+            const isCompleted = s.status === 'completed' || s.status === 'reviewed' || s.has_report;
             return (
               <div
                 key={s.id}
-                onClick={() => onSelectSession(s)}
+                onClick={() => {
+                  if (isCompleted && onViewReport) {
+                    onViewReport(s);
+                  } else {
+                    onSelectSession(s);
+                  }
+                }}
                 className={`p-5 rounded-2xl cursor-pointer transition-all border text-left flex flex-col justify-between ${
                   isCurrent
                     ? 'bg-sky-50/60 border-sky-400 ring-1 ring-sky-400 shadow-sm'
@@ -183,24 +190,17 @@ export const SessionHistoryView: React.FC<SessionHistoryViewProps> = ({
                 <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 font-mono">
                   <span>{new Date(s.created_at).toLocaleDateString()}</span>
                   <div className="flex items-center gap-3">
-                    {onViewReport && (
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onViewReport(s);
-                        }}
-                        className="flex items-center gap-1 text-indigo-600 hover:text-indigo-800 font-bold hover:underline"
-                        title="View multimodal comprehension report"
-                      >
-                        <Award className="w-3.5 h-3.5" />
-                        <span>View Report</span>
-                      </button>
+                    {isCompleted ? (
+                      <div className="flex items-center gap-1.5 text-emerald-700 font-bold group">
+                        <Award className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>Completed • View Diagnosis Report →</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1 text-sky-700 font-bold group">
+                        <span>{isCurrent ? 'Active Now • Continue Workspace' : 'Resume Workspace'}</span>
+                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                      </div>
                     )}
-                    <div className="flex items-center gap-1 text-sky-700 font-bold group">
-                      <span>{s.status === 'completed' ? 'Completed' : isCurrent ? 'Active Now' : 'Open Workspace'}</span>
-                      <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
-                    </div>
                   </div>
                 </div>
               </div>

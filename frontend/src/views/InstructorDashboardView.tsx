@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { 
   ShieldCheck, 
   Users, 
-  FileCode, 
-  HelpCircle, 
   Award, 
   AlertTriangle, 
   CheckCircle2, 
@@ -171,7 +169,7 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
 
   const handleCreateAssignment = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newTitle.trim() || !newDescription.trim() || !newStarterCode.trim()) return;
+    if (!newTitle.trim() || !newDescription.trim()) return;
 
     setIsCreatingAssignment(true);
     try {
@@ -181,7 +179,7 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
       await api.createAssignment({
         title: newTitle.trim(),
         description: newDescription.trim(),
-        starter_code: newStarterCode,
+        starter_code: newStarterCode || 'def solution():\n    pass\n',
         difficulty: newDifficulty,
         concept_tags: tags,
         created_by: reviewerName,
@@ -334,7 +332,7 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
           </div>
 
           {/* Aggregate Metrics Grid */}
-          <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="bg-white border border-slate-200 p-4 rounded-xl shadow-sm">
               <div className="flex items-center justify-between text-slate-500 mb-1">
                 <span className="text-xs font-bold uppercase tracking-wider">Students</span>
@@ -342,24 +340,6 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
               </div>
               <div className="text-2xl font-bold text-slate-900">{overview?.total_sessions || 0}</div>
               <div className="text-[10px] text-slate-500 mt-1">Active candidate sessions</div>
-            </div>
-
-            <div className="bg-white border border-slate-200 p-4 rounded-xl shadow-sm">
-              <div className="flex items-center justify-between text-slate-500 mb-1">
-                <span className="text-xs font-bold uppercase tracking-wider">Submissions</span>
-                <FileCode className="w-4 h-4 text-emerald-600" />
-              </div>
-              <div className="text-2xl font-bold text-slate-900">{overview?.total_submissions || 0}</div>
-              <div className="text-[10px] text-slate-500 mt-1">AST snapshots executed</div>
-            </div>
-
-            <div className="bg-white border border-slate-200 p-4 rounded-xl shadow-sm">
-              <div className="flex items-center justify-between text-slate-500 mb-1">
-                <span className="text-xs font-bold uppercase tracking-wider">AI Viva Qs</span>
-                <HelpCircle className="w-4 h-4 text-indigo-600" />
-              </div>
-              <div className="text-2xl font-bold text-slate-900">{overview?.total_questions || 0}</div>
-              <div className="text-[10px] text-slate-500 mt-1">Generated viva items</div>
             </div>
 
             <div className="bg-white border border-slate-200 p-4 rounded-xl shadow-sm">
@@ -620,19 +600,6 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
                 </p>
               </div>
 
-              <div>
-                <label className="block font-mono font-semibold uppercase tracking-wider text-slate-700 mb-1">
-                  Starter Python Code Template
-                </label>
-                <textarea
-                  required
-                  rows={6}
-                  value={newStarterCode}
-                  onChange={(e) => setNewStarterCode(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-slate-900 font-mono text-[11px] focus:outline-none focus:ring-2 focus:ring-indigo-500 leading-relaxed"
-                />
-              </div>
-
               <button
                 type="submit"
                 disabled={isCreatingAssignment}
@@ -725,11 +692,6 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
                         ))}
                       </div>
                     )}
-
-                    {/* Starter code preview */}
-                    <pre className="bg-slate-50 text-[11px] font-mono p-3 rounded-xl border border-slate-200 text-slate-900 overflow-x-auto max-h-24">
-                      {a.starter_code}
-                    </pre>
 
                     <div className="text-[10px] text-slate-500 font-mono flex items-center justify-between pt-1">
                       <span>Created by: {a.created_by}</span>

@@ -12,7 +12,6 @@ import {
   Cpu
 } from 'lucide-react';
 import { CodingSession, AuthUser } from '../types';
-import { MLHealthStatusPill } from './MLHealthStatusPill';
 
 export type ActiveTab = 'landing' | 'workspace' | 'viva' | 'assessment' | 'history' | 'instructor';
 
@@ -98,20 +97,10 @@ export const Navbar: React.FC<NavbarProps> = ({
             </>
           )}
 
-          {/* Teacher Navigation: Strictly shown for Teachers ONLY */}
-          {isTeacher && (
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-indigo-50 text-indigo-800 border border-indigo-200 text-xs font-bold shadow-sm">
-                <ShieldCheck className="w-4 h-4 text-indigo-600" />
-                <span>Instructor Supervision & Question Authoring Portal</span>
-              </div>
-            </div>
-          )}
         </nav>
 
         {/* Right Session & User Profile Controls */}
         <div className="flex items-center gap-3">
-          <MLHealthStatusPill />
           {currentUser && (
             <div className={`flex items-center gap-2 px-3 py-1 rounded-full border text-xs ${
               isTeacher 

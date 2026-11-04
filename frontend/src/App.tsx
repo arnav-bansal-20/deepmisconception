@@ -63,7 +63,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 
 export const App: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
-  const [activeTab, setActiveTab] = useState<ActiveTab>('workspace');
+  const [activeTab, setActiveTab] = useState<ActiveTab>('history');
   const [currentSession, setCurrentSession] = useState<CodingSession | null>(null);
   const [serverOnline, setServerOnline] = useState<boolean>(true);
 
@@ -77,7 +77,7 @@ export const App: React.FC = () => {
         if (user.role === 'teacher') {
           setActiveTab('instructor');
         } else {
-          setActiveTab('workspace');
+          setActiveTab('history');
         }
       } catch {
         // ignore corrupted user record
@@ -159,14 +159,14 @@ export const App: React.FC = () => {
           console.error('Failed to create session on login', err);
         }
       }
-      setActiveTab('workspace');
+      setActiveTab('history');
     }
   };
 
   const handleLogout = () => {
     setCurrentUser(null);
     localStorage.removeItem('deepmisconception_auth_user');
-    setActiveTab('workspace');
+    setActiveTab('history');
   };
 
   const handleSelectSession = (session: CodingSession) => {

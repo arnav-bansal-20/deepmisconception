@@ -29,6 +29,9 @@ DEFAULT_ASSIGNMENTS = [
         "difficulty": "medium",
         "concept_tags": ["loops", "modulo", "accumulator", "continue"],
         "created_by": "Dr. Ada Smith",
+        "teacher_id": "FAC-CS-804",
+        "sample_input": "n = 5",
+        "sample_output": "Computed total: 26",
         "classroom_id": "class-alpha-101",
         "classroom_name": "CS101: Python Foundations - Group Alpha",
     },
@@ -47,6 +50,9 @@ DEFAULT_ASSIGNMENTS = [
         "difficulty": "medium",
         "concept_tags": ["recursion", "base-case", "call-stack"],
         "created_by": "Dr. Ada Smith",
+        "teacher_id": "FAC-CS-804",
+        "sample_input": "5",
+        "sample_output": "Factorial of 5: 120",
         "classroom_id": "class-alpha-101",
         "classroom_name": "CS101: Python Foundations - Group Alpha",
     },
@@ -72,6 +78,9 @@ DEFAULT_ASSIGNMENTS = [
         "difficulty": "hard",
         "concept_tags": ["binary-search", "pointers", "loop-bounds", "invariants"],
         "created_by": "Prof. Alan Turing",
+        "teacher_id": "FAC-CS-901",
+        "sample_input": "arr = [2, 5, 8, 12, 16, 23, 38, 56, 72, 91], target = 23",
+        "sample_output": "Index of 23: 5",
         "classroom_id": "class-beta-201",
         "classroom_name": "CS201: Algorithms & Data Structures - Group Beta",
     },
@@ -89,11 +98,25 @@ def _seed_defaults_if_empty(db: Session):
 @router.get("", response_model=List[AssignmentResponse])
 def list_assignments(
     classroom_id: Optional[str] = Query(None, description="Filter assignments by target classroom ID"),
+    teacher_id: Optional[str] = Query(None, description="Filter assignments authored by this teacher identifier"),
+    created_by: Optional[str] = Query(None, description="Filter assignments authored by this teacher name"),
     db: Session = Depends(get_db),
 ):
-    """List teacher-assigned coding problems, optionally filtered by student's classroom."""
+    """List teacher-assigned coding problems, optionally filtered by student's classroom or authoring teacher."""
     _seed_defaults_if_empty(db)
     query = db.query(Assignment)
+
+    # Filter by specific instructor if requested (so instructors only see questions published by themselves)
+    if teacher_id or created_by:
+        conditions = []
+        if teacher_id:
+            conditions.append(Assignment.teacher_id == teacher_id)
+            conditions.append(Assignment.created_by == teacher_id)
+        if created_by:
+            conditions.append(Assignment.created_by == created_by)
+            conditions.append(Assignment.created_by.ilike(f"%{created_by}%"))
+        query = query.filter(or_(*conditions))
+
     if classroom_id:
         # Include assignments specifically created for this classroom OR open/global assignments (classroom_id is None)
         query = query.filter(
@@ -121,8 +144,11 @@ def create_assignment(payload: AssignmentCreate, db: Session = Depends(get_db)):
         difficulty=payload.difficulty,
         concept_tags=payload.concept_tags,
         created_by=payload.created_by,
+        teacher_id=payload.teacher_id,
         classroom_id=payload.classroom_id,
         classroom_name=classroom_name,
+        sample_input=payload.sample_input,
+        sample_output=payload.sample_output,
     )
     db.add(assignment)
     db.commit()

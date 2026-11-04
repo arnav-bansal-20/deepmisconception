@@ -339,6 +339,31 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
             </p>
           </div>
 
+          {(selectedAssignment?.sample_input || selectedAssignment?.sample_output) && (
+            <div className="bg-sky-50/60 border border-sky-200 rounded-xl p-3 text-xs grid grid-cols-1 sm:grid-cols-2 gap-2.5 font-mono">
+              {selectedAssignment.sample_input && (
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-sky-900 block mb-1">
+                    Sample Input:
+                  </span>
+                  <div className="bg-white px-2.5 py-1.5 rounded-lg border border-sky-200 text-slate-800 font-mono text-[11px] whitespace-pre-wrap">
+                    {selectedAssignment.sample_input}
+                  </div>
+                </div>
+              )}
+              {selectedAssignment.sample_output && (
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-emerald-800 block mb-1">
+                    Expected Output:
+                  </span>
+                  <div className="bg-white px-2.5 py-1.5 rounded-lg border border-emerald-200 text-emerald-800 font-mono text-[11px] whitespace-pre-wrap font-semibold">
+                    {selectedAssignment.sample_output}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           {problemTags.length > 0 && (
             <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
               <span className="text-[10px] font-mono text-slate-500 font-bold uppercase tracking-wider mr-1">

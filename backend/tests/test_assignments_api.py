@@ -47,22 +47,37 @@ def test_list_and_create_assignments(client):
     assignments = res.json()
     assert len(assignments) >= 3
 
-    # 2. Teacher creates a custom coding question
+    # 2. Teacher creates a custom coding question with sample input and output
     new_q = {
         "title": "Prime Number Sieve with Break Logic",
         "description": "Write a function is_prime(n) that checks if an integer is prime.",
         "starter_code": "def is_prime(n: int) -> bool:\n    if n < 2:\n        return False\n    for i in range(2, int(n**0.5) + 1):\n        if n % i == 0:\n            return False\n    return True\n",
         "difficulty": "medium",
         "concept_tags": ["primes", "loops", "early-return"],
-        "created_by": "Dr. Ada Smith",
+        "created_by": "Dr. Custom Instructor",
+        "teacher_id": "FAC-CUSTOM-999",
+        "sample_input": "7",
+        "sample_output": "True",
     }
     create_res = client.post("/api/assignments", json=new_q)
     assert create_res.status_code == 201
     created = create_res.json()
     assert created["title"] == new_q["title"]
-    assert created["created_by"] == "Dr. Ada Smith"
+    assert created["created_by"] == "Dr. Custom Instructor"
+    assert created["teacher_id"] == "FAC-CUSTOM-999"
+    assert created["sample_input"] == "7"
+    assert created["sample_output"] == "True"
 
     # 3. Fetch specific assignment
     get_res = client.get(f"/api/assignments/{created['id']}")
     assert get_res.status_code == 200
     assert get_res.json()["difficulty"] == "medium"
+    assert get_res.json()["sample_input"] == "7"
+    assert get_res.json()["sample_output"] == "True"
+
+    # 4. Filter assignments by teacher_id (only shows questions published by himself)
+    teacher_res = client.get("/api/assignments?teacher_id=FAC-CUSTOM-999")
+    assert teacher_res.status_code == 200
+    teacher_assignments = teacher_res.json()
+    assert len(teacher_assignments) == 1
+    assert teacher_assignments[0]["id"] == created["id"]

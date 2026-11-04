@@ -12,8 +12,11 @@ class AssignmentCreate(BaseModel):
     difficulty: str = Field(default="medium", description="easy, medium, hard")
     concept_tags: List[str] = Field(default_factory=list)
     created_by: str = Field(default="Faculty Instructor")
+    teacher_id: Optional[str] = Field(default=None, description="Faculty instructor identifier")
     classroom_id: Optional[str] = Field(default=None, description="Optional target classroom/cohort id")
     classroom_name: Optional[str] = Field(default=None, description="Optional target classroom name")
+    sample_input: Optional[str] = Field(default=None, description="Optional sample test case input")
+    sample_output: Optional[str] = Field(default=None, description="Optional sample test case expected output")
 
 
 class AssignmentResponse(BaseModel):
@@ -27,6 +30,9 @@ class AssignmentResponse(BaseModel):
     difficulty: str
     concept_tags: Optional[List[str]] = None
     created_by: str
+    teacher_id: Optional[str] = None
+    sample_input: Optional[str] = None
+    sample_output: Optional[str] = None
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)

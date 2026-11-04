@@ -68,6 +68,8 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
   const [newStarterCode, setNewStarterCode] = useState('def solution():\n    pass\n');
   const [newDifficulty, setNewDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
   const [newTags, setNewTags] = useState('loops, conditions, recursion');
+  const [newSampleInput, setNewSampleInput] = useState('');
+  const [newSampleOutput, setNewSampleOutput] = useState('');
   const [targetClassroomId, setTargetClassroomId] = useState<string>('');
   const [isCreatingAssignment, setIsCreatingAssignment] = useState(false);
   const [assignmentSuccess, setAssignmentSuccess] = useState(false);
@@ -87,7 +89,11 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
       const [ovData, sessData, assignData, classList] = await Promise.allSettled([
         api.getInstructorOverview({ classroom_id: classFilter, teacher_id: currentUser?.id }),
         api.listSessions({ classroom_id: classFilter, teacher_id: currentUser?.id }),
-        api.listAssignments(classFilter),
+        api.listAssignments({
+          classroomId: classFilter,
+          teacherId: currentUser?.id,
+          createdBy: currentUser?.name,
+        }),
         api.listClassrooms(currentUser?.id),
       ]);
 
@@ -179,15 +185,25 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
         difficulty: newDifficulty,
         concept_tags: tags,
         created_by: reviewerName,
+        teacher_id: currentUser?.id,
         classroom_id: chosenClass ? chosenClass.id : null,
         classroom_name: chosenClass ? chosenClass.name : null,
+        sample_input: newSampleInput.trim() || undefined,
+        sample_output: newSampleOutput.trim() || undefined,
       });
 
       setAssignmentSuccess(true);
       setNewTitle('');
       setNewDescription('');
       setNewStarterCode('def solution():\n    pass\n');
-      const updated = await api.listAssignments();
+      setNewSampleInput('');
+      setNewSampleOutput('');
+      const classFilter = selectedClassroomId === 'all' ? undefined : selectedClassroomId;
+      const updated = await api.listAssignments({
+        classroomId: classFilter,
+        teacherId: currentUser?.id,
+        createdBy: currentUser?.name,
+      });
       setAssignments(updated);
       setTimeout(() => setAssignmentSuccess(false), 2000);
     } catch (err) {
@@ -275,7 +291,7 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
             }`}
           >
             <PlusCircle className="w-4 h-4" />
-            <span>Author Coding Questions ({assignments.length})</span>
+            <span>My Published Questions ({assignments.length})</span>
           </button>
 
           <button
@@ -563,6 +579,47 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
                 </div>
               </div>
 
+              {/* Sample Test Case: Input and Output */}
+              <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="block font-mono font-bold uppercase tracking-wider text-slate-800 text-[11px]">
+                    Sample Test Case (Input &amp; Expected Output)
+                  </label>
+                  <span className="text-[10px] font-mono text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded font-semibold border border-indigo-100">
+                    Optional
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block font-mono font-semibold uppercase tracking-wider text-slate-600 text-[10px] mb-1">
+                      Sample Input
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={newSampleInput}
+                      onChange={(e) => setNewSampleInput(e.target.value)}
+                      placeholder="e.g. n = 5 or [1, 2, 3]"
+                      className="w-full bg-white border border-slate-300 rounded-xl p-2.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono text-[11px]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-mono font-semibold uppercase tracking-wider text-slate-600 text-[10px] mb-1">
+                      Expected Output
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={newSampleOutput}
+                      onChange={(e) => setNewSampleOutput(e.target.value)}
+                      placeholder="e.g. 26 or True"
+                      className="w-full bg-white border border-slate-300 rounded-xl p-2.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono text-[11px]"
+                    />
+                  </div>
+                </div>
+                <p className="text-[10px] text-slate-500">
+                  Providing a sample input and expected output helps students verify their solution and tests program correctness.
+                </p>
+              </div>
+
               <div>
                 <label className="block font-mono font-semibold uppercase tracking-wider text-slate-700 mb-1">
                   Starter Python Code Template
@@ -591,65 +648,97 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
           <div className="space-y-4">
             <h3 className="font-bold text-slate-900 text-base flex items-center gap-2">
               <BookOpen className="w-4 h-4 text-indigo-600" />
-              <span>Published Coding Questions ({assignments.length})</span>
+              <span>My Published Coding Questions ({assignments.length})</span>
             </h3>
 
-            <div className="space-y-3">
-              {assignments.map((a) => (
-                <div key={a.id} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className={`text-[10px] font-mono uppercase px-2 py-0.5 rounded font-bold ${
-                        a.difficulty === 'easy'
-                          ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                          : a.difficulty === 'medium'
-                          ? 'bg-amber-50 text-amber-800 border border-amber-200'
-                          : 'bg-rose-50 text-rose-800 border border-rose-200'
-                      }`}>
-                        {a.difficulty}
-                      </span>
-                      <h4 className="font-bold text-slate-900 text-sm">{a.title}</h4>
-                      {a.classroom_name && (
-                        <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-50 text-sky-800 border border-sky-200 font-bold">
-                          Assigned to: {a.classroom_name}
+            {assignments.length === 0 ? (
+              <div className="bg-white border border-slate-200 rounded-2xl p-8 text-center space-y-2">
+                <BookOpen className="w-8 h-8 text-slate-300 mx-auto" />
+                <p className="text-xs font-semibold text-slate-700">No coding questions published by you yet</p>
+                <p className="text-[11px] text-slate-400 max-w-sm mx-auto">
+                  Use the authoring form on the left to create and publish programming questions with sample test inputs and outputs for your student cohorts.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {assignments.map((a) => (
+                  <div key={a.id} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className={`text-[10px] font-mono uppercase px-2 py-0.5 rounded font-bold ${
+                          a.difficulty === 'easy'
+                            ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                            : a.difficulty === 'medium'
+                            ? 'bg-amber-50 text-amber-800 border border-amber-200'
+                            : 'bg-rose-50 text-rose-800 border border-rose-200'
+                        }`}>
+                          {a.difficulty}
                         </span>
-                      )}
+                        <h4 className="font-bold text-slate-900 text-sm">{a.title}</h4>
+                        {a.classroom_name && (
+                          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-50 text-sky-800 border border-sky-200 font-bold">
+                            Assigned to: {a.classroom_name}
+                          </span>
+                        )}
+                      </div>
+
+                      <button
+                        onClick={() => handleDeleteAssignment(a.id)}
+                        className="p-1 text-slate-400 hover:text-rose-600 transition-colors"
+                        title="Delete assignment"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
                     </div>
 
-                    <button
-                      onClick={() => handleDeleteAssignment(a.id)}
-                      className="p-1 text-slate-400 hover:text-rose-600 transition-colors"
-                      title="Delete assignment"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
+                    <p className="text-xs text-slate-600 leading-relaxed">{a.description}</p>
 
-                  <p className="text-xs text-slate-600 leading-relaxed">{a.description}</p>
+                    {/* Sample Test Case Preview */}
+                    {(a.sample_input || a.sample_output) && (
+                      <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-[11px] font-mono grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        {a.sample_input && (
+                          <div>
+                            <span className="text-[10px] uppercase font-bold text-slate-500 block mb-1">Sample Input:</span>
+                            <div className="text-slate-800 bg-white px-2.5 py-1.5 rounded-lg border border-slate-200 font-mono text-[11px] whitespace-pre-wrap">
+                              {a.sample_input}
+                            </div>
+                          </div>
+                        )}
+                        {a.sample_output && (
+                          <div>
+                            <span className="text-[10px] uppercase font-bold text-emerald-700 block mb-1">Expected Output:</span>
+                            <div className="text-emerald-800 bg-white px-2.5 py-1.5 rounded-lg border border-emerald-200 font-mono text-[11px] whitespace-pre-wrap font-semibold">
+                              {a.sample_output}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
 
-                  {/* Concept Tags */}
-                  {a.concept_tags && a.concept_tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 pt-1">
-                      {a.concept_tags.map((tag, i) => (
-                        <span key={i} className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-indigo-700 font-semibold">
-                          #{tag}
-                        </span>
-                      ))}
+                    {/* Concept Tags */}
+                    {a.concept_tags && a.concept_tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 pt-1">
+                        {a.concept_tags.map((tag, i) => (
+                          <span key={i} className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-indigo-700 font-semibold">
+                            #{tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Starter code preview */}
+                    <pre className="bg-slate-50 text-[11px] font-mono p-3 rounded-xl border border-slate-200 text-slate-900 overflow-x-auto max-h-24">
+                      {a.starter_code}
+                    </pre>
+
+                    <div className="text-[10px] text-slate-500 font-mono flex items-center justify-between pt-1">
+                      <span>Created by: {a.created_by}</span>
+                      <span>{new Date(a.created_at).toLocaleDateString()}</span>
                     </div>
-                  )}
-
-                  {/* Starter code preview */}
-                  <pre className="bg-slate-50 text-[11px] font-mono p-3 rounded-xl border border-slate-200 text-slate-900 overflow-x-auto max-h-24">
-                    {a.starter_code}
-                  </pre>
-
-                  <div className="text-[10px] text-slate-500 font-mono flex items-center justify-between pt-1">
-                    <span>Created by: {a.created_by}</span>
-                    <span>{new Date(a.created_at).toLocaleDateString()}</span>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}

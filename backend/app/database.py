@@ -34,6 +34,9 @@ def ensure_sqlite_columns():
         for table, col, col_type in [
             ("assignments", "classroom_id", "VARCHAR(36)"),
             ("assignments", "classroom_name", "VARCHAR(256)"),
+            ("assignments", "teacher_id", "VARCHAR(64)"),
+            ("assignments", "sample_input", "TEXT"),
+            ("assignments", "sample_output", "TEXT"),
             ("coding_sessions", "classroom_id", "VARCHAR(36)"),
             ("coding_sessions", "classroom_name", "VARCHAR(256)"),
             ("coding_sessions", "teacher_id", "VARCHAR(64)"),

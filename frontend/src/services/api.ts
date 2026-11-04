@@ -206,8 +206,17 @@ export const api = {
     request<InstructorReview[]>(`/instructor/reviews/session/${sessionId}`),
 
   // Assignments
-  listAssignments: (classroomId?: string) => {
-    const query = classroomId ? `?classroom_id=${encodeURIComponent(classroomId)}` : '';
+  listAssignments: (params?: { classroomId?: string; teacherId?: string; createdBy?: string } | string) => {
+    let query = '';
+    if (typeof params === 'string') {
+      query = `?classroom_id=${encodeURIComponent(params)}`;
+    } else if (params) {
+      const parts: string[] = [];
+      if (params.classroomId) parts.push(`classroom_id=${encodeURIComponent(params.classroomId)}`);
+      if (params.teacherId) parts.push(`teacher_id=${encodeURIComponent(params.teacherId)}`);
+      if (params.createdBy) parts.push(`created_by=${encodeURIComponent(params.createdBy)}`);
+      if (parts.length > 0) query = `?${parts.join('&')}`;
+    }
     return request<Assignment[]>(`/assignments${query}`);
   },
 
@@ -218,8 +227,11 @@ export const api = {
     difficulty?: string;
     concept_tags?: string[];
     created_by?: string;
+    teacher_id?: string;
     classroom_id?: string | null;
     classroom_name?: string | null;
+    sample_input?: string;
+    sample_output?: string;
   }) =>
     request<Assignment>('/assignments', {
       method: 'POST',

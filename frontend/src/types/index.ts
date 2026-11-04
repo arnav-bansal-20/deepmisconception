@@ -20,6 +20,9 @@ export interface Assignment {
   difficulty: 'easy' | 'medium' | 'hard';
   concept_tags?: string[] | null;
   created_by: string;
+  teacher_id?: string | null;
+  sample_input?: string | null;
+  sample_output?: string | null;
   created_at: string;
 }
 

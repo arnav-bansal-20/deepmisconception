@@ -18,4 +18,7 @@ class Assignment(Base):
     difficulty = Column(String(32), default="medium", nullable=False)  # easy, medium, hard
     concept_tags = Column(JSON, nullable=True)  # e.g., ["loops", "modulo", "accumulator"]
     created_by = Column(String(128), default="Instructor", nullable=False)
+    teacher_id = Column(String(64), nullable=True, index=True)
+    sample_input = Column(Text, nullable=True)
+    sample_output = Column(Text, nullable=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)

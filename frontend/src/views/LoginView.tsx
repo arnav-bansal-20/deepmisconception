@@ -154,25 +154,6 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
             </div>
           </div>
 
-          {/* Role specific banner */}
-          <div className={`p-3 rounded-xl mb-5 text-xs flex items-center gap-2.5 border ${
-            role === 'student'
-              ? 'bg-sky-50 border-sky-200 text-sky-800'
-              : 'bg-indigo-50 border-indigo-200 text-indigo-800'
-          }`}>
-            {role === 'student' ? (
-              <>
-                <GraduationCap className="w-4 h-4 text-sky-600 flex-shrink-0" />
-                <span>Join your teacher's group to access assigned coding tasks and AI viva evaluations.</span>
-              </>
-            ) : (
-              <>
-                <ShieldCheck className="w-4 h-4 text-indigo-600 flex-shrink-0" />
-                <span>Author coding questions for your student groups and review student viva reports.</span>
-              </>
-            )}
-          </div>
-
           {/* Login Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             {role === 'student' ? (

@@ -250,9 +250,6 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
       <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm space-y-3.5">
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-3">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-xs font-mono px-2.5 py-0.5 rounded-full bg-sky-50 text-sky-700 border border-sky-200 font-bold uppercase">
-              {session.language} 3.14
-            </span>
             <span className={`text-[11px] font-mono uppercase px-2.5 py-0.5 rounded-full font-bold border ${
               problemDifficulty === 'easy'
                 ? 'bg-emerald-50 text-emerald-700 border-emerald-200'

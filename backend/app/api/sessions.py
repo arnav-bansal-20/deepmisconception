@@ -7,6 +7,7 @@ from app.database import get_db
 from app.models.session import CodingSession
 from app.models.submission import CodeSubmission
 from app.models.viva_question import VivaQuestion
+from app.models.answer_assessment import AnswerAssessment
 from app.models.comprehension_report import ComprehensionReport
 from app.schemas.session import SessionCreate, SessionUpdate, SessionSummary, SessionDetail
 
@@ -55,8 +56,17 @@ def list_sessions(
     for s in sessions:
         sub_count = db.query(func.count(CodeSubmission.id)).filter(CodeSubmission.session_id == s.id).scalar() or 0
         q_count = db.query(func.count(VivaQuestion.id)).filter(VivaQuestion.session_id == s.id).scalar() or 0
+        ans_count = db.query(func.count(AnswerAssessment.id)).filter(AnswerAssessment.session_id == s.id).scalar() or 0
         latest_report = db.query(ComprehensionReport).filter(ComprehensionReport.session_id == s.id).order_by(ComprehensionReport.created_at.desc()).first()
         
+        # Self-healing: if student completed problem and answered viva (or report exists), mark status as completed
+        current_status = s.status
+        if current_status == "active" and (latest_report is not None or (q_count > 0 and ans_count >= q_count)):
+            s.status = "completed"
+            current_status = "completed"
+            db.add(s)
+            db.commit()
+
         results.append(SessionSummary(
             id=s.id,
             student_id=s.student_id,
@@ -67,7 +77,7 @@ def list_sessions(
             teacher_name=s.teacher_name,
             title=s.title,
             language=s.language,
-            status=s.status,
+            status=current_status,
             created_at=s.created_at,
             updated_at=s.updated_at,
             submission_count=sub_count,
@@ -84,6 +94,16 @@ def get_session(session_id: str, db: Session = Depends(get_db)):
     session = db.query(CodingSession).filter(CodingSession.id == session_id).first()
     if not session:
         raise HTTPException(status_code=404, detail="Coding session not found")
+
+    # Mark completed if student answered viva or report exists
+    if session.status == "active":
+        q_count = db.query(func.count(VivaQuestion.id)).filter(VivaQuestion.session_id == session.id).scalar() or 0
+        ans_count = db.query(func.count(AnswerAssessment.id)).filter(AnswerAssessment.session_id == session.id).scalar() or 0
+        has_report = db.query(ComprehensionReport).filter(ComprehensionReport.session_id == session.id).first() is not None
+        if has_report or (q_count > 0 and ans_count >= q_count):
+            session.status = "completed"
+            db.add(session)
+            db.commit()
     return session
 
 

@@ -339,7 +339,7 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
                 <Users className="w-4 h-4 text-sky-600" />
               </div>
               <div className="text-2xl font-bold text-slate-900">{overview?.total_sessions || 0}</div>
-              <div className="text-[10px] text-slate-500 mt-1">Active candidate sessions</div>
+              <div className="text-[10px] text-slate-500 mt-1">Total student sessions</div>
             </div>
 
             <div className="bg-white border border-slate-200 p-4 rounded-xl shadow-sm">
@@ -427,8 +427,12 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
                           )}
                         </td>
                         <td className="p-4 font-mono capitalize">
-                          <span className={`px-2 py-0.5 rounded text-[10px] font-semibold ${
-                            s.status === 'reviewed' ? 'bg-indigo-50 text-indigo-800 border border-indigo-200' : 'text-slate-500'
+                          <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${
+                            s.status === 'completed'
+                              ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                              : s.status === 'reviewed'
+                              ? 'bg-indigo-50 text-indigo-800 border-indigo-200'
+                              : 'bg-amber-50 text-amber-800 border-amber-300'
                           }`}>
                             {s.status}
                           </span>

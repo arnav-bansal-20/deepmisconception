@@ -352,6 +352,13 @@ class ComprehensionEngine:
             existing_report.rubric_summary = rubric_summary
             existing_report.recommended_interventions = interventions
             existing_report.needs_instructor_review = needs_review
+
+            # Update session status to completed if not already reviewed
+            session = db.query(CodingSession).filter(CodingSession.id == session_id).first()
+            if session and session.status == "active":
+                session.status = "completed"
+                db.add(session)
+
             db.commit()
             db.refresh(existing_report)
             return existing_report
@@ -369,6 +376,13 @@ class ComprehensionEngine:
             needs_instructor_review=needs_review,
         )
         db.add(report)
+
+        # Update session status to completed if not already reviewed
+        session = db.query(CodingSession).filter(CodingSession.id == session_id).first()
+        if session and session.status == "active":
+            session.status = "completed"
+            db.add(session)
+
         db.commit()
         db.refresh(report)
         return report

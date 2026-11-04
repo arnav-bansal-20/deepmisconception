@@ -2,6 +2,7 @@
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from app.database import get_db
 from app.models.session import CodingSession
 from app.models.submission import CodeSubmission
@@ -178,6 +179,17 @@ def evaluate_student_answer(answer_in: VivaAnswerSubmit, db: Session = Depends(g
     db.add(assessment)
     db.commit()
     db.refresh(assessment)
+
+    # Check if student has answered the viva questions for this session; if so, transition session status to 'completed'
+    session_obj = db.query(CodingSession).filter(CodingSession.id == question.session_id).first()
+    if session_obj and session_obj.status == "active":
+        total_qs = db.query(func.count(VivaQuestion.id)).filter(VivaQuestion.session_id == question.session_id).scalar() or 0
+        answered_qs = db.query(func.count(AnswerAssessment.id)).filter(AnswerAssessment.session_id == question.session_id).scalar() or 0
+        if total_qs > 0 and answered_qs >= total_qs:
+            session_obj.status = "completed"
+            db.add(session_obj)
+            db.commit()
+
     return assessment
 
 

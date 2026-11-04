@@ -142,6 +142,15 @@ export const SessionHistoryView: React.FC<SessionHistoryViewProps> = ({
                       {s.language}
                     </span>
                     <div className="flex items-center gap-2">
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold capitalize border ${
+                        s.status === 'completed'
+                          ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                          : s.status === 'reviewed'
+                          ? 'bg-indigo-50 text-indigo-800 border-indigo-200'
+                          : 'bg-amber-50 text-amber-800 border-amber-300'
+                      }`}>
+                        {s.status}
+                      </span>
                       {s.latest_verdict && (
                         <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
                           s.latest_verdict === 'Understood'
@@ -189,7 +198,7 @@ export const SessionHistoryView: React.FC<SessionHistoryViewProps> = ({
                       </button>
                     )}
                     <div className="flex items-center gap-1 text-sky-700 font-bold group">
-                      <span>{isCurrent ? 'Active Now' : 'Open Workspace'}</span>
+                      <span>{s.status === 'completed' ? 'Completed' : isCurrent ? 'Active Now' : 'Open Workspace'}</span>
                       <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
                     </div>
                   </div>

@@ -109,7 +109,7 @@ export const SessionHistoryView: React.FC<SessionHistoryViewProps> = ({
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search by student name, ID, or task title..."
+          placeholder="Enter Search Query"
           className="w-full bg-white border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm"
         />
       </div>

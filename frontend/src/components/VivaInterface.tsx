@@ -271,7 +271,7 @@ export const VivaInterface: React.FC<VivaInterfaceProps> = ({
                     rows={4}
                     value={answerInput}
                     onChange={(e) => setAnswerInput(e.target.value)}
-                    placeholder="Provide a detailed explanation of what happens in this code snippet, why this construct is used, and how variables change..."
+                    placeholder="Enter Explanation"
                     className="w-full bg-slate-50 border border-slate-300 rounded-xl p-3.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white font-sans"
                     disabled={isSubmittingAnswer}
                   />

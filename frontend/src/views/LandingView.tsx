@@ -99,8 +99,10 @@ export const LandingView: React.FC<LandingViewProps> = ({
               required
               value={studentId}
               onChange={(e) => setStudentId(e.target.value)}
+              onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity('Enter Student ID')}
+              onInput={(e) => (e.target as HTMLInputElement).setCustomValidity('')}
               className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white"
-              placeholder="e.g. STU-10492"
+              placeholder="Enter Student ID"
             />
           </div>
 
@@ -113,8 +115,10 @@ export const LandingView: React.FC<LandingViewProps> = ({
               required
               value={studentName}
               onChange={(e) => setStudentName(e.target.value)}
+              onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity('Enter Full Name')}
+              onInput={(e) => (e.target as HTMLInputElement).setCustomValidity('')}
               className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white"
-              placeholder="e.g. Grace Hopper"
+              placeholder="Enter Full Name"
             />
           </div>
 
@@ -127,8 +131,10 @@ export const LandingView: React.FC<LandingViewProps> = ({
               required
               value={taskTitle}
               onChange={(e) => setTaskTitle(e.target.value)}
+              onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity('Enter Problem Title')}
+              onInput={(e) => (e.target as HTMLInputElement).setCustomValidity('')}
               className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white"
-              placeholder="e.g. Recursion & Loop Invariants"
+              placeholder="Enter Problem Title"
             />
           </div>
 

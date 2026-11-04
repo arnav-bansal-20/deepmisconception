@@ -227,7 +227,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
                             setCustomCode(e.target.value);
                             setCustomCodeError(null);
                           }}
-                          placeholder="e.g. CS101-ALPHA"
+                          placeholder="Enter Group Code"
                           className="w-full uppercase font-mono bg-white border border-slate-300 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500"
                         />
                       </div>
@@ -249,7 +249,9 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
                       required
                       value={studentId}
                       onChange={(e) => setStudentId(e.target.value)}
-                      placeholder="e.g. STU-2026-042"
+                      onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity('Enter Student ID')}
+                      onInput={(e) => (e.target as HTMLInputElement).setCustomValidity('')}
+                      placeholder="Enter Student ID"
                       className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white"
                     />
                   </div>
@@ -266,7 +268,9 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
                       required
                       value={studentName}
                       onChange={(e) => setStudentName(e.target.value)}
-                      placeholder="e.g. Alex Rivera"
+                      onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity('Enter Full Name')}
+                      onInput={(e) => (e.target as HTMLInputElement).setCustomValidity('')}
+                      placeholder="Enter Full Name"
                       className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white"
                     />
                   </div>
@@ -285,7 +289,9 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
                       required
                       value={teacherId}
                       onChange={(e) => setTeacherId(e.target.value)}
-                      placeholder="e.g. FAC-CS-804"
+                      onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity('Enter Faculty ID')}
+                      onInput={(e) => (e.target as HTMLInputElement).setCustomValidity('')}
+                      placeholder="Enter Faculty ID"
                       className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white"
                     />
                   </div>
@@ -302,7 +308,9 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
                       required
                       value={teacherName}
                       onChange={(e) => setTeacherName(e.target.value)}
-                      placeholder="e.g. Dr. Ada Smith"
+                      onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity('Enter Faculty Name')}
+                      onInput={(e) => (e.target as HTMLInputElement).setCustomValidity('')}
+                      placeholder="Enter Faculty Name"
                       className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white"
                     />
                   </div>
@@ -317,7 +325,9 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
                     required
                     value={department}
                     onChange={(e) => setDepartment(e.target.value)}
-                    placeholder="e.g. Computer Science & Engineering"
+                    onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity('Enter Department')}
+                    onInput={(e) => (e.target as HTMLInputElement).setCustomValidity('')}
+                    placeholder="Enter Department"
                     className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white"
                   />
                 </div>

@@ -510,7 +510,9 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
                   required
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
-                  placeholder="e.g. Inverted Binary Tree Traversal"
+                  onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity('Enter Problem Title')}
+                  onInput={(e) => (e.target as HTMLInputElement).setCustomValidity('')}
+                  placeholder="Enter Problem Title"
                   className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium"
                 />
               </div>
@@ -524,7 +526,9 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
                   rows={4}
                   value={newDescription}
                   onChange={(e) => setNewDescription(e.target.value)}
-                  placeholder="Describe the logic requirement, edge cases, and expected algorithmic behavior..."
+                  onInvalid={(e) => (e.target as HTMLTextAreaElement).setCustomValidity('Enter Problem Description')}
+                  onInput={(e) => (e.target as HTMLTextAreaElement).setCustomValidity('')}
+                  placeholder="Enter Problem Description"
                   className="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-sans leading-relaxed"
                 />
               </div>
@@ -553,7 +557,7 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
                     type="text"
                     value={newTags}
                     onChange={(e) => setNewTags(e.target.value)}
-                    placeholder="e.g. loops, modulo, recursion"
+                    placeholder="Enter Concept Tags"
                     className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono"
                   />
                 </div>
@@ -575,7 +579,7 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
                       rows={2}
                       value={newSampleInput}
                       onChange={(e) => setNewSampleInput(e.target.value)}
-                      placeholder="e.g. n = 5 or [1, 2, 3]"
+                      placeholder="Enter Sample Input"
                       className="w-full bg-white border border-slate-300 rounded-xl p-2.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono text-[11px]"
                     />
                   </div>
@@ -587,7 +591,7 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
                       rows={2}
                       value={newSampleOutput}
                       onChange={(e) => setNewSampleOutput(e.target.value)}
-                      placeholder="e.g. 26 or True"
+                      placeholder="Enter Expected Output"
                       className="w-full bg-white border border-slate-300 rounded-xl p-2.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono text-[11px]"
                     />
                   </div>
@@ -735,7 +739,9 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
                   required
                   value={newClassName}
                   onChange={(e) => setNewClassName(e.target.value)}
-                  placeholder="e.g. CS101: Python Foundations - Section C"
+                  onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity('Enter Group Name')}
+                  onInput={(e) => (e.target as HTMLInputElement).setCustomValidity('')}
+                  placeholder="Enter Group Name"
                   className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium"
                 />
               </div>
@@ -749,7 +755,9 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
                   required
                   value={newClassCode}
                   onChange={(e) => setNewClassCode(e.target.value.toUpperCase())}
-                  placeholder="e.g. CS101-SEC-C"
+                  onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity('Enter Group Code')}
+                  onInput={(e) => (e.target as HTMLInputElement).setCustomValidity('')}
+                  placeholder="Enter Group Code"
                   className="w-full uppercase font-mono bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-bold"
                 />
               </div>
@@ -762,7 +770,7 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
                   rows={2}
                   value={newClassDesc}
                   onChange={(e) => setNewClassDesc(e.target.value)}
-                  placeholder="Group objectives, syllabus focus..."
+                  placeholder="Enter Group Description"
                   className="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
@@ -1005,7 +1013,7 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
                         rows={2}
                         value={feedbackNotes}
                         onChange={(e) => setFeedbackNotes(e.target.value)}
-                        placeholder="Add pedagogical feedback, specific code misconceptions identified, or justification for override..."
+                        placeholder="Enter Qualitative Notes"
                         className="w-full bg-white border border-slate-300 rounded-xl p-2.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                       />
                     </div>

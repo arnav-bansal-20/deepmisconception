@@ -55,8 +55,8 @@ const DEFAULT_ASSIGNMENT: Assignment = {
   difficulty: 'medium',
   concept_tags: ['modulo-filtering', 'accumulator-invariants', 'loop-control'],
   starter_code: DEFAULT_PYTHON_CODE,
+  created_by: 'Dr. Ada Smith',
   created_at: new Date().toISOString(),
-  updated_at: new Date().toISOString(),
 };
 
 export const WorkspaceView: React.FC<WorkspaceViewProps> = ({

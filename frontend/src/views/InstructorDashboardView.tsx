@@ -26,6 +26,7 @@ import {
 } from '../types';
 import { api } from '../services/api';
 import { ProcessTimeline } from '../components/ProcessTimeline';
+import { ComprehensionReportTemplate } from '../components/ComprehensionReportTemplate';
 
 interface InstructorDashboardViewProps {
   onSelectSession: (session: CodingSession) => void;
@@ -833,119 +834,18 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
               </div>
             ) : (
               <div className="space-y-6">
-                {/* AI Classification & Confidence */}
-                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-wrap items-center justify-between gap-4">
-                  <div>
-                    <span className="text-[10px] font-mono uppercase tracking-wider text-slate-500 block mb-1 font-bold">
-                      System Comprehension Verdict
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <span className={`px-3 py-1 rounded-full text-xs font-black border ${
-                        (studentReport?.overall_label || inspectingSession.latest_verdict) === 'Understood'
-                          ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
-                          : (studentReport?.overall_label || inspectingSession.latest_verdict) === 'Partial Understanding'
-                          ? 'bg-amber-50 text-amber-800 border-amber-300'
-                          : (studentReport?.overall_label || inspectingSession.latest_verdict) === 'Pending / Insufficient Evidence'
-                          ? 'bg-slate-100 text-slate-800 border-slate-300'
-                          : 'bg-rose-50 text-rose-800 border-rose-300'
-                      }`}>
-                        {studentReport?.overall_label || inspectingSession.latest_verdict || 'Understood'}
-                      </span>
-                      <span className="text-xs text-slate-600 font-mono font-medium">
-                        Model Confidence: <strong className="text-sky-700">{studentReport ? Math.round(studentReport.confidence_score * 100) : 85}%</strong>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="text-right">
-                    <span className="text-[10px] font-mono uppercase tracking-wider text-slate-500 block mb-1 font-bold">
-                      Viva Questions Answered
-                    </span>
-                    <span className="text-sm font-bold text-slate-900 font-mono">
-                      {studentQuestions.filter((q) => q.has_answer || !!q.assessment).length} / {studentQuestions.length} Questions
-                    </span>
-                  </div>
-                </div>
-
-                {/* Evidence Summary */}
-                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700 space-y-1">
-                  <span className="font-bold text-sky-800 uppercase tracking-wider text-[10px]">
-                    Synthesized Evidence Summary:
-                  </span>
-                  <p className="leading-relaxed">
-                    {studentReport?.evidence_summary || 'The student demonstrated consistent control-flow reasoning across iterations, with active revision patterns and valid AST logic.'}
-                  </p>
-                </div>
-
-                {/* Question by Question Viva Breakdown */}
-                <div className="space-y-3">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 font-mono">
-                    AI Viva Questions & Student Explanations
-                  </h4>
-
-                  {studentQuestions.length === 0 ? (
-                    <p className="text-xs text-slate-400 italic p-4 bg-slate-50 rounded-xl">
-                      No viva questions generated yet for this student.
-                    </p>
-                  ) : (
-                    studentQuestions.map((q, idx) => (
-                      <div key={q.id} className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2 text-xs">
-                        <div className="flex items-center justify-between">
-                          <span className="font-mono font-bold text-indigo-700">Q{idx + 1}: {q.concept}</span>
-                          <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-slate-200 text-slate-700">
-                            {q.difficulty}
-                          </span>
-                        </div>
-                        <p className="font-medium text-slate-900">{q.question_text}</p>
-                        
-                        {q.assessment ? (
-                          <div className="mt-2 pt-2 border-t border-slate-200 space-y-1.5">
-                            <div className="flex items-center gap-2">
-                              <span className="font-bold text-slate-500 text-[10px] uppercase">Evaluation:</span>
-                              <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                                q.assessment.evaluation_label === 'Correct'
-                                  ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                                  : q.assessment.evaluation_label === 'Partially Correct'
-                                  ? 'bg-amber-50 text-amber-800 border border-amber-200'
-                                  : 'bg-rose-50 text-rose-800 border border-rose-200'
-                              }`}>
-                                {q.assessment.evaluation_label}
-                              </span>
-                              <span className="text-slate-500 text-[10px]">Score: {Math.round((q.assessment.score ?? 0) * 100)}%</span>
-                            </div>
-                            <p className="text-slate-700 italic bg-white p-2.5 rounded-lg border border-slate-200">
-                              "{q.assessment.student_answer}"
-                            </p>
-                            <p className="text-slate-500 text-[11px]">
-                              <strong>Rationale:</strong> {q.assessment.feedback}
-                            </p>
-                          </div>
-                        ) : (
-                          <p className="text-slate-400 italic text-[11px] pt-1">
-                            Awaiting student response.
-                          </p>
-                        )}
-                      </div>
-                    ))
-                  )}
-                </div>
-
-                {/* Submitted Code Preview */}
-                {studentSubmissions.length > 0 && (
-                  <div className="space-y-2">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 font-mono">
-                      Latest Submitted Code
-                    </h4>
-                    <pre className="bg-slate-50 p-4 rounded-xl border border-slate-200 font-mono text-[11px] text-slate-900 overflow-x-auto max-h-48 leading-relaxed">
-                      {studentSubmissions[0].code}
-                    </pre>
+                {studentReport ? (
+                  <ComprehensionReportTemplate
+                    report={studentReport}
+                    session={inspectingSession}
+                    features={studentFeatures}
+                    currentUser={currentUser}
+                  />
+                ) : (
+                  <div className="py-8 text-center text-xs text-slate-500 font-mono">
+                    No report synthesized yet for this student session.
                   </div>
                 )}
-
-                {/* Process Telemetry & Problem-Solving Timeline */}
-                <div className="space-y-2">
-                  <ProcessTimeline features={studentFeatures} />
-                </div>
 
                 {/* Instructor Ground-Truth Annotation Form */}
                 <div className="p-5 rounded-2xl bg-indigo-50/50 border border-indigo-200 space-y-4">

@@ -115,6 +115,8 @@ export interface CodingSession {
   student_name: string;
   classroom_id?: string | null;
   classroom_name?: string | null;
+  teacher_id?: string | null;
+  teacher_name?: string | null;
   title: string;
   language: string;
   status: string;

@@ -25,6 +25,7 @@ import {
 import { CodingSession, ComprehensionReport, ProcessFeatures, AuthUser } from '../types';
 import { api } from '../services/api';
 import { ProcessTimeline } from '../components/ProcessTimeline';
+import { ComprehensionReportTemplate } from '../components/ComprehensionReportTemplate';
 
 interface AssessmentResultsViewProps {
   session: CodingSession | null;
@@ -292,152 +293,16 @@ export const AssessmentResultsView: React.FC<AssessmentResultsViewProps> = ({
                 </div>
               </div>
             ) : (
-              /* Modal Body: Complete Report Details */
+              /* Modal Body: Complete Report Details matching 10-section template */
               <div className="space-y-6">
-                {/* Banner & Verdict */}
-                <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200">
-                  <div>
-                    <span className="text-[10px] font-mono uppercase font-bold text-slate-500 block">
-                      Overall Evaluation
-                    </span>
-                    <div className="flex items-center gap-2.5 mt-1">
-                      <div className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black border shadow-sm ${
-                        verdict === 'Understood'
-                          ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
-                          : verdict === 'Partial Understanding'
-                          ? 'bg-amber-50 text-amber-800 border-amber-300'
-                          : verdict === 'Pending / Insufficient Evidence'
-                          ? 'bg-slate-100 text-slate-800 border-slate-300'
-                          : 'bg-rose-50 text-rose-800 border-rose-300'
-                      }`}>
-                        {verdict === 'Understood' && <CheckCircle2 className="w-4 h-4 text-emerald-600" />}
-                        {verdict === 'Partial Understanding' && <AlertTriangle className="w-4 h-4 text-amber-600" />}
-                        {verdict === 'Pending / Insufficient Evidence' && <HelpCircle className="w-4 h-4 text-slate-600" />}
-                        {verdict === 'Possible Misconception' && <XCircle className="w-4 h-4 text-rose-600" />}
-                        <span>{verdict}</span>
-                      </div>
-                      <span className="text-xs font-mono text-slate-500 font-medium">
-                        Model Confidence: <strong className="text-sky-700">{confidence}%</strong>
-                      </span>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() => loadData(true, popupSession.id)}
-                    disabled={isRegenerating}
-                    className="p-2 text-slate-500 hover:text-slate-800 border border-slate-200 rounded-xl hover:bg-white transition-colors text-xs flex items-center gap-1.5 shadow-sm"
-                    title="Re-synthesize latest report"
-                  >
-                    <RefreshCw className={`w-3.5 h-3.5 ${isRegenerating ? 'animate-spin' : ''}`} />
-                    <span className="font-semibold">Re-synthesize</span>
-                  </button>
-                </div>
-
-                {/* Flagged for Review Notice */}
-                {report.needs_instructor_review && (
-                  <div className="p-3.5 bg-amber-50 border border-amber-300 text-amber-900 rounded-xl text-xs flex items-start gap-2.5">
-                    <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <strong className="block font-bold">Uncertainty Flagged for Instructor Review:</strong>
-                      <p className="mt-0.5 text-amber-800 leading-relaxed">
-                        The model flagged potential ambiguity or conflicting signals between code execution and viva explanations. An instructor will review this session.
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                {/* Multimodal Score Profiles */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  <div className="bg-slate-50 border border-slate-200 p-3.5 rounded-xl">
-                    <div className="flex items-center justify-between text-slate-500 mb-1">
-                      <span className="text-[10px] font-bold uppercase tracking-wider">AST Structure</span>
-                      <Code2 className="w-3.5 h-3.5 text-sky-600" />
-                    </div>
-                    <div className="text-xl font-bold text-slate-900">
-                      {Math.round((scores.ast_structural_score || 0) * 100)}%
-                    </div>
-                    <div className="text-[10px] text-slate-500 mt-0.5">Syntax logic</div>
-                  </div>
-
-                  <div className="bg-slate-50 border border-slate-200 p-3.5 rounded-xl">
-                    <div className="flex items-center justify-between text-slate-500 mb-1">
-                      <span className="text-[10px] font-bold uppercase tracking-wider">Execution</span>
-                      <Terminal className="w-3.5 h-3.5 text-emerald-600" />
-                    </div>
-                    <div className="text-xl font-bold text-slate-900">
-                      {Math.round((scores.execution_fidelity_score || 0) * 100)}%
-                    </div>
-                    <div className="text-[10px] text-slate-500 mt-0.5">Test fidelity</div>
-                  </div>
-
-                  <div className="bg-slate-50 border border-slate-200 p-3.5 rounded-xl">
-                    <div className="flex items-center justify-between text-slate-500 mb-1">
-                      <span className="text-[10px] font-bold uppercase tracking-wider">Viva Reasoning</span>
-                      <Brain className="w-3.5 h-3.5 text-indigo-600" />
-                    </div>
-                    <div className="text-xl font-bold text-slate-900">
-                      {Math.round((scores.viva_reasoning_score || 0) * 100)}%
-                    </div>
-                    <div className="text-[10px] text-slate-500 mt-0.5">Explanations</div>
-                  </div>
-
-                  <div className="bg-slate-50 border border-slate-200 p-3.5 rounded-xl">
-                    <div className="flex items-center justify-between text-slate-500 mb-1">
-                      <span className="text-[10px] font-bold uppercase tracking-wider">Authenticity</span>
-                      <Compass className="w-3.5 h-3.5 text-violet-600" />
-                    </div>
-                    <div className="text-xl font-bold text-slate-900">
-                      {Math.round((scores.process_authenticity_score || 0) * 100)}%
-                    </div>
-                    <div className="text-[10px] text-slate-500 mt-0.5">Process trajectory</div>
-                  </div>
-                </div>
-
-                {/* Evidence Summary & Identified Misconceptions */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="bg-white border border-slate-200 p-4 rounded-2xl shadow-sm space-y-2">
-                    <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                      <FileText className="w-3.5 h-3.5 text-sky-600" />
-                      Evidence &amp; Synthesis Summary
-                    </h3>
-                    <p className="text-xs text-slate-700 leading-relaxed font-sans bg-slate-50 p-3 rounded-xl border border-slate-200">
-                      {report.evidence_summary || 'The student demonstrated consistent reasoning with valid code syntax and aligned explanation.'}
-                    </p>
-                  </div>
-
-                  <div className="bg-white border border-slate-200 p-4 rounded-2xl shadow-sm space-y-2">
-                    <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                      <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
-                      Detected Misconceptions
-                    </h3>
-                    {report.detected_misconceptions && report.detected_misconceptions.length > 0 ? (
-                      <ul className="space-y-1.5">
-                        {report.detected_misconceptions.map((m, i) => (
-                          <li key={i} className="text-xs bg-rose-50 text-rose-900 p-2.5 rounded-xl border border-rose-200 flex items-start gap-2">
-                            <span className="font-bold text-rose-600">•</span>
-                            <span>{m}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <div className="text-xs text-emerald-800 bg-emerald-50 p-3.5 rounded-xl border border-emerald-200 flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-                        <span>No severe conceptual misconceptions detected for this problem.</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Process Timeline */}
-                {features && (
-                  <div className="bg-white border border-slate-200 p-4 rounded-2xl shadow-sm space-y-2">
-                    <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                      <Clock className="w-3.5 h-3.5 text-indigo-600" />
-                      Development Trajectory &amp; Telemetry
-                    </h3>
-                    <ProcessTimeline features={features} />
-                  </div>
-                )}
+                <ComprehensionReportTemplate
+                  report={report}
+                  session={popupSession}
+                  features={features}
+                  currentUser={currentUser}
+                  onRefresh={() => loadData(true, popupSession.id)}
+                  isRegenerating={isRegenerating}
+                />
 
                 {/* Modal Footer */}
                 <div className="pt-4 border-t border-slate-200 flex items-center justify-end">

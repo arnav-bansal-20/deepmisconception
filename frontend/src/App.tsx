@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { Navbar, ActiveTab } from './components/Navbar';
 import { LoginView } from './views/LoginView';
-import { LandingView } from './views/LandingView';
 import { WorkspaceView } from './views/WorkspaceView';
 import { VivaView } from './views/VivaView';
 import { AssessmentResultsView } from './views/AssessmentResultsView';
@@ -64,10 +63,9 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 
 export const App: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
-  const [activeTab, setActiveTab] = useState<ActiveTab>('landing');
+  const [activeTab, setActiveTab] = useState<ActiveTab>('workspace');
   const [currentSession, setCurrentSession] = useState<CodingSession | null>(null);
   const [serverOnline, setServerOnline] = useState<boolean>(true);
-  const [isInitializing, setIsInitializing] = useState<boolean>(false);
 
   // Restore authenticated user from localStorage on mount
   useEffect(() => {
@@ -78,6 +76,8 @@ export const App: React.FC = () => {
         setCurrentUser(user);
         if (user.role === 'teacher') {
           setActiveTab('instructor');
+        } else {
+          setActiveTab('workspace');
         }
       } catch {
         // ignore corrupted user record
@@ -115,42 +115,58 @@ export const App: React.FC = () => {
     }
   }, []);
 
-  const handleLogin = (user: AuthUser) => {
+  // Ensure an active session is auto-created whenever a student is logged in without one
+  useEffect(() => {
+    if (currentUser?.role === 'student' && !currentSession) {
+      api.createSession({
+        student_id: currentUser.id,
+        student_name: currentUser.name,
+        classroom_id: currentUser.classroomId,
+        classroom_name: currentUser.classroomName,
+        teacher_id: currentUser.teacherId,
+        teacher_name: currentUser.teacherName,
+        title: 'Code Comprehension Assessment',
+      }).then((sess) => {
+        setCurrentSession(sess);
+        localStorage.setItem('deepmisconception_active_session', JSON.stringify(sess));
+      }).catch((e) => {
+        console.error('Failed auto-creating student session:', e);
+      });
+    }
+  }, [currentUser, currentSession]);
+
+  const handleLogin = async (user: AuthUser) => {
     setCurrentUser(user);
     localStorage.setItem('deepmisconception_auth_user', JSON.stringify(user));
     if (user.role === 'teacher') {
       setActiveTab('instructor');
     } else {
-      setActiveTab('landing');
+      let session = currentSession;
+      if (!session || session.student_id !== user.id) {
+        try {
+          session = await api.createSession({
+            student_id: user.id,
+            student_name: user.name,
+            classroom_id: user.classroomId,
+            classroom_name: user.classroomName,
+            teacher_id: user.teacherId,
+            teacher_name: user.teacherName,
+            title: 'Code Comprehension Assessment',
+          });
+          setCurrentSession(session);
+          localStorage.setItem('deepmisconception_active_session', JSON.stringify(session));
+        } catch (err) {
+          console.error('Failed to create session on login', err);
+        }
+      }
+      setActiveTab('workspace');
     }
   };
 
   const handleLogout = () => {
     setCurrentUser(null);
     localStorage.removeItem('deepmisconception_auth_user');
-    setActiveTab('landing');
-  };
-
-  const handleStartSession = async (studentId: string, studentName: string, title: string) => {
-    setIsInitializing(true);
-    try {
-      const session = await api.createSession({
-        student_id: studentId,
-        student_name: studentName,
-        classroom_id: currentUser?.classroomId,
-        classroom_name: currentUser?.classroomName,
-        teacher_id: currentUser?.teacherId,
-        teacher_name: currentUser?.teacherName,
-        title,
-      });
-      setCurrentSession(session);
-      localStorage.setItem('deepmisconception_active_session', JSON.stringify(session));
-      setActiveTab('workspace');
-    } catch (err: any) {
-      alert(`Could not initialize session: ${err.message}`);
-    } finally {
-      setIsInitializing(false);
-    }
+    setActiveTab('workspace');
   };
 
   const handleSelectSession = (session: CodingSession) => {
@@ -191,16 +207,6 @@ export const App: React.FC = () => {
 
       <main className="flex-1 pb-12">
         <ErrorBoundary onReset={() => setActiveTab('workspace')}>
-          {activeTab === 'landing' && (
-            <LandingView
-              onStartSession={handleStartSession}
-              isLoading={isInitializing}
-              currentSession={currentSession}
-              currentUser={currentUser}
-              onContinueCurrent={() => setActiveTab('workspace')}
-            />
-          )}
-
           {activeTab === 'workspace' && (
             <WorkspaceView
               session={currentSession}

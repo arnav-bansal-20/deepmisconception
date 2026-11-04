@@ -5,7 +5,6 @@ import {
   Award, 
   History, 
   ShieldCheck, 
-  Home, 
   User, 
   GraduationCap,
   LogOut,
@@ -13,7 +12,7 @@ import {
 } from 'lucide-react';
 import { CodingSession, AuthUser } from '../types';
 
-export type ActiveTab = 'landing' | 'workspace' | 'viva' | 'assessment' | 'history' | 'instructor';
+export type ActiveTab = 'workspace' | 'viva' | 'assessment' | 'history' | 'instructor';
 
 interface NavbarProps {
   activeTab: ActiveTab;
@@ -38,7 +37,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Brand */}
         <div 
           className="flex items-center gap-3 cursor-pointer select-none"
-          onClick={() => setActiveTab(isTeacher ? 'instructor' : 'landing')}
+          onClick={() => setActiveTab(isTeacher ? 'instructor' : 'workspace')}
         >
           <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-600 to-indigo-600 flex items-center justify-center shadow-md shadow-sky-500/10">
             <Cpu className="w-6 h-6 text-white" />
@@ -56,18 +55,6 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Student Tabs: ONLY shown for students */}
           {!isTeacher && (
             <>
-              <button
-                onClick={() => setActiveTab('landing')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                  activeTab === 'landing'
-                    ? 'bg-sky-50 text-sky-700 font-bold border border-sky-200'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-                }`}
-              >
-                <Home className="w-4 h-4" />
-                <span>Overview</span>
-              </button>
-
               <button
                 onClick={() => setActiveTab('workspace')}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${

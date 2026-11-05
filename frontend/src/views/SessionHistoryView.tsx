@@ -7,10 +7,9 @@ import {
   CheckCircle, 
   AlertTriangle, 
   XCircle, 
-  ArrowRight,
-  RefreshCw,
-  Trash2,
-  Award
+  ArrowRight, 
+  RefreshCw, 
+  Award,
 } from 'lucide-react';
 import { CodingSession, AuthUser } from '../types';
 import { api } from '../services/api';
@@ -55,17 +54,6 @@ export const SessionHistoryView: React.FC<SessionHistoryViewProps> = ({
   useEffect(() => {
     fetchSessions();
   }, [currentUser?.id, currentUser?.role]);
-
-  const handleDelete = async (e: React.MouseEvent, id: string) => {
-    e.stopPropagation();
-    if (!window.confirm('Delete this session and all associated data?')) return;
-    try {
-      await api.deleteSession(id);
-      setSessions((prev) => prev.filter((s) => s.id !== id));
-    } catch (err) {
-      console.error('Failed to delete session', err);
-    }
-  };
 
   const filteredSessions = sessions.filter(
     (s) =>
@@ -164,13 +152,6 @@ export const SessionHistoryView: React.FC<SessionHistoryViewProps> = ({
                           {s.latest_verdict}
                         </span>
                       )}
-                      <button
-                        onClick={(e) => handleDelete(e, s.id)}
-                        className="text-slate-400 hover:text-rose-600 p-1"
-                        title="Delete session"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
                     </div>
                   </div>
 

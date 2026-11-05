@@ -404,15 +404,41 @@ export const ComprehensionReportTemplate: React.FC<ComprehensionReportTemplatePr
             </tbody>
           </table>
         </div>
-        <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs space-y-1">
-          <div className="font-mono text-slate-800 font-semibold">
-            Counts: Incorrect answers I = <strong className="text-slate-900">{miscCounts.incorrect_answers || 0}</strong>; unique contradictions K = <strong className="text-slate-900">{miscCounts.contradictions || 0}</strong>.
+        <div className="bg-slate-50 p-3.5 rounded-lg border border-slate-200 text-xs space-y-2">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-2">
+            <span className="font-bold text-slate-900 font-mono">
+              Multimodal Classification Formula:
+            </span>
+            <span className={`px-2 py-0.5 rounded text-[11px] font-bold border ${
+              verdict === 'Understood'
+                ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                : verdict === 'Partial Understanding'
+                ? 'bg-amber-50 text-amber-800 border-amber-300'
+                : verdict === 'Pending / Insufficient Evidence'
+                ? 'bg-slate-100 text-slate-800 border-slate-300'
+                : 'bg-rose-50 text-rose-800 border-rose-300'
+            }`}>
+              Outcome: {verdict} ({overallScore}%)
+            </span>
           </div>
-          <div className="font-mono text-slate-700 text-[11px]">
-            Rule: Possible misconception if (I ≥ 2) OR (K ≥ 2) OR (I ≥ 1 AND K ≥ 1).
+
+          <div className="font-mono text-slate-800 font-semibold text-[11.5px] bg-white p-2.5 rounded border border-slate-200">
+            Formula: Overall = 0.15(AST) + 0.20(EXEC) + 0.45(VIVA) + 0.20(PROCESS)
+            <div className="text-sky-700 mt-1 text-[11px]">
+              Computed: 0.15({astScore.toFixed(2)}) + 0.20({execScore.toFixed(2)}) + 0.45({vivaScore.toFixed(2)}) + 0.20({procScore.toFixed(2)}) = <strong className="text-slate-900">{compositeScore.toFixed(3)} ({overallScore}%)</strong>
+            </div>
           </div>
-          <div className="text-[11px] text-slate-500 italic">
-            Describe evidence carefully; do not infer a misconception from one isolated wrong response.
+
+          <div className="space-y-1 text-[11px]">
+            <div className="font-mono text-slate-700">
+              <strong className="text-slate-900">Multimodal Classification Rule:</strong> Possible Misconception is determined by the weighted formula across all modalities. Triggered if Overall &lt; 0.50 (&lt;50%) OR if acute cross-modal divergence exists (e.g., sophisticated code syntax AST ≥ 0.85 with unsupported viva reasoning &lt; 0.45, or runtime execution crash).
+            </div>
+            <div className="font-mono text-slate-600 text-[10.5px]">
+              Supporting Viva Signals: Incorrect answers I = <strong className="text-slate-800">{miscCounts.incorrect_answers || 0}</strong>; unique contradictions K = <strong className="text-slate-800">{miscCounts.contradictions || 0}</strong>.
+            </div>
+            <div className="text-slate-500 italic text-[10.5px] pt-0.5">
+              Multimodal synthesis prevents isolated errors or typing speeds from penalizing comprehension, ensuring classification is grounded across code syntax, test execution, viva explanations, and development trajectory.
+            </div>
           </div>
         </div>
       </div>
@@ -544,3 +570,4 @@ export const ComprehensionReportTemplate: React.FC<ComprehensionReportTemplatePr
     </div>
   );
 };
+

@@ -242,12 +242,24 @@ class ComprehensionEngine:
             if a.answer_label == "Insufficient Evidence" or not (a.student_answer and a.student_answer.strip())
         )
 
-        # Classification Logic:
-        # Rule 1: Possible Misconception triggers when there are repeated errors, verified contradictions,
-        # or multiple diagnosed conceptual flaws where the student cannot explain sophisticated code
-        has_misconception_evidence = (
-            incorrect_vivas >= 2
-            or len(detected_contradictions) >= 2
+        # Classification Logic based on Multimodal Formula:
+        # S_overall = 0.15*S_ast + 0.20*S_exec + 0.45*S_viva + 0.20*S_process
+        #
+        # Rule 1: Missing or Insufficient Evidence -> Explicit Pending Status
+        # Appears when viva answers have not been submitted or are empty whitespace,
+        # or single non-committal answer without substantive verification
+        if len(assessments) == 0 or len(submitted_answers) == 0 or (len(valid_answers) == 0 and len(assessments) <= 1):
+            overall_label = "Pending / Insufficient Evidence"
+            confidence = 0.35
+            needs_review = True
+
+        # Rule 2: Possible Misconception triggers based on multimodal formula
+        # (Composite multimodal score < 0.50 with conceptual flaws or execution failures)
+        # OR acute cross-modal divergence between code sophistication and verbal reasoning
+        elif (
+            (composite_score < 0.50 and (incorrect_vivas > 0 or len(detected_contradictions) > 0 or len(detected_misconceptions) > 0))
+            or (incorrect_vivas >= 2)
+            or (len(detected_contradictions) >= 2)
             or (incorrect_vivas == 1 and len(detected_contradictions) >= 1)
             or (
                 scores["ast_structural_score"] >= 0.85 
@@ -256,25 +268,14 @@ class ComprehensionEngine:
                 and len(submitted_answers) >= 2
                 and len(detected_misconceptions) >= 2
             )
-            or (composite_score < 0.45 and len(submitted_answers) > 0 and len(detected_misconceptions) >= 1)
-        )
-
-        if has_misconception_evidence:
+        ):
             overall_label = "Possible Misconception"
             confidence = round(max(0.70, min(0.95, 0.60 + 0.10 * max(incorrect_vivas, len(detected_misconceptions)))), 2)
 
-        # Rule 2: Missing or Insufficient Evidence -> Explicit Pending Status
-        # Appears when viva answers have not been submitted or are empty whitespace,
-        # or single non-committal answer without substantive verification
-        elif len(assessments) == 0 or len(submitted_answers) == 0 or (len(valid_answers) == 0 and len(assessments) <= 1):
-            overall_label = "Pending / Insufficient Evidence"
-            confidence = 0.35
-            needs_review = True
-
-        # Rule 3: Understood requires solid composite score, zero errors/contradictions, and all valid answers are Correct
-        # A student who pastes code but explains it correctly is NOT penalized and can receive 'Understood'.
+        # Rule 3: Understood requires solid multimodal composite score (>= 0.70), zero errors/contradictions, and all valid answers are Correct
+        # A student who pastes code but explains it correctly is NOT penalized and receives 'Understood'.
         elif (
-            composite_score >= 0.72 
+            composite_score >= 0.70 
             and incorrect_vivas == 0 
             and len(detected_contradictions) == 0 
             and len(valid_answers) > 0
@@ -283,7 +284,7 @@ class ComprehensionEngine:
             overall_label = "Understood"
             confidence = round(max(0.75, min(0.98, composite_score)), 2)
 
-        # Rule 4: Partial Understanding (Default balanced state)
+        # Rule 4: Partial Understanding (Default balanced multimodal state: 0.50 <= composite < 0.70)
         # Captures single error, partially correct answers, or fragile boundary knowledge
         else:
             overall_label = "Partial Understanding"
@@ -503,7 +504,22 @@ class ComprehensionEngine:
             "misconceptions_table": misconceptions_table,
             "misconception_counts": {
                 "incorrect_answers": incorrect_vivas,
-                "contradictions": len(detected_contradictions)
+                "contradictions": len(detected_contradictions),
+                "composite_score": composite_score,
+                "composite_percent": int(round(composite_score * 100)),
+                "ast_score": scores["ast_structural_score"],
+                "exec_score": scores["execution_fidelity_score"],
+                "viva_score": scores["viva_reasoning_score"],
+                "process_score": scores["process_overall_score"],
+                "formula": "Overall = 0.15(AST) + 0.20(EXEC) + 0.45(VIVA) + 0.20(PROCESS)",
+                "formula_evaluation": (
+                    f"0.15({scores['ast_structural_score']:.2f}) + "
+                    f"0.20({scores['execution_fidelity_score']:.2f}) + "
+                    f"0.45({scores['viva_reasoning_score']:.2f}) + "
+                    f"0.20({scores['process_overall_score']:.2f}) = {composite_score:.2f} ({int(round(composite_score*100))}%)"
+                ),
+                "rule": "Possible Misconception if Multimodal Overall < 0.50 OR cross-modal divergence; Understood if Overall >= 0.70; Partial Understanding if 0.50 <= Overall < 0.70.",
+                "verdict": overall_label,
             },
             "code_evidence": code_evidence,
             "telemetry_signals": telemetry_signals,

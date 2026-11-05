@@ -140,3 +140,4 @@ def get_faculty(faculty_id: str, db: Session = Depends(get_db)):
             detail=f"Faculty with ID '{faculty_id}' not found.",
         )
     return fac
+

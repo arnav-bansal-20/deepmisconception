@@ -2,6 +2,7 @@
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
+from app.config import settings
 from app.database import get_db
 from app.models.classroom import Classroom
 from app.models.session import CodingSession
@@ -13,8 +14,8 @@ router = APIRouter(prefix="/classrooms", tags=["Classrooms"])
 
 
 def seed_default_classrooms_if_empty(db: Session):
-    """Seed initial academic classrooms if table is empty."""
-    if db.query(Classroom).count() == 0:
+    """Seed initial academic classrooms if auto-seed is enabled and table is empty."""
+    if settings.auto_seed_defaults and db.query(Classroom).count() == 0:
         from app.seed_real_data import seed_real_data
         seed_real_data(db=db, clean=False)
 

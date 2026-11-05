@@ -44,6 +44,9 @@ class Settings(BaseModel):
     safe_sandbox_enabled: bool = Field(
         default_factory=lambda: os.getenv("SAFE_SANDBOX_ENABLED", "true").lower() in ("true", "1")
     )
+    auto_seed_defaults: bool = Field(
+        default_factory=lambda: os.getenv("AUTO_SEED_DEFAULTS", "false").lower() in ("true", "1")
+    )
 
     # Configurable Multimodal Evaluation Weights:
     # S_overall = 0.15 * S_ast + 0.20 * S_exec + 0.45 * S_viva + 0.20 * S_process

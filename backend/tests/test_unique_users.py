@@ -158,3 +158,4 @@ def test_api_list_and_get_student_and_faculty(client):
     res_fac = client.get("/api/faculty/FAC-100")
     assert res_fac.status_code == 200
     assert res_fac.json()["name"] == "Prof. One"
+

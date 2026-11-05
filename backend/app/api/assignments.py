@@ -3,6 +3,7 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
+from app.config import settings
 from app.database import get_db
 from app.models.assignment import Assignment
 from app.models.classroom import Classroom
@@ -12,8 +13,7 @@ router = APIRouter(prefix="/assignments", tags=["Assignments"])
 
 
 def _seed_defaults_if_empty(db: Session):
-    count = db.query(Assignment).count()
-    if count == 0:
+    if settings.auto_seed_defaults and db.query(Assignment).count() == 0:
         from app.seed_real_data import seed_real_data
         seed_real_data(db=db, clean=False)
 

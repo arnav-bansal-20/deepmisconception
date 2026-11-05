@@ -6,6 +6,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from app.database import Base, get_db
+from app.config import settings
 from app.main import app
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
@@ -20,9 +21,12 @@ TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engin
 
 @pytest.fixture(autouse=True)
 def setup_test_db():
+    prev = settings.auto_seed_defaults
+    settings.auto_seed_defaults = True
     Base.metadata.create_all(bind=engine)
     yield
     Base.metadata.drop_all(bind=engine)
+    settings.auto_seed_defaults = prev
 
 
 @pytest.fixture

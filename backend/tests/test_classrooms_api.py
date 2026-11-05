@@ -2,6 +2,7 @@
 import uuid
 import pytest
 from fastapi.testclient import TestClient
+from app.config import settings
 from app.main import app
 
 client = TestClient(app)
@@ -9,18 +10,23 @@ client = TestClient(app)
 
 def test_list_and_seed_classrooms():
     """Verify default classrooms are seeded and queryable."""
-    response = client.get("/api/classrooms")
-    assert response.status_code == 200
-    classrooms = response.json()
-    assert len(classrooms) >= 2
+    prev = settings.auto_seed_defaults
+    settings.auto_seed_defaults = True
+    try:
+        response = client.get("/api/classrooms")
+        assert response.status_code == 200
+        classrooms = response.json()
+        assert len(classrooms) >= 2
 
-    codes = [c["code"] for c in classrooms]
-    assert "CS101-ALPHA" in codes
-    assert "CS201-BETA" in codes
+        codes = [c["code"] for c in classrooms]
+        assert "CS101-ALPHA" in codes
+        assert "CS201-BETA" in codes
 
-    alpha = next(c for c in classrooms if c["code"] == "CS101-ALPHA")
-    assert alpha["teacher_name"] == "Dr. Ada Smith"
-    assert alpha["teacher_id"] == "FAC-CS-804"
+        alpha = next(c for c in classrooms if c["code"] == "CS101-ALPHA")
+        assert alpha["teacher_name"] == "Dr. Ada Smith"
+        assert alpha["teacher_id"] == "FAC-CS-804"
+    finally:
+        settings.auto_seed_defaults = prev
 
 
 def test_create_new_classroom_and_lookup_by_code():

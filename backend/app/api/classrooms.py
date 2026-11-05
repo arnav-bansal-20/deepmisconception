@@ -1,7 +1,7 @@
 """Classroom and Cohort API routes for teacher-guided student groups."""
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy import or_
+from sqlalchemy import or_, func
 from sqlalchemy.orm import Session
 from app.config import settings
 from app.database import get_db
@@ -41,7 +41,12 @@ def list_classrooms(
 
     result = []
     for c in classrooms:
-        students_count = db.query(CodingSession).filter(CodingSession.classroom_id == c.id).count()
+        students_count = (
+            db.query(func.count(func.distinct(CodingSession.student_id)))
+            .filter(CodingSession.classroom_id == c.id)
+            .scalar()
+            or 0
+        )
         problems_count = db.query(Assignment).filter(Assignment.classroom_id == c.id).count()
         result.append(
             ClassroomResponse(
@@ -119,7 +124,12 @@ def get_classroom_by_code(code: str, db: Session = Depends(get_db)):
             detail=f"No classroom found with code '{code_normalized}'."
         )
 
-    students_count = db.query(CodingSession).filter(CodingSession.classroom_id == classroom.id).count()
+    students_count = (
+        db.query(func.count(func.distinct(CodingSession.student_id)))
+        .filter(CodingSession.classroom_id == classroom.id)
+        .scalar()
+        or 0
+    )
     problems_count = db.query(Assignment).filter(Assignment.classroom_id == classroom.id).count()
 
     return ClassroomResponse(
@@ -147,7 +157,12 @@ def get_classroom(classroom_id: str, db: Session = Depends(get_db)):
             detail=f"Classroom '{classroom_id}' not found."
         )
 
-    students_count = db.query(CodingSession).filter(CodingSession.classroom_id == classroom.id).count()
+    students_count = (
+        db.query(func.count(func.distinct(CodingSession.student_id)))
+        .filter(CodingSession.classroom_id == classroom.id)
+        .scalar()
+        or 0
+    )
     problems_count = db.query(Assignment).filter(Assignment.classroom_id == classroom.id).count()
 
     return ClassroomResponse(

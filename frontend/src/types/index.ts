@@ -239,6 +239,7 @@ export interface ComprehensionReport {
 }
 
 export interface InstructorOverview {
+  total_students?: number;
   total_sessions: number;
   total_submissions: number;
   total_questions: number;

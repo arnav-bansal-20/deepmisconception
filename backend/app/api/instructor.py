@@ -39,6 +39,7 @@ def get_instructor_overview(
     if not matched_session_ids:
         # If no matching sessions, return zeroed counters
         return {
+            "total_students": 0,
             "total_sessions": 0,
             "total_submissions": 0,
             "total_questions": 0,
@@ -51,6 +52,12 @@ def get_instructor_overview(
             },
         }
 
+    distinct_students = (
+        db.query(func.count(func.distinct(CodingSession.student_id)))
+        .filter(CodingSession.id.in_(matched_session_ids))
+        .scalar()
+        or 0
+    )
     total_sessions = len(matched_session_ids)
     total_submissions = (
         db.query(func.count(CodeSubmission.id))
@@ -98,6 +105,7 @@ def get_instructor_overview(
     )
 
     return {
+        "total_students": distinct_students,
         "total_sessions": total_sessions,
         "total_submissions": total_submissions,
         "total_questions": total_questions,

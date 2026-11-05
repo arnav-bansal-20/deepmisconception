@@ -12,6 +12,7 @@ import {
   FolderPlus,
   Hash,
   School,
+  FileCode,
 } from 'lucide-react';
 import { 
   CodingSession, 
@@ -333,14 +334,25 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
           </div>
 
           {/* Aggregate Metrics Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="bg-white border border-slate-200 p-4 rounded-xl shadow-sm">
               <div className="flex items-center justify-between text-slate-500 mb-1">
                 <span className="text-xs font-bold uppercase tracking-wider">Students</span>
                 <Users className="w-4 h-4 text-sky-600" />
               </div>
-              <div className="text-2xl font-bold text-slate-900">{overview?.total_sessions || 0}</div>
-              <div className="text-[10px] text-slate-500 mt-1">Total student sessions</div>
+              <div className="text-2xl font-bold text-slate-900">
+                {overview?.total_students ?? (sessions.length > 0 ? new Set(sessions.map((s) => s.student_id || s.student_name)).size : 0)}
+              </div>
+              <div className="text-[10px] text-slate-500 mt-1">Unique enrolled students</div>
+            </div>
+
+            <div className="bg-white border border-slate-200 p-4 rounded-xl shadow-sm">
+              <div className="flex items-center justify-between text-slate-500 mb-1">
+                <span className="text-xs font-bold uppercase tracking-wider">Problem Runs</span>
+                <FileCode className="w-4 h-4 text-indigo-600" />
+              </div>
+              <div className="text-2xl font-bold text-slate-900">{overview?.total_sessions || sessions.length}</div>
+              <div className="text-[10px] text-slate-500 mt-1">Total problem sessions</div>
             </div>
 
             <div className="bg-white border border-slate-200 p-4 rounded-xl shadow-sm">

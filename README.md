@@ -4,7 +4,7 @@
 [![FastAPI](https://img.shields.io/badge/Framework-FastAPI-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![React](https://img.shields.io/badge/Frontend-React%2018%20%7C%20Vite%20%7C%20TypeScript-61DAFB?logo=react&logoColor=black)](https://react.dev/)
 [![PyTorch](https://img.shields.io/badge/Architecture-PyTorch%20Transformer-EE4C2C?logo=pytorch&logoColor=white)](https://pytorch.org/)
-[![Tests](https://img.shields.io/badge/Tests-82%2F82%20Passing-brightgreen?logo=pytest&logoColor=white)](https://pytest.org/)
+[![Tests](https://img.shields.io/badge/Tests-87%2F87%20Passing-brightgreen?logo=pytest&logoColor=white)](https://pytest.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 > **AI-Assisted Code Comprehension Verification and Student Misconception Detection**
@@ -84,8 +84,12 @@ graph TD
     $$S_{\text{PROCESS}} = 0.30 S_{\text{incremental}} + 0.30 S_{\text{debugging}} + 0.25 S_{\text{revision}} + 0.15 S_{\text{testing}}$$
   - **Fairness & Zero Paste Penalties**: Pasting code, typing speed, and event volume never independently decide comprehension or misconduct. A student who imports code and demonstrates thorough understanding receives an `Understood` verdict.
   - **Explicit Missing Evidence Handling**: Missing telemetry is recorded explicitly (`has_process_evidence = False`) with a neutral calibrated baseline without penalties or false misconception flags.
-- **Teacher Supervision Portal**:
-  - Instructors can review student sessions, audit flagged uncertainty cases, override AI verdicts, and author scoped programming assignments.
+- **Teacher Supervision & Interactive Problem Studio**:
+  - Instructors can create custom classroom cohorts, author targeted programming problems with custom test cases, review student sessions, audit flagged uncertainty cases, override AI verdicts, and write faculty feedback.
+- **Unique Academic Identity Registry**:
+  - Database-level `UNIQUE` constraints for both **Student ID** (`students` table) and **Faculty ID** (`faculty` table), preventing identifier collisions and verifying enrollment integrity via API validation (`HTTP 409 Conflict` on duplicate ID claims).
+- **Organic Dashboard Data Lifecycle**:
+  - Operates on a pure database-driven architecture with zero required seed data. All classrooms, problems, student coding snapshots, runtime executions, viva examinations, and multimodal reports can be generated live through the dashboard UI. An optional curriculum seeder (`python -m app.seed_real_data`) is provided for instant testing.
 
 ---
 
@@ -179,7 +183,7 @@ deepmisconception/
 │   │   ├── schemas/          # Pydantic schemas (annotation, telemetry, report, viva)
 │   │   ├── services/         # ComprehensionEngine, SafeExecutor, ASTAnalyzer, Telemetry
 │   │   └── ml/               # PyTorch Transformer, CodeBERT, Sentence-Transformer, Ablation
-│   ├── tests/                # 16 test modules covering 82 passing unit & integration tests
+│   ├── tests/                # 17 test modules covering 87 passing unit & integration tests
 │   ├── requirements.txt      # Core application requirements
 │   ├── requirements-ml.txt   # Optional deep learning dependencies (PyTorch, Transformers)
 │   └── start.sh              # Backend server launcher
@@ -224,7 +228,13 @@ deepmisconception/
    pip install -r requirements-ml.txt
    ```
 
-4. Start the FastAPI backend server:
+4. (Optional) Populate initial curriculum assignments and sample cohorts:
+   ```bash
+   python -m app.seed_real_data
+   ```
+   *Note: This is completely optional. You can start with an empty database and author classrooms and coding problems organically through the dashboard.*
+
+5. Start the FastAPI backend server:
    ```bash
    python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
    ```
@@ -250,7 +260,7 @@ cd backend
 ./venv/bin/pytest -v
 ```
 
-> **Results**: **82/82 tests passing** across AST parsing, sandbox process isolation, viva generation, answer evaluation, ML status, zero-leakage splits, configurable process evaluation, and comprehension classification.
+> **Results**: **87/87 tests passing** across AST parsing, sandbox process isolation, viva generation, answer evaluation, ML status, zero-leakage splits, configurable process evaluation, unique student/faculty identity constraints, and comprehension classification.
 
 ### Building Frontend for Production
 
@@ -276,6 +286,8 @@ npm run build
 | `GET`  | `/api/ml/ablation` | Executes systematic multimodal ablation study across feature slices |
 | `GET`, `POST` | `/api/classrooms` | Manages instructor classrooms, student rosters, and cohort codes |
 | `GET`, `POST` | `/api/assignments`| Scopes custom coding assignments to designated classrooms |
+| `GET`, `POST` | `/api/students`   | Registers and verifies students enforcing unique Student ID constraints |
+| `GET`, `POST` | `/api/faculty`    | Registers and verifies faculty members enforcing unique Faculty ID constraints |
 | `GET`  | `/api/instructor/overview` | Aggregates classroom analytics, flagged review queues, and misconception frequencies |
 
 ---

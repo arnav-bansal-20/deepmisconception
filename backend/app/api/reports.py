@@ -54,7 +54,7 @@ def get_session_report(
         needs_synth = (not report and sub_count > 0) or (
             report is not None and (
                 ans_count > rep_answered or 
-                (report.overall_label == "Pending / Insufficient Evidence" and ans_count > 0)
+                (report.overall_label in ("Insufficient Evidence", "Pending / Insufficient Evidence") and ans_count > 0)
             )
         )
         if needs_synth:

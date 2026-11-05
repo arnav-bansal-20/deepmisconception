@@ -407,7 +407,7 @@ export const ComprehensionReportTemplate: React.FC<ComprehensionReportTemplatePr
                 ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
                 : verdict === 'Partial Understanding'
                 ? 'bg-amber-50 text-amber-800 border-amber-300'
-                : verdict === 'Pending / Insufficient Evidence'
+                : (verdict === 'Insufficient Evidence' || verdict === 'Pending / Insufficient Evidence')
                 ? 'bg-slate-100 text-slate-800 border-slate-300'
                 : 'bg-rose-50 text-rose-800 border-rose-300'
             }`}>

@@ -417,7 +417,7 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
                                 ? 'bg-emerald-50 text-emerald-800 border border-emerald-300'
                                 : s.latest_verdict === 'Partial Understanding'
                                 ? 'bg-amber-50 text-amber-800 border border-amber-300'
-                                : s.latest_verdict === 'Pending / Insufficient Evidence'
+                                : (s.latest_verdict === 'Insufficient Evidence' || s.latest_verdict === 'Pending / Insufficient Evidence')
                                 ? 'bg-slate-100 text-slate-800 border border-slate-300'
                                 : 'bg-rose-50 text-rose-800 border border-rose-300'
                             }`}>

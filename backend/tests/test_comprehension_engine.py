@@ -224,8 +224,8 @@ def test_api_report_generate_and_fetch():
     assert gen_res.status_code == 201
     rep = gen_res.json()
     assert rep["session_id"] == s_id
-    assert rep["overall_label"] in ["Understood", "Partial Understanding", "Possible Misconception", "Pending / Insufficient Evidence"]
-    assert rep["overall_label"] == "Pending / Insufficient Evidence"
+    assert rep["overall_label"] in ["Understood", "Partial Understanding", "Possible Misconception", "Insufficient Evidence"]
+    assert rep["overall_label"] == "Insufficient Evidence"
     assert rep["needs_instructor_review"] is True
     assert "evidence_summary" in rep
     assert "multimodal_scores" in rep
@@ -353,7 +353,7 @@ def test_student_typing_manually_without_understanding_not_classified_as_underst
 
         report = ComprehensionEngine.synthesize_report(session.id, db)
         # MUST NOT be classified as 'Understood' - explicit pending review
-        assert report.overall_label == "Pending / Insufficient Evidence"
+        assert report.overall_label == "Insufficient Evidence"
         assert report.overall_label != "Understood"
         assert report.needs_instructor_review is True
     finally:
@@ -415,7 +415,7 @@ def test_single_incorrect_answer_does_not_trigger_misconception():
 
 
 def test_missing_viva_answers_produce_uncertainty_review_state():
-    """Requirement: Missing viva answers produce an explicit Pending / Insufficient Evidence status."""
+    """Requirement: Missing viva answers produce an explicit Insufficient Evidence status."""
     db = SessionLocal()
     try:
         session = CodingSession(
@@ -437,9 +437,9 @@ def test_missing_viva_answers_produce_uncertainty_review_state():
         db.add(sub)
         db.commit()
 
-        # Zero viva questions answered -> Explicit Pending / Insufficient Evidence
+        # Zero viva questions answered -> Explicit Insufficient Evidence
         report = ComprehensionEngine.synthesize_report(session.id, db)
-        assert report.overall_label == "Pending / Insufficient Evidence"
+        assert report.overall_label == "Insufficient Evidence"
         assert report.needs_instructor_review is True
         assert report.confidence_score <= 0.50
         assert any("Insufficient viva evidence" in flag for flag in report.evidence_breakdown["review_flags"])
@@ -448,7 +448,7 @@ def test_missing_viva_answers_produce_uncertainty_review_state():
 
 
 def test_empty_viva_answers_produce_pending_insufficient_evidence():
-    """Requirement: Empty viva answers produce Pending / Insufficient Evidence."""
+    """Requirement: Empty viva answers produce Insufficient Evidence."""
     db = SessionLocal()
     try:
         session = CodingSession(
@@ -483,7 +483,7 @@ def test_empty_viva_answers_produce_pending_insufficient_evidence():
         db.commit()
 
         report = ComprehensionEngine.synthesize_report(session.id, db)
-        assert report.overall_label == "Pending / Insufficient Evidence"
+        assert report.overall_label == "Insufficient Evidence"
         assert report.needs_instructor_review is True
     finally:
         db.close()
@@ -513,8 +513,8 @@ def test_syntax_error_without_viva_does_not_trigger_misconception():
         db.commit()
 
         report = ComprehensionEngine.synthesize_report(session.id, db)
-        # Must be Pending / Insufficient Evidence, NEVER Possible Misconception
-        assert report.overall_label == "Pending / Insufficient Evidence"
+        # Must be Insufficient Evidence, NEVER Possible Misconception
+        assert report.overall_label == "Insufficient Evidence"
         assert report.overall_label != "Possible Misconception"
     finally:
         db.close()
@@ -543,8 +543,8 @@ def test_runtime_error_without_viva_does_not_trigger_misconception():
         db.commit()
 
         report = ComprehensionEngine.synthesize_report(session.id, db)
-        # Must be Pending / Insufficient Evidence, NEVER Possible Misconception
-        assert report.overall_label == "Pending / Insufficient Evidence"
+        # Must be Insufficient Evidence, NEVER Possible Misconception
+        assert report.overall_label == "Insufficient Evidence"
         assert report.overall_label != "Possible Misconception"
     finally:
         db.close()

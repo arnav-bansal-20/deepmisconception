@@ -13,7 +13,7 @@ class ComprehensionReportResponse(BaseModel):
     """Schema for final comprehension and misconception synthesis report."""
     id: str
     session_id: str
-    overall_label: str  # Understood, Partial Understanding, Possible Misconception, Pending / Insufficient Evidence
+    overall_label: str  # Understood, Partial Understanding, Possible Misconception, Insufficient Evidence
     confidence_score: float
     evidence_summary: str
     evidence_breakdown: Optional[Dict[str, Any]] = None

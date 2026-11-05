@@ -245,11 +245,11 @@ class ComprehensionEngine:
         # Classification Logic based on Multimodal Formula:
         # S_overall = 0.15*S_ast + 0.20*S_exec + 0.45*S_viva + 0.20*S_process
         #
-        # Rule 1: Missing or Insufficient Evidence -> Explicit Pending Status
+        # Rule 1: Missing or Insufficient Evidence -> Explicit Insufficient Evidence Status
         # Appears when viva answers have not been submitted or are empty whitespace,
         # or single non-committal answer without substantive verification
         if len(assessments) == 0 or len(submitted_answers) == 0 or (len(valid_answers) == 0 and len(assessments) <= 1):
-            overall_label = "Pending / Insufficient Evidence"
+            overall_label = "Insufficient Evidence"
             confidence = 0.35
             needs_review = True
 
@@ -308,9 +308,9 @@ class ComprehensionEngine:
             )
             if detected_misconceptions:
                 summary_parts.append(f"Specific identified flaws: {', '.join(detected_misconceptions[:3])}.")
-        elif overall_label == "Pending / Insufficient Evidence":
+        elif overall_label == "Insufficient Evidence":
             summary_parts.append(
-                f"Candidate evaluation is pending sufficient viva explanation evidence (Composite Index: {int(composite_score*100)}%). "
+                f"Candidate evaluation reflects insufficient viva explanation evidence (Composite Index: {int(composite_score*100)}%). "
                 "Syntactic code snapshot is present, but verbal/conceptual justification has not been completed or is insufficient."
             )
             if detected_misconceptions:

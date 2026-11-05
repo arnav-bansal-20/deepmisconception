@@ -225,7 +225,7 @@ export interface AnswerAssessment {
 export interface ComprehensionReport {
   id: string;
   session_id: string;
-  overall_label: 'Understood' | 'Partial Understanding' | 'Possible Misconception' | 'Pending / Insufficient Evidence';
+  overall_label: 'Understood' | 'Partial Understanding' | 'Possible Misconception' | 'Insufficient Evidence' | 'Pending / Insufficient Evidence';
   confidence_score: number;
   evidence_summary: string;
   evidence_breakdown?: Record<string, any> | null;

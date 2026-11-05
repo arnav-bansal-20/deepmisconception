@@ -313,7 +313,7 @@ export const ComprehensionReportTemplate: React.FC<ComprehensionReportTemplatePr
           </table>
         </div>
         <div className="text-[11px] text-slate-500 font-mono bg-slate-50/70 p-2 rounded border border-slate-200">
-          Formula: Overall = 0.15(AST) + 0.20(EXEC) + 0.45(VIVA) + 0.20(PROCESS). Verify deployed weights before publication.
+          Formula: Overall = 0.15(AST) + 0.20(EXEC) + 0.45(VIVA) + 0.20(PROCESS)
         </div>
       </div>
 
@@ -356,9 +356,6 @@ export const ComprehensionReportTemplate: React.FC<ComprehensionReportTemplatePr
               ))}
             </tbody>
           </table>
-        </div>
-        <div className="text-[11px] text-slate-500 italic">
-          Viva score = average of numeric scores for valid assessed answers. Add rows/pages as needed.
         </div>
       </div>
 
@@ -436,9 +433,6 @@ export const ComprehensionReportTemplate: React.FC<ComprehensionReportTemplatePr
               ))}
             </tbody>
           </table>
-        </div>
-        <div className="text-[11px] text-slate-500 italic">
-          Process telemetry is supporting evidence and is not direct proof of conceptual knowledge.
         </div>
       </div>
 

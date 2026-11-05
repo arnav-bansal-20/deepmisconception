@@ -12,6 +12,7 @@ router = APIRouter(prefix="/assignments", tags=["Assignments"])
 
 DEFAULT_ASSIGNMENTS = [
     {
+        "id": "asgn-acc-modulo",
         "title": "Accumulator with Modulo Filtering",
         "description": "Write a function `sum_of_squares_skipping_threes(n)` that calculates the sum of squares of numbers from 1 to n (inclusive), but skips numbers that are multiples of 3 using a conditional control-flow statement.",
         "starter_code": (
@@ -32,33 +33,88 @@ DEFAULT_ASSIGNMENTS = [
         "teacher_id": "FAC-CS-804",
         "sample_input": "n = 5",
         "sample_output": "Computed total: 26",
-        "classroom_id": "class-alpha-101",
+        "classroom_id": "class-cse-101",
         "classroom_name": "CS101: Python Foundations - Group Alpha",
     },
     {
+        "id": "asgn-palindrome-ptr",
+        "title": "Two-Pointer Palindrome Verification",
+        "description": "Write a function `is_palindrome_phrase(s: str) -> bool` that verifies whether a string is a palindrome, ignoring non-alphanumeric characters and case, using converging symmetric pointers.",
+        "starter_code": (
+            "def is_palindrome_phrase(s: str) -> bool:\n"
+            "    left = 0\n"
+            "    right = len(s) - 1\n"
+            "    while left < right:\n"
+            "        while left < right and not s[left].isalnum():\n"
+            "            left += 1\n"
+            "        while left < right and not s[right].isalnum():\n"
+            "            right -= 1\n"
+            "        if s[left].lower() != s[right].lower():\n"
+            "            return False\n"
+            "        left += 1\n"
+            "        right -= 1\n"
+            "    return True\n\n"
+            "test_phrase = 'A man, a plan, a canal: Panama'\n"
+            "print(f'Is palindrome: {is_palindrome_phrase(test_phrase)}')\n"
+        ),
+        "difficulty": "easy",
+        "concept_tags": ["two-pointers", "string-manipulation", "invariants", "boundary-check"],
+        "created_by": "Dr. Ada Smith",
+        "teacher_id": "FAC-CS-804",
+        "sample_input": "s = 'A man, a plan, a canal: Panama'",
+        "sample_output": "Is palindrome: True",
+        "classroom_id": "class-cse-101",
+        "classroom_name": "CS101: Python Foundations - Group Alpha",
+    },
+    {
+        "id": "asgn-word-frequency",
+        "title": "Word Frequency Mapping via Dictionary",
+        "description": "Implement `word_frequency_map(text: str) -> dict[str, int]` that counts occurrences of each word in a string using dictionary key lookup.",
+        "starter_code": (
+            "def word_frequency_map(text: str) -> dict[str, int]:\n"
+            "    counts = {}\n"
+            "    words = text.lower().split()\n"
+            "    for w in words:\n"
+            "        counts[w] = counts.get(w, 0) + 1\n"
+            "    return counts\n\n"
+            "sample = 'apple banana apple orange banana apple'\n"
+            "print(f'Frequency map: {word_frequency_map(sample)}')\n"
+        ),
+        "difficulty": "easy",
+        "concept_tags": ["dictionaries", "strings", "hash-map", "counting"],
+        "created_by": "Dr. Ada Smith",
+        "teacher_id": "FAC-CS-804",
+        "sample_input": "text = 'apple banana apple orange banana apple'",
+        "sample_output": "Frequency map: {'apple': 3, 'banana': 2, 'orange': 1}",
+        "classroom_id": "class-cse-101",
+        "classroom_name": "CS101: Python Foundations - Group Alpha",
+    },
+    {
+        "id": "asgn-factorial-bounds",
         "title": "Recursive Factorial & Call Stack Bounds",
-        "description": "Implement a recursive function `factorial(n)` that computes n!. Ensure you define a correct base case for n <= 1 to avoid a RecursionError.",
+        "description": "Implement a recursive function `factorial(n: int) -> int` that computes n!. Ensure you define a correct base case for n <= 1 to avoid a RecursionError.",
         "starter_code": (
             "def factorial(n: int) -> int:\n"
-            "    # Base case\n"
+            "    if n < 0:\n"
+            "        raise ValueError('Factorial is not defined for negative numbers')\n"
             "    if n <= 1:\n"
             "        return 1\n"
-            "    # Recursive call\n"
             "    return n * factorial(n - 1)\n\n"
             "print(f'Factorial of 5: {factorial(5)}')\n"
         ),
         "difficulty": "medium",
-        "concept_tags": ["recursion", "base-case", "call-stack"],
-        "created_by": "Dr. Ada Smith",
-        "teacher_id": "FAC-CS-804",
-        "sample_input": "5",
+        "concept_tags": ["recursion", "base-case", "call-stack", "invariants"],
+        "created_by": "Prof. Rajesh Kumar",
+        "teacher_id": "FAC-CSE-205",
+        "sample_input": "n = 5",
         "sample_output": "Factorial of 5: 120",
-        "classroom_id": "class-alpha-101",
-        "classroom_name": "CS101: Python Foundations - Group Alpha",
+        "classroom_id": "class-cse-201",
+        "classroom_name": "CS201: Algorithms & Data Structures - Group Beta",
     },
     {
-        "title": "Binary Search & Off-by-One Range Bounds",
-        "description": "Implement `binary_search(arr, target)` on a sorted list. Correctly manage low and high pointers without infinite looping or missing edge elements.",
+        "id": "asgn-binary-search",
+        "title": "Binary Search on Sorted Sequence",
+        "description": "Implement `binary_search(arr: list[int], target: int) -> int` on a sorted list. Correctly manage low and high pointers without infinite looping or missing edge elements.",
         "starter_code": (
             "def binary_search(arr: list[int], target: int) -> int:\n"
             "    low = 0\n"
@@ -75,14 +131,53 @@ DEFAULT_ASSIGNMENTS = [
             "data = [2, 5, 8, 12, 16, 23, 38, 56, 72, 91]\n"
             "print(f'Index of 23: {binary_search(data, 23)}')\n"
         ),
-        "difficulty": "hard",
+        "difficulty": "medium",
         "concept_tags": ["binary-search", "pointers", "loop-bounds", "invariants"],
-        "created_by": "Prof. Alan Turing",
-        "teacher_id": "FAC-CS-901",
+        "created_by": "Prof. Rajesh Kumar",
+        "teacher_id": "FAC-CSE-205",
         "sample_input": "arr = [2, 5, 8, 12, 16, 23, 38, 56, 72, 91], target = 23",
         "sample_output": "Index of 23: 5",
-        "classroom_id": "class-beta-201",
+        "classroom_id": "class-cse-201",
         "classroom_name": "CS201: Algorithms & Data Structures - Group Beta",
+    },
+    {
+        "id": "asgn-matrix-spiral",
+        "title": "Matrix Boundary Spiral Traversal",
+        "description": "Given an M x N 2D matrix, return all elements in clockwise spiral order maintaining 4 strict boundary limits.",
+        "starter_code": (
+            "def spiral_order(matrix: list[list[int]]) -> list[int]:\n"
+            "    if not matrix or not matrix[0]:\n"
+            "        return []\n"
+            "    res = []\n"
+            "    top, bottom = 0, len(matrix) - 1\n"
+            "    left, right = 0, len(matrix[0]) - 1\n"
+            "    while top <= bottom and left <= right:\n"
+            "        for col in range(left, right + 1):\n"
+            "            res.append(matrix[top][col])\n"
+            "        top += 1\n"
+            "        for row in range(top, bottom + 1):\n"
+            "            res.append(matrix[row][right])\n"
+            "        right -= 1\n"
+            "        if top <= bottom:\n"
+            "            for col in range(right, left - 1, -1):\n"
+            "                res.append(matrix[bottom][col])\n"
+            "            bottom -= 1\n"
+            "        if left <= right:\n"
+            "            for row in range(bottom, top - 1, -1):\n"
+            "                res.append(matrix[row][left])\n"
+            "            left += 1\n"
+            "    return res\n\n"
+            "grid = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]\n"
+            "print(f'Spiral traversal: {spiral_order(grid)}')\n"
+        ),
+        "difficulty": "hard",
+        "concept_tags": ["matrix", "2d-arrays", "spiral-order", "boundary-invariants"],
+        "created_by": "Dr. Michael Chang",
+        "teacher_id": "FAC-CSE-301",
+        "sample_input": "grid = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]",
+        "sample_output": "Spiral traversal: [1, 2, 3, 6, 9, 8, 7, 4, 5]",
+        "classroom_id": "class-ise-204",
+        "classroom_name": "CS204: Object-Oriented Software Design",
     },
 ]
 

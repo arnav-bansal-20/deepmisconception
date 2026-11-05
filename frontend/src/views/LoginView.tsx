@@ -21,7 +21,7 @@ interface LoginViewProps {
 export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
   const [role, setRole] = useState<UserRole>('student');
   const [classrooms, setClassrooms] = useState<Classroom[]>([]);
-  const [selectedClassroomId, setSelectedClassroomId] = useState<string>('class-alpha-101');
+  const [selectedClassroomId, setSelectedClassroomId] = useState<string>('class-cse-101');
   
   // Custom class code entry mode
   const [useCustomCode, setUseCustomCode] = useState(false);
@@ -78,7 +78,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
         role: 'student',
         id: studentId.trim(),
         name: studentName.trim(),
-        classroomId: targetClassroom?.id || 'class-alpha-101',
+        classroomId: targetClassroom?.id || 'class-cse-101',
         classroomName: targetClassroom?.name || 'CS101: Python Foundations - Group Alpha',
         classroomCode: targetClassroom?.code || 'CS101-ALPHA',
         teacherId: targetClassroom?.teacher_id || 'FAC-CS-804',

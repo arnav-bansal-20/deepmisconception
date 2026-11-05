@@ -18,22 +18,31 @@ def seed_default_classrooms_if_empty(db: Session):
 
     defaults = [
         Classroom(
-            id="class-alpha-101",
+            id="class-cse-101",
             name="CS101: Python Foundations - Group Alpha",
             code="CS101-ALPHA",
             teacher_id="FAC-CS-804",
             teacher_name="Dr. Ada Smith",
             department="Computer Science & Engineering",
-            description="Morning group exploring program control flow, accumulator patterns, and loop invariants.",
+            description="Foundations of imperative programming, control-flow invariants, accumulator patterns, and algorithm verification.",
         ),
         Classroom(
-            id="class-beta-201",
+            id="class-cse-201",
             name="CS201: Algorithms & Data Structures - Group Beta",
             code="CS201-BETA",
-            teacher_id="FAC-CS-901",
-            teacher_name="Prof. Alan Turing",
+            teacher_id="FAC-CSE-205",
+            teacher_name="Prof. Rajesh Kumar",
             department="Computer Science & Engineering",
-            description="Intermediate group focusing on recursion, state transitions, and computational complexity.",
+            description="Intermediate algorithmic complexity, pointer convergence, divide-and-conquer, and recursion bounds.",
+        ),
+        Classroom(
+            id="class-ise-204",
+            name="CS204: Object-Oriented Software Design",
+            code="CS204-OOD",
+            teacher_id="FAC-CSE-301",
+            teacher_name="Dr. Michael Chang",
+            department="Information Science & Engineering",
+            description="Modular design patterns, state accumulation, complexity analysis, and multi-dimensional matrix structures.",
         ),
     ]
     for c in defaults:

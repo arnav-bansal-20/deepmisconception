@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   ShieldCheck, 
   Users, 
@@ -13,6 +13,9 @@ import {
   Hash,
   School,
   FileCode,
+  ChevronDown,
+  ChevronUp,
+  GraduationCap,
 } from 'lucide-react';
 import { 
   CodingSession, 
@@ -81,6 +84,66 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
   const [newClassDesc, setNewClassDesc] = useState('');
   const [classCreateError, setClassCreateError] = useState<string | null>(null);
   const [isCreatingClass, setIsCreatingClass] = useState(false);
+
+  // Group sessions by unique student
+  const [collapsedStudents, setCollapsedStudents] = useState<Record<string, boolean>>({});
+
+  const toggleStudentCollapse = (key: string) => {
+    setCollapsedStudents((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
+  };
+
+  const studentGroups = useMemo(() => {
+    const map: Record<string, {
+      studentKey: string;
+      studentId: string;
+      studentName: string;
+      classroomName: string;
+      sessions: CodingSession[];
+      stats: {
+        total: number;
+        understood: number;
+        partial: number;
+        misconceptions: number;
+        pending: number;
+      };
+    }> = {};
+
+    sessions.forEach((s) => {
+      const key = s.student_id || s.student_name || 'unknown';
+      if (!map[key]) {
+        map[key] = {
+          studentKey: key,
+          studentId: s.student_id || 'N/A',
+          studentName: s.student_name || 'Anonymous Student',
+          classroomName: s.classroom_name || 'Classroom Cohort',
+          sessions: [],
+          stats: {
+            total: 0,
+            understood: 0,
+            partial: 0,
+            misconceptions: 0,
+            pending: 0,
+          },
+        };
+      }
+      map[key].sessions.push(s);
+      map[key].stats.total += 1;
+      if (s.latest_verdict === 'Understood') {
+        map[key].stats.understood += 1;
+      } else if (s.latest_verdict === 'Partial Understanding') {
+        map[key].stats.partial += 1;
+      } else if (s.latest_verdict === 'Possible Misconception') {
+        map[key].stats.misconceptions += 1;
+      } else {
+        map[key].stats.pending += 1;
+      }
+    });
+
+    return Object.values(map);
+  }, [sessions]);
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -374,96 +437,164 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
             </div>
           </div>
 
-          {/* Student Groups Table */}
-          <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
-            <div className="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+          {/* Clubbed Student Groups View */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between px-1">
               <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
                 <Users className="w-4 h-4 text-indigo-600" />
                 Student Comprehension Records & Reports
               </h3>
-              <span className="text-xs text-slate-500 font-mono">
-                {sessions.length} student sessions recorded
-              </span>
+              <div className="flex items-center gap-2 text-xs text-slate-500 font-mono">
+                <span className="font-semibold text-slate-700">{studentGroups.length}</span> students enrolled •
+                <span className="font-semibold text-slate-700">{sessions.length}</span> problem sessions recorded
+              </div>
             </div>
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead className="bg-slate-50 text-slate-500 font-mono uppercase text-[10px] border-b border-slate-200">
-                  <tr>
-                    <th className="p-4">Student</th>
-                    <th className="p-4">Student Group</th>
-                    <th className="p-4">Problem Task</th>
-                    <th className="p-4">Submissions</th>
-                    <th className="p-4">Viva Qs</th>
-                    <th className="p-4">Diagnosis Verdict</th>
-                    <th className="p-4">Status</th>
-                    <th className="p-4 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 text-slate-700">
-                  {sessions.length === 0 ? (
-                    <tr>
-                      <td colSpan={8} className="p-8 text-center text-slate-400 italic">
-                        No student sessions recorded yet for this group. Students can join using the class code and submit code.
-                      </td>
-                    </tr>
-                  ) : (
-                    sessions.map((s) => (
-                      <tr key={s.id} className="hover:bg-slate-50/80 transition-colors">
-                        <td className="p-4 font-medium text-slate-900">
-                          <div className="font-bold">{s.student_name}</div>
-                          <span className="text-[11px] text-slate-500 font-mono">{s.student_id}</span>
-                        </td>
-                        <td className="p-4 font-mono text-slate-700">
-                          <span className="px-2 py-0.5 rounded bg-sky-50 text-sky-800 border border-sky-200 text-[10px] font-bold">
-                            {s.classroom_name || 'Group Alpha'}
-                          </span>
-                        </td>
-                        <td className="p-4 text-slate-800 font-medium">{s.title}</td>
-                        <td className="p-4 font-mono">{s.submission_count || 0}</td>
-                        <td className="p-4 font-mono">{s.question_count || 0}</td>
-                        <td className="p-4">
-                          {s.latest_verdict ? (
-                            <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                              s.latest_verdict === 'Understood'
-                                ? 'bg-emerald-50 text-emerald-800 border border-emerald-300'
-                                : s.latest_verdict === 'Partial Understanding'
-                                ? 'bg-amber-50 text-amber-800 border border-amber-300'
-                                : (s.latest_verdict === 'Insufficient Evidence' || s.latest_verdict === 'Pending / Insufficient Evidence')
-                                ? 'bg-slate-100 text-slate-800 border border-slate-300'
-                                : 'bg-rose-50 text-rose-800 border border-rose-300'
-                            }`}>
-                              {s.latest_verdict}
+            {studentGroups.length === 0 ? (
+              <div className="bg-white border border-slate-200 rounded-2xl p-8 text-center text-slate-400 italic shadow-sm">
+                No student sessions recorded yet for this group. Students can join using the class code and submit code.
+              </div>
+            ) : (
+              studentGroups.map((group) => {
+                const isCollapsed = collapsedStudents[group.studentKey] === true;
+                return (
+                  <div
+                    key={group.studentKey}
+                    className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm transition-all"
+                  >
+                    {/* Student Header Card */}
+                    <div
+                      onClick={() => toggleStudentCollapse(group.studentKey)}
+                      className="p-4 bg-gradient-to-r from-slate-50 via-white to-indigo-50/20 hover:bg-slate-50/80 cursor-pointer flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 transition-colors select-none"
+                    >
+                      <div className="flex items-center gap-3.5">
+                        <div className="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-sm shadow-sm ring-2 ring-indigo-100">
+                          {group.studentName.slice(0, 2).toUpperCase()}
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-bold text-slate-900 text-base">{group.studentName}</span>
+                            <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-mono text-[11px] font-bold border border-slate-200">
+                              {group.studentId}
                             </span>
-                          ) : (
-                            <span className="text-slate-400 italic">Pending Viva</span>
-                          )}
-                        </td>
-                        <td className="p-4 font-mono capitalize">
-                          <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${
-                            s.status === 'completed'
-                              ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
-                              : s.status === 'reviewed'
-                              ? 'bg-indigo-50 text-indigo-800 border-indigo-200'
-                              : 'bg-amber-50 text-amber-800 border-amber-300'
-                          }`}>
-                            {s.status}
+                            <span className="px-2 py-0.5 rounded bg-sky-50 text-sky-800 border border-sky-200 text-[10px] font-bold">
+                              {group.classroomName}
+                            </span>
+                          </div>
+                          <div className="text-xs text-slate-500 mt-1 flex items-center gap-3">
+                            <span className="flex items-center gap-1 font-medium">
+                              <BookOpen className="w-3.5 h-3.5 text-slate-400" />
+                              {group.sessions.length} Problem{group.sessions.length !== 1 ? 's' : ''} Attempted
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Verdict Badges & Collapse Toggle */}
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {group.stats.understood > 0 && (
+                          <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-300 text-[11px] font-bold flex items-center gap-1 shadow-xs">
+                            <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                            {group.stats.understood} Understood
                           </span>
-                        </td>
-                        <td className="p-4 text-right">
-                          <button
-                            onClick={() => handleInspectStudentReport(s)}
-                            className="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-600 text-indigo-700 hover:text-white border border-indigo-200 hover:border-indigo-600 rounded-lg font-bold text-[11px] transition-all shadow-sm"
-                          >
-                            Inspect Report
-                          </button>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
+                        )}
+                        {group.stats.partial > 0 && (
+                          <span className="px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-300 text-[11px] font-bold shadow-xs">
+                            {group.stats.partial} Partial Understanding
+                          </span>
+                        )}
+                        {group.stats.misconceptions > 0 && (
+                          <span className="px-2.5 py-1 rounded-full bg-rose-50 text-rose-800 border border-rose-300 text-[11px] font-bold flex items-center gap-1 shadow-xs">
+                            <AlertTriangle className="w-3 h-3 text-rose-600" />
+                            {group.stats.misconceptions} Misconception{group.stats.misconceptions > 1 ? 's' : ''}
+                          </span>
+                        )}
+                        {group.stats.pending > 0 && (
+                          <span className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-300 text-[11px] font-medium shadow-xs">
+                            {group.stats.pending} Pending Viva
+                          </span>
+                        )}
+                        <div className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 ml-1 transition-colors">
+                          {isCollapsed ? (
+                            <ChevronDown className="w-5 h-5" />
+                          ) : (
+                            <ChevronUp className="w-5 h-5" />
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Problems Table Under This Student */}
+                    {!isCollapsed && (
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left text-xs">
+                          <thead className="bg-slate-50/70 text-slate-500 font-mono uppercase text-[10px] border-b border-slate-200">
+                            <tr>
+                              <th className="py-3 px-4 font-semibold">Problem Task</th>
+                              <th className="py-3 px-4 font-semibold">Submissions</th>
+                              <th className="py-3 px-4 font-semibold">Viva Qs</th>
+                              <th className="py-3 px-4 font-semibold">Diagnosis Verdict</th>
+                              <th className="py-3 px-4 font-semibold">Status</th>
+                              <th className="py-3 px-4 text-right font-semibold">Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100 text-slate-700">
+                            {group.sessions.map((s) => (
+                              <tr key={s.id} className="hover:bg-slate-50/80 transition-colors">
+                                <td className="py-3.5 px-4 font-medium text-slate-900">
+                                  <div className="flex items-center gap-2">
+                                    <FileCode className="w-4 h-4 text-indigo-500 shrink-0" />
+                                    <span className="font-semibold text-slate-800">{s.title}</span>
+                                  </div>
+                                </td>
+                                <td className="py-3.5 px-4 font-mono font-bold text-slate-700">{s.submission_count || 0}</td>
+                                <td className="py-3.5 px-4 font-mono font-bold text-slate-700">{s.question_count || 0}</td>
+                                <td className="py-3.5 px-4">
+                                  {s.latest_verdict ? (
+                                    <span className={`inline-flex px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                                      s.latest_verdict === 'Understood'
+                                        ? 'bg-emerald-50 text-emerald-800 border border-emerald-300'
+                                        : s.latest_verdict === 'Partial Understanding'
+                                        ? 'bg-amber-50 text-amber-800 border border-amber-300'
+                                        : (s.latest_verdict === 'Insufficient Evidence' || s.latest_verdict === 'Pending / Insufficient Evidence')
+                                        ? 'bg-slate-100 text-slate-800 border border-slate-300'
+                                        : 'bg-rose-50 text-rose-800 border border-rose-300'
+                                    }`}>
+                                      {s.latest_verdict}
+                                    </span>
+                                  ) : (
+                                    <span className="text-slate-400 italic">Pending Viva</span>
+                                  )}
+                                </td>
+                                <td className="py-3.5 px-4 font-mono capitalize">
+                                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${
+                                    s.status === 'completed'
+                                      ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                                      : s.status === 'reviewed'
+                                      ? 'bg-indigo-50 text-indigo-800 border-indigo-200'
+                                      : 'bg-amber-50 text-amber-800 border-amber-300'
+                                  }`}>
+                                    {s.status}
+                                  </span>
+                                </td>
+                                <td className="py-3.5 px-4 text-right">
+                                  <button
+                                    onClick={() => handleInspectStudentReport(s)}
+                                    className="px-3.5 py-1.5 bg-indigo-50 hover:bg-indigo-600 text-indigo-700 hover:text-white border border-indigo-200 hover:border-indigo-600 rounded-lg font-bold text-[11px] transition-all shadow-sm"
+                                  >
+                                    Inspect Report
+                                  </button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+                );
+              })
+            )}
           </div>
         </div>
       )}

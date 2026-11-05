@@ -49,6 +49,38 @@ def create_session(session_in: SessionCreate, db: Session = Depends(get_db)):
             except Exception:
                 db.rollback()
 
+    # Prevent duplicate problem solving: check if student has already completed this problem
+    if session_in.student_id and session_in.title:
+        clean_sid = session_in.student_id.strip()
+        clean_title = session_in.title.strip()
+        existing_completed = (
+            db.query(CodingSession)
+            .filter(
+                CodingSession.student_id == clean_sid,
+                func.lower(CodingSession.title) == clean_title.lower(),
+                CodingSession.status.in_(["completed", "reviewed"]),
+            )
+            .first()
+        )
+        if existing_completed:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"You have already completed problem '{session_in.title}'. Each coding problem can only be solved once.",
+            )
+
+        # Return existing active session if one is already in progress
+        existing_active = (
+            db.query(CodingSession)
+            .filter(
+                CodingSession.student_id == clean_sid,
+                func.lower(CodingSession.title) == clean_title.lower(),
+                CodingSession.status == "active",
+            )
+            .first()
+        )
+        if existing_active:
+            return existing_active
+
     session = CodingSession(
         student_id=session_in.student_id,
         student_name=session_in.student_name,

@@ -185,16 +185,17 @@ def evaluate_student_answer(answer_in: VivaAnswerSubmit, db: Session = Depends(g
     if session_obj:
         total_qs = db.query(func.count(VivaQuestion.id)).filter(VivaQuestion.session_id == question.session_id).scalar() or 0
         answered_qs = db.query(func.count(AnswerAssessment.id)).filter(AnswerAssessment.session_id == question.session_id).scalar() or 0
-        if total_qs > 0 and answered_qs >= total_qs:
-            if session_obj.status == "active":
-                session_obj.status = "completed"
-                db.add(session_obj)
-                db.commit()
-            try:
-                from app.services.comprehension_engine import ComprehensionEngine
-                ComprehensionEngine.synthesize_report(question.session_id, db)
-            except Exception as e:
-                logger.warning(f"Failed auto-synthesizing report upon viva completion: {e}")
+        # As soon as the student answers viva question, mark problem session as completed
+        if session_obj.status == "active":
+            session_obj.status = "completed"
+            db.add(session_obj)
+            db.commit()
+            db.refresh(session_obj)
+        try:
+            from app.services.comprehension_engine import ComprehensionEngine
+            ComprehensionEngine.synthesize_report(question.session_id, db)
+        except Exception as e:
+            logger.warning(f"Failed auto-synthesizing report upon viva completion: {e}")
 
     return assessment
 

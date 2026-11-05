@@ -14,7 +14,8 @@ import {
   BookOpen,
   Award,
   PlusCircle,
-  ArrowRight
+  ArrowRight,
+  Lock
 } from 'lucide-react';
 import { MonacoEditor } from '../components/MonacoEditor';
 import { ExecutionTerminal } from '../components/ExecutionTerminal';
@@ -29,6 +30,7 @@ interface WorkspaceViewProps {
   onNavigateToViva: () => void;
   onNavigateToResults?: () => void;
   onStartProblem?: (assignment: Assignment) => void;
+  onSelectSession?: (session: CodingSession) => void;
 }
 
 export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
@@ -38,6 +40,7 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
   onNavigateToViva,
   onNavigateToResults,
   onStartProblem,
+  onSelectSession,
 }) => {
   const [code, setCode] = useState('');
   const [stdout, setStdout] = useState<string | null>(null);
@@ -52,15 +55,20 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
   const [processFeatures, setProcessFeatures] = useState<ProcessFeatures | null>(null);
   const [isLoadingFeatures, setIsLoadingFeatures] = useState(false);
   const [assignments, setAssignments] = useState<Assignment[]>([]);
+  const [studentSessions, setStudentSessions] = useState<CodingSession[]>([]);
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
   const [isSelectingProblem, setIsSelectingProblem] = useState(false);
 
-  // Load teacher-authored assignments for student's classroom on mount
+  // Load teacher-authored assignments and student history on mount
   useEffect(() => {
     const loadAssignments = async () => {
       try {
-        const list = await api.listAssignments(currentUser?.classroomId);
+        const [list, sList] = await Promise.all([
+          api.listAssignments(currentUser?.classroomId),
+          currentUser?.id ? api.listSessions({ student_id: currentUser.id }) : Promise.resolve([]),
+        ]);
         setAssignments(list);
+        setStudentSessions(sList);
         if (list.length > 0 && !selectedAssignment) {
           // If session has title matching one of the assignments, pick it
           const matching = session ? list.find((a) => a.title.toLowerCase() === session.title.toLowerCase()) : null;
@@ -73,11 +81,25 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
       }
     };
     loadAssignments();
-  }, [currentUser?.classroomId, session?.id]);
+  }, [currentUser?.classroomId, session?.id, currentUser?.id]);
+
+  const getCompletedSession = (problemTitle: string) => {
+    return studentSessions.find(
+      (s) => s.title.toLowerCase() === problemTitle.toLowerCase() && (s.status === 'completed' || s.status === 'reviewed' || s.has_report)
+    );
+  };
 
   const handleSelectAssignment = (assignmentId: string) => {
     const found = assignments.find((a) => a.id === assignmentId);
     if (found) {
+      const completed = getCompletedSession(found.title);
+      if (completed) {
+        alert(`Problem "${found.title}" has already been completed and evaluated. Switching to its completed report.`);
+        if (onSelectSession) {
+          onSelectSession(completed);
+        }
+        return;
+      }
       setSelectedAssignment(found);
       setCode(found.starter_code);
       setStdout(null);
@@ -217,6 +239,11 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
   };
 
   const handleLaunchProblem = (assignment: Assignment) => {
+    const completedSession = getCompletedSession(assignment.title);
+    if (completedSession) {
+      alert(`Problem "${assignment.title}" has already been completed and evaluated. Completed problems cannot be re-solved.`);
+      return;
+    }
     setSelectedAssignment(assignment);
     setCode(assignment.starter_code || '');
     setIsSelectingProblem(false);
@@ -300,60 +327,96 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
 
         {displayAssignments.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {displayAssignments.map((a) => (
-              <div
-                key={a.id}
-                className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex flex-col justify-between hover:border-sky-300 hover:shadow-md transition-all"
-              >
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className={`text-[11px] font-mono uppercase px-2.5 py-0.5 rounded-full font-bold border ${
-                      a.difficulty === 'easy'
-                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                        : a.difficulty === 'hard'
-                        ? 'bg-rose-50 text-rose-700 border-rose-200'
-                        : 'bg-amber-50 text-amber-700 border-amber-200'
-                    }`}>
-                      {a.difficulty}
-                    </span>
-                    {a.concept_tags && a.concept_tags.length > 0 && (
-                      <span className="text-[10px] font-mono text-slate-400 truncate max-w-[140px]">
-                        {a.concept_tags.join(', ')}
+            {displayAssignments.map((a) => {
+              const completedSession = getCompletedSession(a.title);
+              const isCompletedProblem = Boolean(completedSession);
+
+              return (
+                <div
+                  key={a.id}
+                  className={`bg-white border rounded-2xl p-5 shadow-sm flex flex-col justify-between transition-all ${
+                    isCompletedProblem
+                      ? 'border-emerald-200 bg-emerald-50/20 shadow-none'
+                      : 'border-slate-200 hover:border-sky-300 hover:shadow-md'
+                  }`}
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className={`text-[11px] font-mono uppercase px-2.5 py-0.5 rounded-full font-bold border ${
+                        a.difficulty === 'easy'
+                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                          : a.difficulty === 'hard'
+                          ? 'bg-rose-50 text-rose-700 border-rose-200'
+                          : 'bg-amber-50 text-amber-700 border-amber-200'
+                      }`}>
+                        {a.difficulty}
                       </span>
+                      {isCompletedProblem ? (
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                          Completed • {completedSession?.latest_verdict || 'Evaluated'}
+                        </span>
+                      ) : a.concept_tags && a.concept_tags.length > 0 ? (
+                        <span className="text-[10px] font-mono text-slate-400 truncate max-w-[140px]">
+                          {a.concept_tags.join(', ')}
+                        </span>
+                      ) : null}
+                    </div>
+
+                    <h3 className="font-bold text-slate-900 text-base leading-snug">
+                      {a.title}
+                    </h3>
+
+                    <p className="text-xs text-slate-600 line-clamp-3 leading-relaxed">
+                      {a.description}
+                    </p>
+
+                    {(a.sample_input || a.sample_output) && (
+                      <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-[11px] font-mono space-y-1">
+                        {a.sample_input && (
+                          <div className="truncate"><span className="text-slate-400 font-bold">Input:</span> {a.sample_input}</div>
+                        )}
+                        {a.sample_output && (
+                          <div className="truncate"><span className="text-slate-400 font-bold">Output:</span> {a.sample_output}</div>
+                        )}
+                      </div>
                     )}
                   </div>
 
-                  <h3 className="font-bold text-slate-900 text-base leading-snug">
-                    {a.title}
-                  </h3>
-
-                  <p className="text-xs text-slate-600 line-clamp-3 leading-relaxed">
-                    {a.description}
-                  </p>
-
-                  {(a.sample_input || a.sample_output) && (
-                    <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-[11px] font-mono space-y-1">
-                      {a.sample_input && (
-                        <div className="truncate"><span className="text-slate-400 font-bold">Input:</span> {a.sample_input}</div>
-                      )}
-                      {a.sample_output && (
-                        <div className="truncate"><span className="text-slate-400 font-bold">Output:</span> {a.sample_output}</div>
-                      )}
-                    </div>
-                  )}
+                  <div className="pt-4 mt-4 border-t border-slate-100">
+                    {isCompletedProblem ? (
+                      <div>
+                        <button
+                          onClick={() => {
+                            if (onSelectSession && completedSession) {
+                              onSelectSession(completedSession);
+                            } else if (onNavigateToResults) {
+                              onNavigateToResults();
+                            }
+                          }}
+                          className="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs border border-emerald-300 transition-all shadow-sm"
+                        >
+                          <Award className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>View Completed Report</span>
+                        </button>
+                        <p className="text-[10px] text-slate-500 font-medium text-center mt-1.5 flex items-center justify-center gap-1">
+                          <Lock className="w-3 h-3 text-slate-400" />
+                          <span>Solved & Evaluated (Locked)</span>
+                        </p>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => handleLaunchProblem(a)}
+                        className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-bold text-xs shadow-md shadow-sky-500/10 transition-all"
+                      >
+                        <Play className="w-3.5 h-3.5 fill-current" />
+                        <span>Start Problem</span>
+                      </button>
+                    )}
+                  </div>
                 </div>
-
-                <div className="pt-4 mt-4 border-t border-slate-100 flex items-center justify-end">
-                  <button
-                    onClick={() => handleLaunchProblem(a)}
-                    className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-bold text-xs shadow-md shadow-sky-500/10 transition-all"
-                  >
-                    <Play className="w-3.5 h-3.5 fill-current" />
-                    <span>Start Problem</span>
-                  </button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         ) : (
           <div className="bg-white border border-slate-200 rounded-2xl p-12 text-center">
@@ -410,11 +473,14 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
                   onChange={(e) => handleSelectAssignment(e.target.value)}
                   className="bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 font-medium"
                 >
-                  {assignments.map((a) => (
-                    <option key={a.id} value={a.id}>
-                      {a.title} ({a.difficulty})
-                    </option>
-                  ))}
+                  {assignments.map((a) => {
+                    const comp = getCompletedSession(a.title);
+                    return (
+                      <option key={a.id} value={a.id}>
+                        {comp ? `✓ [Completed] ${a.title}` : `${a.title} (${a.difficulty})`}
+                      </option>
+                    );
+                  })}
                 </select>
               </div>
             )}
@@ -439,8 +505,8 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
 
             <button
               onClick={handleRunCode}
-              disabled={isRunning}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition-colors shadow-sm disabled:opacity-50"
+              disabled={isRunning || isCompleted}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition-colors shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <Play className="w-3.5 h-3.5 fill-current" />
               {isRunning ? 'Running...' : 'Run Code'}
@@ -448,14 +514,34 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
 
             <button
               onClick={handleSubmitForViva}
-              disabled={isSubmitting}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-bold text-xs transition-all shadow-sm disabled:opacity-50"
+              disabled={isSubmitting || isCompleted}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-bold text-xs transition-all shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <Sparkles className="w-4 h-4" />
-              {isSubmitting ? 'Submitting...' : 'Submit for Viva'}
+              {isSubmitting ? 'Submitting...' : isCompleted ? 'Completed (Locked)' : 'Submit for Viva'}
             </button>
           </div>
         </div>
+
+        {/* Completed Lock Banner */}
+        {isCompleted && (
+          <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-xl text-xs flex flex-wrap items-center justify-between gap-2 font-medium">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>
+                <strong>Problem Finalized:</strong> You have executed this problem and completed the AI viva evaluation. Re-solving or modifying code is locked.
+              </span>
+            </div>
+            {onNavigateToResults && (
+              <button
+                onClick={onNavigateToResults}
+                className="px-3 py-1 bg-white hover:bg-slate-50 text-emerald-800 font-bold text-[11px] rounded-lg border border-emerald-300 shadow-sm transition-all"
+              >
+                View Diagnostic Report
+              </button>
+            )}
+          </div>
+        )}
 
         {/* Problem Title & Statement */}
         <div className="space-y-2">

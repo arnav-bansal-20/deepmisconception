@@ -4,7 +4,7 @@
 [![FastAPI](https://img.shields.io/badge/Framework-FastAPI-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![React](https://img.shields.io/badge/Frontend-React%2018%20%7C%20Vite%20%7C%20TypeScript-61DAFB?logo=react&logoColor=black)](https://react.dev/)
 [![PyTorch](https://img.shields.io/badge/Architecture-PyTorch%20Transformer-EE4C2C?logo=pytorch&logoColor=white)](https://pytorch.org/)
-[![Tests](https://img.shields.io/badge/Tests-87%2F87%20Passing-brightgreen?logo=pytest&logoColor=white)](https://pytest.org/)
+[![Tests](https://img.shields.io/badge/Tests-90%2F90%20Passing-brightgreen?logo=pytest&logoColor=white)](https://pytest.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 > **AI-Assisted Code Comprehension Verification and Student Misconception Detection**
@@ -88,6 +88,9 @@ graph TD
   - Instructors can create custom classroom cohorts, author targeted programming problems with custom test cases, review student sessions, audit flagged uncertainty cases, override AI verdicts, and write faculty feedback.
 - **Unique Academic Identity Registry**:
   - Database-level `UNIQUE` constraints for both **Student ID** (`students` table) and **Faculty ID** (`faculty` table), preventing identifier collisions and verifying enrollment integrity via API validation (`HTTP 409 Conflict` on duplicate ID claims).
+- **Single-Solve Problem Completion & Lock Enforcement**:
+  - Once a student writes code, executes in sandbox, and answers the viva voce questions, the session transitions automatically to `completed` and synthesizes the multimodal report.
+  - Completed problems are strictly locked at the API (`HTTP 409 Conflict` on re-attempts, `HTTP 400 Bad Request` on code modifications) and UI levels (replaces "Start Problem" with "View Completed Report", prevents duplicate problem runs).
 - **Organic Dashboard Data Lifecycle**:
   - Operates on a pure database-driven architecture with zero required seed data. All classrooms, problems, student coding snapshots, runtime executions, viva examinations, and multimodal reports can be generated live through the dashboard UI. An optional curriculum seeder (`python -m app.seed_real_data`) is provided for instant testing.
 

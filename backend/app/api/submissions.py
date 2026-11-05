@@ -19,6 +19,12 @@ def submit_code(sub_in: CodeSubmissionCreate, db: Session = Depends(get_db)):
     if not session:
         raise HTTPException(status_code=404, detail="Coding session not found")
 
+    if session.status in ["completed", "reviewed"]:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Problem '{session.title}' is already marked as completed. Code cannot be modified or re-submitted.",
+        )
+
     # 1. Run AST analysis
     analyzer = ASTAnalyzer(sub_in.code)
     ast_result = analyzer.analyze()

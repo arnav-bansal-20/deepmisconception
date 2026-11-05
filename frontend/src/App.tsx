@@ -201,6 +201,7 @@ export const App: React.FC = () => {
               onNavigateToViva={() => setActiveTab('viva')}
               onNavigateToResults={() => setActiveTab('assessment')}
               onStartProblem={handleStartProblem}
+              onSelectSession={handleSelectSession}
             />
           )}
 

@@ -69,4 +69,9 @@ def get_session_report(
             detail="No comprehension report generated yet for this session. Submit code and answer viva questions to generate report."
         )
 
+    if session and session.status == "active":
+        session.status = "completed"
+        db.add(session)
+        db.commit()
+
     return report

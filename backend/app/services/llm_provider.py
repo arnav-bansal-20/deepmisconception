@@ -223,6 +223,45 @@ class MockLLMProvider(BaseLLMProvider):
                 "needs_instructor_review": False
             }
 
+        # Check for recursion base-case misconception
+        if "no base case" in student_ans or "without a base case" in student_ans or "not require an explicit base case" in student_ans or "does not require a base case" in student_ans or "automatically terminates when" in student_ans:
+            return {
+                "answer_label": "Incorrect",
+                "concepts_correct": ["Recognizes recursive execution"],
+                "concepts_missed": ["Recursion base case termination condition"],
+                "contradictions": ["Claims recursive functions do not require an explicit base case, leading to unbounded call stack expansion."],
+                "supporting_evidence": [student_ans],
+                "evaluation_explanation": "The student exhibits an acute recursion misconception by claiming recursive functions do not require a base case. Without a base case, recursion produces an infinite call stack and runtime error.",
+                "uncertainty_score": 0.1,
+                "needs_instructor_review": False
+            }
+
+        # Check for reference aliasing / mutation misconception
+        if "independent copy" in student_ans or "independent copies" in student_ans or "deep copy" in student_ans or "copies in memory" in student_ans:
+            return {
+                "answer_label": "Incorrect",
+                "concepts_correct": ["Identifies variable assignment"],
+                "concepts_missed": ["Reference assignment vs object copying for mutable structures"],
+                "contradictions": ["Claims variable assignment creates an independent copy of a mutable list, but Python assigns shared object references."],
+                "supporting_evidence": [student_ans],
+                "evaluation_explanation": "The student displays a classic reference aliasing misconception, falsely assuming assignment creates deep copies of mutable collections rather than binding new names to the identical object.",
+                "uncertainty_score": 0.1,
+                "needs_instructor_review": False
+            }
+
+        # Check for partial understanding / admitted omission
+        if "didn't lowercase" in student_ans or "did not lowercase" in student_ans or "forgot" in student_ans or "failing on mixed case" in student_ans:
+            return {
+                "answer_label": "Partially Correct",
+                "concepts_correct": ["Identifies core string reversal mechanism"],
+                "concepts_missed": ["Input normalization and case folding"],
+                "contradictions": [],
+                "supporting_evidence": [student_ans],
+                "evaluation_explanation": "The student correctly understands the slicing and reversal logic, but acknowledges omitting character case normalization.",
+                "uncertainty_score": 0.25,
+                "needs_instructor_review": False
+            }
+
         # Check for relevant programming concept keywords
         relevant_keywords = [
             "continue", "skip", "modulo", "remainder", "multiple", "divisib", 

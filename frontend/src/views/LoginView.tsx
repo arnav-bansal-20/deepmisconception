@@ -21,7 +21,7 @@ interface LoginViewProps {
 export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
   const [role, setRole] = useState<UserRole>('student');
   const [classrooms, setClassrooms] = useState<Classroom[]>([]);
-  const [selectedClassroomId, setSelectedClassroomId] = useState<string>('class-cse-101');
+  const [selectedClassroomId, setSelectedClassroomId] = useState<string>('');
   
   // Custom class code entry mode
   const [useCustomCode, setUseCustomCode] = useState(false);
@@ -43,8 +43,8 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
       try {
         const list = await api.listClassrooms();
         setClassrooms(list);
-        if (list.length > 0 && !selectedClassroomId) {
-          setSelectedClassroomId(list[0].id);
+        if (list.length > 0) {
+          setSelectedClassroomId((prev) => prev || list[0].id);
         }
       } catch (err) {
         console.error('Failed to load classrooms', err);
@@ -78,11 +78,11 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
         role: 'student',
         id: studentId.trim(),
         name: studentName.trim(),
-        classroomId: targetClassroom?.id || 'class-cse-101',
-        classroomName: targetClassroom?.name || 'CS101: Python Foundations - Group Alpha',
-        classroomCode: targetClassroom?.code || 'CS101-ALPHA',
-        teacherId: targetClassroom?.teacher_id || 'FAC-CS-804',
-        teacherName: targetClassroom?.teacher_name || 'Dr. Ada Smith',
+        classroomId: targetClassroom?.id || '',
+        classroomName: targetClassroom?.name || '',
+        classroomCode: targetClassroom?.code || '',
+        teacherId: targetClassroom?.teacher_id || '',
+        teacherName: targetClassroom?.teacher_name || '',
       });
     } else {
       if (!teacherId.trim() || !teacherName.trim()) return;

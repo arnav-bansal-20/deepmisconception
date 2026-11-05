@@ -13,49 +13,9 @@ router = APIRouter(prefix="/classrooms", tags=["Classrooms"])
 
 def seed_default_classrooms_if_empty(db: Session):
     """Seed initial academic classrooms if table is empty."""
-    if db.query(Classroom).count() > 0:
-        return
-
-    defaults = [
-        Classroom(
-            id="class-cse-101",
-            name="CS101: Python Foundations - Group Alpha",
-            code="CS101-ALPHA",
-            teacher_id="FAC-CS-804",
-            teacher_name="Dr. Ada Smith",
-            department="Computer Science & Engineering",
-            description="Foundations of imperative programming, control-flow invariants, accumulator patterns, and algorithm verification.",
-        ),
-        Classroom(
-            id="class-cse-201",
-            name="CS201: Algorithms & Data Structures - Group Beta",
-            code="CS201-BETA",
-            teacher_id="FAC-CSE-205",
-            teacher_name="Prof. Rajesh Kumar",
-            department="Computer Science & Engineering",
-            description="Intermediate algorithmic complexity, pointer convergence, divide-and-conquer, and recursion bounds.",
-        ),
-        Classroom(
-            id="class-ise-204",
-            name="CS204: Object-Oriented Software Design",
-            code="CS204-OOD",
-            teacher_id="FAC-CSE-301",
-            teacher_name="Dr. Michael Chang",
-            department="Information Science & Engineering",
-            description="Modular design patterns, state accumulation, complexity analysis, and multi-dimensional matrix structures.",
-        ),
-    ]
-    for c in defaults:
-        db.add(c)
-    db.commit()
-
-    # Link existing default assignments to Group Alpha or Group Beta
-    assigns = db.query(Assignment).all()
-    for a in assigns:
-        if not a.classroom_id:
-            a.classroom_id = "class-alpha-101"
-            a.classroom_name = "CS101: Python Foundations - Group Alpha"
-    db.commit()
+    if db.query(Classroom).count() == 0:
+        from app.seed_real_data import seed_real_data
+        seed_real_data(db=db, clean=False)
 
 
 @router.get("", response_model=List[ClassroomResponse])

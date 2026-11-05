@@ -31,34 +31,6 @@ interface WorkspaceViewProps {
   onStartProblem?: (assignment: Assignment) => void;
 }
 
-const DEFAULT_PYTHON_CODE = `# Python Code Comprehension Task
-# Implement an accumulator that computes the sum of squares up to n,
-# but skips multiples of 3.
-
-def sum_of_squares_skipping_threes(n: int) -> int:
-    total = 0
-    for i in range(1, n + 1):
-        if i % 3 == 0:
-            continue
-        total += i * i
-    return total
-
-# Test the function with n = 5
-result = sum_of_squares_skipping_threes(5)
-print(f"Computed total: {result}")
-`;
-
-const DEFAULT_ASSIGNMENT: Assignment = {
-  id: 'default-task-accumulator',
-  title: 'Accumulator with Modulo Filtering',
-  description: 'Implement an accumulator function that computes the sum of squares up to n, skipping multiples of 3. Ensure your loop preserves invariant state across cycles and correctly handles control-flow skipping.',
-  difficulty: 'medium',
-  concept_tags: ['modulo-filtering', 'accumulator-invariants', 'loop-control'],
-  starter_code: DEFAULT_PYTHON_CODE,
-  created_by: 'Dr. Ada Smith',
-  created_at: new Date().toISOString(),
-};
-
 export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
   session,
   currentUser,
@@ -67,7 +39,7 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
   onNavigateToResults,
   onStartProblem,
 }) => {
-  const [code, setCode] = useState(DEFAULT_PYTHON_CODE);
+  const [code, setCode] = useState('');
   const [stdout, setStdout] = useState<string | null>(null);
   const [stderr, setStderr] = useState<string | null>(null);
   const [isRunning, setIsRunning] = useState(false);
@@ -236,9 +208,9 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
 
   const handleResetCode = () => {
     if (selectedAssignment) {
-      setCode(selectedAssignment.starter_code);
+      setCode(selectedAssignment.starter_code || '');
     } else {
-      setCode(DEFAULT_PYTHON_CODE);
+      setCode('');
     }
     setStdout(null);
     setStderr(null);
@@ -246,7 +218,7 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
 
   const handleLaunchProblem = (assignment: Assignment) => {
     setSelectedAssignment(assignment);
-    setCode(assignment.starter_code || DEFAULT_PYTHON_CODE);
+    setCode(assignment.starter_code || '');
     setIsSelectingProblem(false);
     if (onStartProblem) {
       onStartProblem(assignment);
@@ -254,7 +226,7 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
   };
 
   const isCompleted = Boolean(session && (session.status === 'completed' || session.status === 'reviewed'));
-  const displayAssignments = assignments.length > 0 ? assignments : [DEFAULT_ASSIGNMENT];
+  const displayAssignments = assignments;
 
   // If completed and not actively choosing another problem, show completed summary
   if (isCompleted && !isSelectingProblem && session) {
@@ -326,76 +298,81 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
           )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {displayAssignments.map((a) => (
-            <div
-              key={a.id}
-              className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex flex-col justify-between hover:border-sky-300 hover:shadow-md transition-all"
-            >
-              <div className="space-y-3">
-                <div className="flex items-center justify-between gap-2">
-                  <span className={`text-[11px] font-mono uppercase px-2.5 py-0.5 rounded-full font-bold border ${
-                    a.difficulty === 'easy'
-                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                      : a.difficulty === 'hard'
-                      ? 'bg-rose-50 text-rose-700 border-rose-200'
-                      : 'bg-amber-50 text-amber-700 border-amber-200'
-                  }`}>
-                    {a.difficulty}
-                  </span>
-                  {a.concept_tags && a.concept_tags.length > 0 && (
-                    <span className="text-[10px] font-mono text-slate-400 truncate max-w-[140px]">
-                      {a.concept_tags.join(', ')}
+        {displayAssignments.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {displayAssignments.map((a) => (
+              <div
+                key={a.id}
+                className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex flex-col justify-between hover:border-sky-300 hover:shadow-md transition-all"
+              >
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className={`text-[11px] font-mono uppercase px-2.5 py-0.5 rounded-full font-bold border ${
+                      a.difficulty === 'easy'
+                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                        : a.difficulty === 'hard'
+                        ? 'bg-rose-50 text-rose-700 border-rose-200'
+                        : 'bg-amber-50 text-amber-700 border-amber-200'
+                    }`}>
+                      {a.difficulty}
                     </span>
+                    {a.concept_tags && a.concept_tags.length > 0 && (
+                      <span className="text-[10px] font-mono text-slate-400 truncate max-w-[140px]">
+                        {a.concept_tags.join(', ')}
+                      </span>
+                    )}
+                  </div>
+
+                  <h3 className="font-bold text-slate-900 text-base leading-snug">
+                    {a.title}
+                  </h3>
+
+                  <p className="text-xs text-slate-600 line-clamp-3 leading-relaxed">
+                    {a.description}
+                  </p>
+
+                  {(a.sample_input || a.sample_output) && (
+                    <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-[11px] font-mono space-y-1">
+                      {a.sample_input && (
+                        <div className="truncate"><span className="text-slate-400 font-bold">Input:</span> {a.sample_input}</div>
+                      )}
+                      {a.sample_output && (
+                        <div className="truncate"><span className="text-slate-400 font-bold">Output:</span> {a.sample_output}</div>
+                      )}
+                    </div>
                   )}
                 </div>
 
-                <h3 className="font-bold text-slate-900 text-base leading-snug">
-                  {a.title}
-                </h3>
-
-                <p className="text-xs text-slate-600 line-clamp-3 leading-relaxed">
-                  {a.description}
-                </p>
-
-                {(a.sample_input || a.sample_output) && (
-                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-[11px] font-mono space-y-1">
-                    {a.sample_input && (
-                      <div className="truncate"><span className="text-slate-400 font-bold">Input:</span> {a.sample_input}</div>
-                    )}
-                    {a.sample_output && (
-                      <div className="truncate"><span className="text-slate-400 font-bold">Output:</span> {a.sample_output}</div>
-                    )}
-                  </div>
-                )}
+                <div className="pt-4 mt-4 border-t border-slate-100 flex items-center justify-end">
+                  <button
+                    onClick={() => handleLaunchProblem(a)}
+                    className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-bold text-xs shadow-md shadow-sky-500/10 transition-all"
+                  >
+                    <Play className="w-3.5 h-3.5 fill-current" />
+                    <span>Start Problem</span>
+                  </button>
+                </div>
               </div>
-
-              <div className="pt-4 mt-4 border-t border-slate-100 flex items-center justify-end">
-                <button
-                  onClick={() => handleLaunchProblem(a)}
-                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-bold text-xs shadow-md shadow-sky-500/10 transition-all"
-                >
-                  <Play className="w-3.5 h-3.5 fill-current" />
-                  <span>Start Problem</span>
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="bg-white border border-slate-200 rounded-2xl p-12 text-center">
+            <p className="font-bold text-slate-800 text-sm">No assignments currently available</p>
+            <p className="text-xs text-slate-500 mt-1">Assignments assigned to your classroom will appear here.</p>
+          </div>
+        )}
       </div>
     );
   }
 
-  const problemName = selectedAssignment?.title || 
-    (session.title && session.title.toLowerCase() !== 'test' ? session.title : 'Accumulator with Modulo Filtering');
+  const problemName = selectedAssignment?.title || session.title || 'Coding Problem';
 
-  const problemStatement = selectedAssignment?.description || 
-    'Implement an accumulator function that computes the sum of squares up to n, skipping multiples of 3. Ensure your loop preserves invariant state across cycles and correctly handles control-flow skipping.';
+  const problemStatement = selectedAssignment?.description || 'Solve the programming problem according to the specifications.';
 
   const problemDifficulty = selectedAssignment?.difficulty || 'medium';
   const problemTags = selectedAssignment?.concept_tags && selectedAssignment.concept_tags.length > 0
     ? selectedAssignment.concept_tags
-    : ['modulo-filtering', 'accumulator-invariants', 'loop-control'];
+    : [];
 
   return (
     <div className="max-w-7xl mx-auto space-y-4 px-4 sm:px-6 py-4">

@@ -16,21 +16,31 @@ from app.services.safe_executor import SafeExecutor
 from app.services.comprehension_engine import ComprehensionEngine
 
 
-def seed_real_data():
-    db = SessionLocal()
+def seed_real_data(db: Session = None, clean: bool = True):
+    db_provided = db is not None
+    if not db_provided:
+        Base.metadata.create_all(bind=engine)
+        db = SessionLocal()
+    else:
+        try:
+            Base.metadata.create_all(bind=db.get_bind())
+        except Exception:
+            pass
+
     try:
         print("1. Seeding real academic Classrooms & Faculty...")
-        # Clean existing data to ensure a fresh, consistent dataset
-        db.query(InstructorReview).delete()
-        db.query(ComprehensionReport).delete()
-        db.query(AnswerAssessment).delete()
-        db.query(VivaQuestion).delete()
-        db.query(ProcessEvent).delete()
-        db.query(CodeSubmission).delete()
-        db.query(CodingSession).delete()
-        db.query(Assignment).delete()
-        db.query(Classroom).delete()
-        db.commit()
+        if clean:
+            # Clean existing data to ensure a fresh, consistent dataset
+            db.query(InstructorReview).delete()
+            db.query(ComprehensionReport).delete()
+            db.query(AnswerAssessment).delete()
+            db.query(VivaQuestion).delete()
+            db.query(ProcessEvent).delete()
+            db.query(CodeSubmission).delete()
+            db.query(CodingSession).delete()
+            db.query(Assignment).delete()
+            db.query(Classroom).delete()
+            db.commit()
 
         classrooms_data = [
             {
@@ -64,9 +74,13 @@ def seed_real_data():
 
         classrooms_map = {}
         for c in classrooms_data:
-            obj = Classroom(**c)
-            db.add(obj)
-            classrooms_map[c["id"]] = obj
+            existing = db.query(Classroom).filter(Classroom.id == c["id"]).first()
+            if not existing:
+                obj = Classroom(**c)
+                db.add(obj)
+                classrooms_map[c["id"]] = obj
+            else:
+                classrooms_map[c["id"]] = existing
         db.commit()
 
         print("2. Seeding real Curriculum-Aligned Coding Problems...")
@@ -260,7 +274,9 @@ def seed_real_data():
         ]
 
         for a in assignments_data:
-            db.add(Assignment(**a))
+            existing = db.query(Assignment).filter(Assignment.id == a["id"]).first()
+            if not existing:
+                db.add(Assignment(**a))
         db.commit()
 
         print("3. Seeding real Student Coding Sessions with AST, Safe Execution & Viva Evaluations...")
@@ -583,7 +599,8 @@ def seed_real_data():
         print("\nAll real classrooms, instructors, assignments, and student sessions successfully seeded into deepmisconception.db!")
 
     finally:
-        db.close()
+        if not db_provided and db is not None:
+            db.close()
 
 
 if __name__ == "__main__":

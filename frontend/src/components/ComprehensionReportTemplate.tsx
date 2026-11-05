@@ -52,16 +52,7 @@ export const ComprehensionReportTemplate: React.FC<ComprehensionReportTemplatePr
   const verdict = report.overall_label || 'Partial Understanding';
 
   // Section 4: Viva answer evaluations
-  const vivaEvals: any[] = eb.viva_evaluations || [
-    {
-      index: 1,
-      concept: session.title || 'Core Program Invariant',
-      question_text: 'Explain mechanistic logic and boundary condition.',
-      student_answer: 'Student articulated logic with corresponding variables.',
-      answer_label: 'Correct',
-      score: 1.00
-    }
-  ];
+  const vivaEvals: any[] = eb.viva_evaluations || [];
 
   // Section 5: Misconceptions table
   const miscTable: any[] = eb.misconceptions_table || (
@@ -82,37 +73,39 @@ export const ComprehensionReportTemplate: React.FC<ComprehensionReportTemplatePr
 
   // Section 6: Code & execution evidence
   const codeEv = eb.code_evidence || {
-    code_summary: `Python solution. Problem: ${session.title}. Target constructs: loops, conditionals, accumulator.`,
-    ast_findings: `Syntactically valid AST structure. Cyclomatic complexity M=2. Valid function declarations verified.`,
-    execution_outcome: `Sandbox execution clean exit code 0. Verified against automated test cases.`,
-    evidence_limitations: `Sandbox unit tests executed in isolated PyLite environment. Oral viva verified against verified physical stdout traces.`
+    code_summary: session.title ? `Python solution for "${session.title}".` : 'Python source submission.',
+    ast_findings: 'Syntactically valid AST structure. Valid function declarations verified.',
+    execution_outcome: 'Sandbox execution exit code 0.',
+    evidence_limitations: 'Sandbox unit tests and physical stdout verification.'
   };
 
   // Section 7: Telemetry signals
-  const telemetrySignals = eb.telemetry_signals || [
-    { feature: 'Edit events', value: `${eb.edit_count || 0} events`, interpretation: 'Context only' },
-    { feature: 'Run events', value: `${eb.run_count || 0} runs`, interpretation: 'Context only' },
-    { feature: 'Error recovery', value: `${Math.round((eb.error_recovery_rate || 1.0) * 100)}%`, interpretation: 'Context only' },
-    { feature: 'Revision cycles', value: `${Math.round((eb.process_subscores?.revision || 0.75) * 100)}%`, interpretation: 'Context only' },
-    { feature: 'Testing activity', value: `${Math.round((eb.process_subscores?.testing || 0.60) * 100)}%`, interpretation: 'Context only' },
-  ];
+  const telemetrySignals = eb.telemetry_signals || (eb.edit_count || eb.run_count ? [
+    { feature: 'Edit events', value: `${eb.edit_count || 0} events`, interpretation: 'Process telemetry' },
+    { feature: 'Run events', value: `${eb.run_count || 0} runs`, interpretation: 'Process telemetry' },
+    { feature: 'Error recovery', value: `${Math.round((eb.error_recovery_rate || 1.0) * 100)}%`, interpretation: 'Process telemetry' },
+    { feature: 'Revision cycles', value: `${Math.round((eb.process_subscores?.revision || 0) * 100)}%`, interpretation: 'Process telemetry' },
+    { feature: 'Testing activity', value: `${Math.round((eb.process_subscores?.testing || 0) * 100)}%`, interpretation: 'Process telemetry' },
+  ] : []);
 
   // Section 8: Feedback
   const feedback = eb.feedback || {
-    strengths: ['Modular code structure adhering to Pythonic syntax.', 'Execution output matched test invariants.'],
+    strengths: rubric.ast_syntax_valid ? ['Syntactically valid Python code implementation.'] : [],
     areas_to_revisit: report.detected_misconceptions && report.detected_misconceptions.length > 0 
       ? report.detected_misconceptions 
-      : ['Boundary conditions and loop state preservation.'],
-    suggested_practice: report.recommended_interventions || ['Practice tracing iteration boundaries with manual trace tables.'],
+      : ['Boundary invariants and algorithmic reasoning.'],
+    suggested_practice: report.recommended_interventions && report.recommended_interventions.length > 0
+      ? report.recommended_interventions
+      : ['Review variable invariants and edge condition traces.'],
     instructor_followup: report.needs_instructor_review 
-      ? 'Review ambiguous edge-case traces with student during lab hours.' 
-      : 'Demonstrated satisfactory mental model; proceed to higher-order complexity tasks.'
+      ? 'Instructor review recommended to verify conceptual understanding.' 
+      : 'Satisfactory conceptual reasoning demonstrated.'
   };
 
   // Section 9: Instructor review
   const instructorReview = eb.instructor_review || {
-    comments: session.status === 'reviewed' ? 'Student code and explanation verified by instructor.' : 'Pending instructor manual review and notes.',
-    reviewed_by: session.teacher_name || 'Dr. Ada Smith',
+    comments: session.status === 'reviewed' ? 'Student code and explanation verified by instructor.' : 'Pending instructor evaluation and signoff.',
+    reviewed_by: session.teacher_name || '—',
     review_date: new Date(session.updated_at || Date.now()).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
     final_decision: session.status === 'reviewed' ? `Instructor Review: Accepted` : 'AI-generated baseline (awaiting faculty signoff)'
   };
@@ -199,13 +192,13 @@ export const ComprehensionReportTemplate: React.FC<ComprehensionReportTemplatePr
             <tbody>
               <tr>
                 <td className="bg-slate-100 font-bold px-3 py-2 border border-slate-300 w-1/4 text-slate-700">Student name</td>
-                <td className="px-3 py-2 border border-slate-300 w-1/4 font-semibold text-slate-900">{session.student_name || currentUser?.name || 'Student Candidate'}</td>
+                <td className="px-3 py-2 border border-slate-300 w-1/4 font-semibold text-slate-900">{session.student_name || currentUser?.name || '—'}</td>
                 <td className="bg-slate-100 font-bold px-3 py-2 border border-slate-300 w-1/4 text-slate-700">Student ID</td>
-                <td className="px-3 py-2 border border-slate-300 w-1/4 font-mono font-semibold text-slate-900">{session.student_id || currentUser?.id || 'STU-2026'}</td>
+                <td className="px-3 py-2 border border-slate-300 w-1/4 font-mono font-semibold text-slate-900">{session.student_id || currentUser?.id || '—'}</td>
               </tr>
               <tr>
                 <td className="bg-slate-100 font-bold px-3 py-2 border border-slate-300 text-slate-700">Course / cohort</td>
-                <td className="px-3 py-2 border border-slate-300 text-slate-800">{session.classroom_name || 'Group Alpha (CS101)'}</td>
+                <td className="px-3 py-2 border border-slate-300 text-slate-800">{session.classroom_name || currentUser?.classroomCode || '—'}</td>
                 <td className="bg-slate-100 font-bold px-3 py-2 border border-slate-300 text-slate-700">Assessment date</td>
                 <td className="px-3 py-2 border border-slate-300 font-mono text-slate-800">
                   {new Date(session.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
@@ -219,7 +212,7 @@ export const ComprehensionReportTemplate: React.FC<ComprehensionReportTemplatePr
               </tr>
               <tr>
                 <td className="bg-slate-100 font-bold px-3 py-2 border border-slate-300 text-slate-700">Instructor</td>
-                <td className="px-3 py-2 border border-slate-300 text-slate-800" colSpan={3}>{session.teacher_name || 'Dr. Ada Smith'}</td>
+                <td className="px-3 py-2 border border-slate-300 text-slate-800" colSpan={3}>{session.teacher_name || '—'}</td>
               </tr>
             </tbody>
           </table>
@@ -334,26 +327,34 @@ export const ComprehensionReportTemplate: React.FC<ComprehensionReportTemplatePr
               </tr>
             </thead>
             <tbody>
-              {vivaEvals.map((v, i) => (
-                <tr key={i} className="hover:bg-slate-50/50">
-                  <td className="px-2.5 py-2.5 border border-slate-300 text-center font-mono font-bold text-slate-600">{v.index || i + 1}</td>
-                  <td className="px-3 py-2.5 border border-slate-300 font-semibold text-slate-900">
-                    <div>{v.concept}</div>
-                    <div className="text-[10px] text-slate-500 font-normal mt-0.5 line-clamp-2">{v.question_text}</div>
-                  </td>
-                  <td className="px-3 py-2.5 border border-slate-300 text-slate-700 italic">
-                    "{v.student_answer}"
-                  </td>
-                  <td className="px-3 py-2.5 border border-slate-300 text-center">
-                    <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold border ${badgeClass(v.answer_label)}`}>
-                      {v.answer_label}
-                    </span>
-                  </td>
-                  <td className="px-3 py-2.5 border border-slate-300 text-right font-mono font-bold text-slate-900">
-                    {Number(v.score || 0).toFixed(2)}
+              {vivaEvals.length > 0 ? (
+                vivaEvals.map((v, i) => (
+                  <tr key={i} className="hover:bg-slate-50/50">
+                    <td className="px-2.5 py-2.5 border border-slate-300 text-center font-mono font-bold text-slate-600">{v.index || i + 1}</td>
+                    <td className="px-3 py-2.5 border border-slate-300 font-semibold text-slate-900">
+                      <div>{v.concept}</div>
+                      <div className="text-[10px] text-slate-500 font-normal mt-0.5 line-clamp-2">{v.question_text}</div>
+                    </td>
+                    <td className="px-3 py-2.5 border border-slate-300 text-slate-700 italic">
+                      "{v.student_answer}"
+                    </td>
+                    <td className="px-3 py-2.5 border border-slate-300 text-center">
+                      <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold border ${badgeClass(v.answer_label)}`}>
+                        {v.answer_label}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2.5 border border-slate-300 text-right font-mono font-bold text-slate-900">
+                      {Number(v.score || 0).toFixed(2)}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={5} className="px-3 py-4 border border-slate-300 text-center text-slate-500 italic">
+                    No viva question evaluations recorded for this assessment.
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
@@ -424,13 +425,21 @@ export const ComprehensionReportTemplate: React.FC<ComprehensionReportTemplatePr
               </tr>
             </thead>
             <tbody>
-              {telemetrySignals.map((t: any, i: number) => (
-                <tr key={i}>
-                  <td className="px-3 py-2 border border-slate-300 font-medium text-slate-800">{t.feature}</td>
-                  <td className="px-3 py-2 border border-slate-300 text-center font-mono font-bold text-slate-900">{t.value}</td>
-                  <td className="px-3 py-2 border border-slate-300 text-right text-slate-500 italic">{t.interpretation}</td>
+              {telemetrySignals.length > 0 ? (
+                telemetrySignals.map((t: any, i: number) => (
+                  <tr key={i}>
+                    <td className="px-3 py-2 border border-slate-300 font-medium text-slate-800">{t.feature}</td>
+                    <td className="px-3 py-2 border border-slate-300 text-center font-mono font-bold text-slate-900">{t.value}</td>
+                    <td className="px-3 py-2 border border-slate-300 text-right text-slate-500 italic">{t.interpretation}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={3} className="px-3 py-4 border border-slate-300 text-center text-slate-500 italic">
+                    No development telemetry signals recorded.
+                  </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>

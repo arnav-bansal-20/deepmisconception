@@ -79,14 +79,9 @@ export const SessionHistoryView: React.FC<SessionHistoryViewProps> = ({
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4 bg-white border border-slate-200 p-4 rounded-2xl shadow-sm">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-mono px-2 py-0.5 rounded bg-sky-50 text-sky-700 border border-sky-200 font-bold uppercase">
-              Audit & Archive
-            </span>
-            <h2 className="text-lg font-bold text-slate-900">
-              {currentUser?.role === 'student' ? 'My Coding Sessions' : 'Student Session History'}
-            </h2>
-          </div>
+          <h2 className="text-lg font-bold text-slate-900">
+            {currentUser?.role === 'student' ? 'My Coding Sessions' : 'Student Session History'}
+          </h2>
           <p className="text-xs text-slate-500 mt-0.5">
             {currentUser?.role === 'student'
               ? 'Browse, resume, or inspect your own previous coding sessions and evaluations.'

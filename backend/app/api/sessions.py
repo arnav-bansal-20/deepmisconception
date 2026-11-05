@@ -190,3 +190,32 @@ def update_session(session_id: str, session_in: SessionUpdate, db: Session = Dep
     db.commit()
     db.refresh(session)
     return session
+
+
+@router.delete("/{session_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_session(session_id: str, db: Session = Depends(get_db)):
+    """Delete a coding session and all its associated artifacts."""
+    session = db.query(CodingSession).filter(CodingSession.id == session_id).first()
+    if not session:
+        raise HTTPException(status_code=404, detail="Coding session not found")
+    
+    # Cascade delete all related records
+    db.query(AnswerAssessment).filter(AnswerAssessment.session_id == session_id).delete()
+    db.query(VivaQuestion).filter(VivaQuestion.session_id == session_id).delete()
+    db.query(ComprehensionReport).filter(ComprehensionReport.session_id == session_id).delete()
+    db.query(CodeSubmission).filter(CodeSubmission.session_id == session_id).delete()
+    try:
+        from app.models.process_event import ProcessEvent
+        db.query(ProcessEvent).filter(ProcessEvent.session_id == session_id).delete()
+    except Exception:
+        pass
+    try:
+        from app.models.instructor_review import InstructorReview
+        db.query(InstructorReview).filter(InstructorReview.session_id == session_id).delete()
+    except Exception:
+        pass
+
+    db.delete(session)
+    db.commit()
+    return None
+

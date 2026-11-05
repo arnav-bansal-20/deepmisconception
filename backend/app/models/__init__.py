@@ -8,6 +8,7 @@ from app.models.answer_assessment import AnswerAssessment
 from app.models.comprehension_report import ComprehensionReport
 from app.models.instructor_review import InstructorReview
 from app.models.assignment import Assignment
+from app.models.user import Student, Faculty
 
 __all__ = [
     "Classroom",
@@ -19,4 +20,6 @@ __all__ = [
     "ComprehensionReport",
     "InstructorReview",
     "Assignment",
+    "Student",
+    "Faculty",
 ]

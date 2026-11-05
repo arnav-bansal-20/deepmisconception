@@ -11,6 +11,7 @@ from app.models.viva_question import VivaQuestion
 from app.models.answer_assessment import AnswerAssessment
 from app.models.comprehension_report import ComprehensionReport
 from app.models.instructor_review import InstructorReview
+from app.models.user import Student, Faculty
 from app.services.ast_analyzer import ASTAnalyzer
 from app.services.safe_executor import SafeExecutor
 from app.services.comprehension_engine import ComprehensionEngine
@@ -40,7 +41,64 @@ def seed_real_data(db: Session = None, clean: bool = True):
             db.query(CodingSession).delete()
             db.query(Assignment).delete()
             db.query(Classroom).delete()
+            db.query(Student).delete()
+            db.query(Faculty).delete()
             db.commit()
+
+        faculty_data = [
+            {
+                "faculty_id": "FAC-CS-804",
+                "name": "Dr. Ada Smith",
+                "department": "Computer Science & Engineering",
+            },
+            {
+                "faculty_id": "FAC-CSE-205",
+                "name": "Prof. Rajesh Kumar",
+                "department": "Computer Science & Engineering",
+            },
+            {
+                "faculty_id": "FAC-CSE-301",
+                "name": "Dr. Michael Chang",
+                "department": "Information Science & Engineering",
+            },
+        ]
+        for f in faculty_data:
+            existing_f = db.query(Faculty).filter(Faculty.faculty_id == f["faculty_id"]).first()
+            if not existing_f:
+                db.add(Faculty(**f))
+        db.commit()
+
+        students_data = [
+            {
+                "student_id": "1RV24CS051",
+                "name": "Arnav Bansal",
+                "classroom_id": "class-cse-101",
+                "classroom_name": "CS101: Python Foundations - Group Alpha",
+            },
+            {
+                "student_id": "1RV24CS052",
+                "name": "Aman Sharma",
+                "classroom_id": "class-cse-101",
+                "classroom_name": "CS101: Python Foundations - Group Alpha",
+            },
+            {
+                "student_id": "1RV24CS089",
+                "name": "Priya Patel",
+                "classroom_id": "class-cse-201",
+                "classroom_name": "CS201: Algorithms & Data Structures - Group Beta",
+            },
+            {
+                "student_id": "1RV24CS110",
+                "name": "Rohan Gupta",
+                "classroom_id": "class-cse-201",
+                "classroom_name": "CS201: Algorithms & Data Structures - Group Beta",
+            },
+        ]
+        for s in students_data:
+            existing_s = db.query(Student).filter(Student.student_id == s["student_id"]).first()
+            if not existing_s:
+                db.add(Student(**s))
+        db.commit()
 
         classrooms_data = [
             {

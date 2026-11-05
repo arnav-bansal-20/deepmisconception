@@ -10,8 +10,10 @@ from app.api.code import router as code_router
 from app.api.assignments import router as assignments_router
 from app.api.classrooms import router as classrooms_router
 from app.api.ml import router as ml_router
+from app.api.users import router as users_router
 
 api_router = APIRouter(prefix="/api")
+api_router.include_router(users_router)
 api_router.include_router(classrooms_router)
 api_router.include_router(sessions_router)
 api_router.include_router(submissions_router)

@@ -37,6 +37,10 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
   const [teacherName, setTeacherName] = useState('');
   const [department, setDepartment] = useState('');
 
+  // General auth error & loading state
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [isSubmittingAuth, setIsSubmittingAuth] = useState(false);
+
   // Load classrooms on mount
   useEffect(() => {
     const fetchClassrooms = async () => {
@@ -55,6 +59,8 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setAuthError(null);
+
     if (role === 'student') {
       if (!studentId.trim() || !studentName.trim()) return;
 
@@ -74,24 +80,52 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
         targetClassroom = classrooms.find((c) => c.id === selectedClassroomId);
       }
 
-      onLogin({
-        role: 'student',
-        id: studentId.trim(),
-        name: studentName.trim(),
-        classroomId: targetClassroom?.id || '',
-        classroomName: targetClassroom?.name || '',
-        classroomCode: targetClassroom?.code || '',
-        teacherId: targetClassroom?.teacher_id || '',
-        teacherName: targetClassroom?.teacher_name || '',
-      });
+      setIsSubmittingAuth(true);
+      try {
+        await api.registerStudent({
+          student_id: studentId.trim(),
+          name: studentName.trim(),
+          classroom_id: targetClassroom?.id,
+          classroom_name: targetClassroom?.name,
+        });
+
+        onLogin({
+          role: 'student',
+          id: studentId.trim(),
+          name: studentName.trim(),
+          classroomId: targetClassroom?.id || '',
+          classroomName: targetClassroom?.name || '',
+          classroomCode: targetClassroom?.code || '',
+          teacherId: targetClassroom?.teacher_id || '',
+          teacherName: targetClassroom?.teacher_name || '',
+        });
+      } catch (err: any) {
+        setAuthError(err.message || 'Student registration/login failed.');
+      } finally {
+        setIsSubmittingAuth(false);
+      }
     } else {
       if (!teacherId.trim() || !teacherName.trim()) return;
-      onLogin({
-        role: 'teacher',
-        id: teacherId.trim(),
-        name: teacherName.trim(),
-        department: department.trim(),
-      });
+
+      setIsSubmittingAuth(true);
+      try {
+        await api.registerFaculty({
+          faculty_id: teacherId.trim(),
+          name: teacherName.trim(),
+          department: department.trim() || 'Computer Science & Engineering',
+        });
+
+        onLogin({
+          role: 'teacher',
+          id: teacherId.trim(),
+          name: teacherName.trim(),
+          department: department.trim(),
+        });
+      } catch (err: any) {
+        setAuthError(err.message || 'Faculty registration/login failed.');
+      } finally {
+        setIsSubmittingAuth(false);
+      }
     }
   };
 
@@ -315,15 +349,29 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
               </>
             )}
 
+            {authError && (
+              <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold flex items-start gap-2">
+                <span className="shrink-0 mt-0.5">⚠️</span>
+                <span>{authError}</span>
+              </div>
+            )}
+
             <button
               type="submit"
-              className={`w-full py-3 px-4 rounded-xl font-bold text-xs flex items-center justify-center gap-2 text-white shadow-md transition-all ${
+              disabled={isSubmittingAuth}
+              className={`w-full py-3 px-4 rounded-xl font-bold text-xs flex items-center justify-center gap-2 text-white shadow-md transition-all disabled:opacity-50 ${
                 role === 'student'
                   ? 'bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 shadow-sky-500/20'
                   : 'bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-700 hover:to-cyan-700 shadow-indigo-500/20'
               }`}
             >
-              <span>{role === 'student' ? 'Enter Guided Workspace' : 'Open Instructor Studio'}</span>
+              <span>
+                {isSubmittingAuth
+                  ? 'Verifying...'
+                  : role === 'student'
+                  ? 'Enter Guided Workspace'
+                  : 'Open Instructor Studio'}
+              </span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>

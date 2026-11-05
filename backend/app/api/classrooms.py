@@ -6,6 +6,7 @@ from app.database import get_db
 from app.models.classroom import Classroom
 from app.models.session import CodingSession
 from app.models.assignment import Assignment
+from app.models.user import Faculty
 from app.schemas.classroom import ClassroomCreate, ClassroomResponse
 
 router = APIRouter(prefix="/classrooms", tags=["Classrooms"])
@@ -73,6 +74,16 @@ def create_classroom(classroom_in: ClassroomCreate, db: Session = Depends(get_db
         description=classroom_in.description.strip() if classroom_in.description else None,
     )
     db.add(classroom)
+
+    # Ensure teacher is registered in unique faculty registry
+    existing_fac = db.query(Faculty).filter(Faculty.faculty_id == classroom_in.teacher_id.strip()).first()
+    if not existing_fac:
+        db.add(Faculty(
+            faculty_id=classroom_in.teacher_id.strip(),
+            name=classroom_in.teacher_name.strip(),
+            department=classroom_in.department.strip() or "Computer Science & Engineering",
+        ))
+
     db.commit()
     db.refresh(classroom)
 

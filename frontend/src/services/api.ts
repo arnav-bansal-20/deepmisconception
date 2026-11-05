@@ -243,6 +243,26 @@ export const api = {
       method: 'DELETE',
     }),
 
+  // Academic User Registry (Unique Student & Faculty ID verification)
+  registerStudent: (data: { student_id: string; name: string; classroom_id?: string; classroom_name?: string }) =>
+    request<{ id: string; student_id: string; name: string; classroom_id?: string; classroom_name?: string }>('/students', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  listStudents: (classroomId?: string) => {
+    const q = classroomId ? `?classroom_id=${encodeURIComponent(classroomId)}` : '';
+    return request<Array<{ id: string; student_id: string; name: string; classroom_id?: string; classroom_name?: string }>>(`/students${q}`);
+  },
+
+  registerFaculty: (data: { faculty_id: string; name: string; department?: string }) =>
+    request<{ id: string; faculty_id: string; name: string; department: string }>('/faculty', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  listFaculty: () => request<Array<{ id: string; faculty_id: string; name: string; department: string }>>('/faculty'),
+
   // Machine Learning & Scientific Ablations (Phase 8 & 9)
   getAblationBenchmarks: (samples: number = 180, seed: number = 42) =>
     request<AblationStudyResponse>(`/ml/ablation?samples=${samples}&seed=${seed}`),

@@ -9,6 +9,7 @@ from app.models.submission import CodeSubmission
 from app.models.viva_question import VivaQuestion
 from app.models.answer_assessment import AnswerAssessment
 from app.models.comprehension_report import ComprehensionReport
+from app.models.user import Student, Faculty
 from app.schemas.session import SessionCreate, SessionUpdate, SessionSummary, SessionDetail
 
 router = APIRouter(prefix="/sessions", tags=["Sessions"])
@@ -17,6 +18,37 @@ router = APIRouter(prefix="/sessions", tags=["Sessions"])
 @router.post("", response_model=SessionDetail, status_code=status.HTTP_201_CREATED)
 def create_session(session_in: SessionCreate, db: Session = Depends(get_db)):
     """Initialize a new coding and evaluation session under teacher/classroom guidance."""
+    # Ensure student is recorded in unique students registry if not already present
+    if session_in.student_id:
+        clean_sid = session_in.student_id.strip()
+        existing_s = db.query(Student).filter(Student.student_id == clean_sid).first()
+        if not existing_s:
+            try:
+                db.add(Student(
+                    student_id=clean_sid,
+                    name=session_in.student_name.strip(),
+                    classroom_id=session_in.classroom_id,
+                    classroom_name=session_in.classroom_name,
+                ))
+                db.commit()
+            except Exception:
+                db.rollback()
+
+    # Ensure faculty is recorded in unique faculty registry if present
+    if session_in.teacher_id:
+        clean_fid = session_in.teacher_id.strip()
+        existing_f = db.query(Faculty).filter(Faculty.faculty_id == clean_fid).first()
+        if not existing_f:
+            try:
+                db.add(Faculty(
+                    faculty_id=clean_fid,
+                    name=session_in.teacher_name.strip() if session_in.teacher_name else "Faculty Instructor",
+                    department="Computer Science & Engineering",
+                ))
+                db.commit()
+            except Exception:
+                db.rollback()
+
     session = CodingSession(
         student_id=session_in.student_id,
         student_name=session_in.student_name,

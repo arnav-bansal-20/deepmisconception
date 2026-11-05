@@ -41,18 +41,17 @@ export const AssessmentResultsView: React.FC<AssessmentResultsViewProps> = ({
   onSelectSession,
 }) => {
   const [selectedSession, setSelectedSession] = useState<CodingSession | null>(session);
-  const [popupSession, setPopupSession] = useState<CodingSession | null>(session);
+  const [popupSession, setPopupSession] = useState<CodingSession | null>(null);
   const [report, setReport] = useState<ComprehensionReport | null>(null);
   const [features, setFeatures] = useState<ProcessFeatures | null>(null);
   const [studentSessions, setStudentSessions] = useState<CodingSession[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isRegenerating, setIsRegenerating] = useState(false);
 
-  // Keep selectedSession & popupSession synced with incoming session prop if present
+  // Keep selectedSession synced with incoming session prop if present
   useEffect(() => {
     if (session) {
       setSelectedSession(session);
-      setPopupSession(session);
     }
   }, [session?.id]);
 

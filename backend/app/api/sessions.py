@@ -2,7 +2,7 @@
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy import func, or_
 from app.database import get_db
 from app.models.session import CodingSession
 from app.models.submission import CodeSubmission
@@ -78,7 +78,11 @@ def list_sessions(
     if classroom_id:
         query = query.filter(CodingSession.classroom_id == classroom_id)
     if teacher_id:
-        query = query.filter(CodingSession.teacher_id == teacher_id)
+        fac = db.query(Faculty).filter(Faculty.faculty_id == teacher_id).first()
+        if fac:
+            query = query.filter(or_(CodingSession.teacher_id == teacher_id, CodingSession.teacher_name.ilike(fac.name)))
+        else:
+            query = query.filter(CodingSession.teacher_id == teacher_id)
     if student_id:
         query = query.filter(CodingSession.student_id == student_id)
 

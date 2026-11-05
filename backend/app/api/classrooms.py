@@ -1,6 +1,7 @@
 """Classroom and Cohort API routes for teacher-guided student groups."""
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 from app.config import settings
 from app.database import get_db
@@ -30,7 +31,11 @@ def list_classrooms(
 
     query = db.query(Classroom)
     if teacher_id:
-        query = query.filter(Classroom.teacher_id == teacher_id)
+        fac = db.query(Faculty).filter(Faculty.faculty_id == teacher_id).first()
+        if fac:
+            query = query.filter(or_(Classroom.teacher_id == teacher_id, Classroom.teacher_name.ilike(fac.name)))
+        else:
+            query = query.filter(Classroom.teacher_id == teacher_id)
 
     classrooms = query.order_by(Classroom.created_at.asc()).all()
 

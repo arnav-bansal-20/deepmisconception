@@ -3,7 +3,7 @@ from typing import List, Dict, Any, Optional
 from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy import func, or_
 from app.database import get_db
 from app.models.session import CodingSession
 from app.models.submission import CodeSubmission
@@ -11,6 +11,7 @@ from app.models.viva_question import VivaQuestion
 from app.models.answer_assessment import AnswerAssessment
 from app.models.comprehension_report import ComprehensionReport
 from app.models.instructor_review import InstructorReview
+from app.models.user import Faculty
 from app.schemas.instructor import InstructorReviewCreate, InstructorReviewResponse
 
 router = APIRouter(prefix="/instructor", tags=["Instructor"])
@@ -27,7 +28,11 @@ def get_instructor_overview(
     if classroom_id:
         session_query = session_query.filter(CodingSession.classroom_id == classroom_id)
     if teacher_id:
-        session_query = session_query.filter(CodingSession.teacher_id == teacher_id)
+        fac = db.query(Faculty).filter(Faculty.faculty_id == teacher_id).first()
+        if fac:
+            session_query = session_query.filter(or_(CodingSession.teacher_id == teacher_id, CodingSession.teacher_name.ilike(fac.name)))
+        else:
+            session_query = session_query.filter(CodingSession.teacher_id == teacher_id)
 
     matched_session_ids = [s_id for (s_id,) in session_query.all()]
 

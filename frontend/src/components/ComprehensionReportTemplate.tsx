@@ -150,10 +150,10 @@ export const ComprehensionReportTemplate: React.FC<ComprehensionReportTemplatePr
               onClick={onRefresh}
               disabled={isRegenerating}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors disabled:opacity-50"
-              title="Re-synthesize latest assessment report"
+              title="Refresh report to fetch latest instructor updates and scores"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isRegenerating ? 'animate-spin text-sky-600' : ''}`} />
-              <span>{isRegenerating ? 'Synthesizing...' : 'Re-synthesize'}</span>
+              <span>{isRegenerating ? 'Refreshing...' : 'Refresh'}</span>
             </button>
           )}
           <button

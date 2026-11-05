@@ -299,8 +299,8 @@ export const AssessmentResultsView: React.FC<AssessmentResultsViewProps> = ({
                   session={popupSession}
                   features={features}
                   currentUser={currentUser}
-                  onRefresh={() => loadData(true, popupSession.id)}
-                  isRegenerating={isRegenerating}
+                  onRefresh={() => loadData(false, popupSession.id)}
+                  isRegenerating={isLoading}
                 />
 
                 {/* Modal Footer */}

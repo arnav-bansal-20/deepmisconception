@@ -1,5 +1,6 @@
 """Instructor review and annotation routes."""
 from typing import List, Dict, Any, Optional
+from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 from sqlalchemy import func
@@ -128,6 +129,24 @@ def submit_instructor_review(review_in: InstructorReviewCreate, db: Session = De
         if assessment:
             assessment.instructor_status = "confirmed" if review_in.agree_with_ai else "overridden"
             assessment.needs_instructor_review = False
+
+    # Update existing ComprehensionReport with instructor review outcome
+    report = db.query(ComprehensionReport).filter(ComprehensionReport.session_id == review_in.session_id).first()
+    if report:
+        if review_in.assigned_label and review_in.assigned_label not in ("agree", ""):
+            report.overall_label = review_in.assigned_label
+        report.needs_instructor_review = False
+        eb = dict(report.evidence_breakdown or {})
+        eb["instructor_review"] = {
+            "has_review": True,
+            "comments": review_in.feedback_notes or "Instructor verified and signed off.",
+            "reviewed_by": review_in.reviewer_name or (session.teacher_name or "Faculty Advisor"),
+            "review_date": datetime.now(timezone.utc).strftime("%d %b %Y"),
+            "final_decision": f"Instructor Review: {review_in.assigned_label}",
+            "agree_with_ai": review_in.agree_with_ai,
+        }
+        report.evidence_breakdown = eb
+        db.add(report)
 
     db.commit()
     db.refresh(review)

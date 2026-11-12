@@ -295,7 +295,8 @@ def test_student_pasting_code_with_correct_explanation_not_penalized():
         # Even with high paste ratio, student is classified as 'Understood' because they explained it correctly!
         assert report.overall_label == "Understood"
         assert report.confidence_score >= 0.72
-        assert report.multimodal_scores["process_authenticity_score"] >= 0.80
+        assert report.multimodal_scores["process_subscores"]["incremental_score"] == 0.0
+        assert report.multimodal_scores["process_authenticity_score"] >= 0.50
     finally:
         db.close()
 
@@ -607,7 +608,8 @@ def test_paste_telemetry_does_not_penalize_comprehension_verdict():
         report = ComprehensionEngine.synthesize_report(session.id, db)
         # Candidate receives 'Understood' despite heavy pasting
         assert report.overall_label == "Understood"
-        assert report.multimodal_scores["process_rhythm_score"] >= 0.80
+        assert report.multimodal_scores["process_subscores"]["incremental_score"] == 0.0
+        assert report.multimodal_scores["process_rhythm_score"] >= 0.50
         assert report.needs_instructor_review is False
     finally:
         db.close()

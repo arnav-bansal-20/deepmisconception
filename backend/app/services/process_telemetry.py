@@ -1,4 +1,5 @@
 """Process Telemetry Analysis Service for student coding behavioral evidence."""
+import math
 from typing import List, Dict, Any, Optional
 from datetime import datetime, timezone
 from app.config import settings
@@ -10,6 +11,49 @@ class ProcessTelemetryService:
     """Analyzes fine-grained editor telemetry to derive problem-solving dynamics."""
 
     BURST_THRESHOLD_SECONDS = 0.5
+
+    @classmethod
+    def calculate_incremental_score(
+        cls, edit_count: int, paste_ratio: Optional[float] = 0.0
+    ) -> float:
+        """Calculate the incremental development score (S_INC) based on edit count and paste ratio.
+
+        Rules:
+        - S_INC_BASE = existing_incremental_score(edit_count)
+        - 0.00–0.30 paste ratio: S_INC = S_INC_BASE (no reduction)
+        - Above 0.30 and below 1.00: S_INC = S_INC_BASE * PASTE_FACTOR
+          where PASTE_FACTOR = (1 - paste_ratio) / 0.70, clamped to [0, 1]
+        - 1.00 paste ratio: S_INC = 0.0 (total paste without incremental development)
+        """
+        # 1. Base incremental score from edit count
+        if edit_count >= 15:
+            s_inc_base = 1.00
+        elif edit_count >= 8:
+            s_inc_base = 0.92
+        elif edit_count >= 3:
+            s_inc_base = 0.85
+        else:
+            s_inc_base = 0.80
+
+        # Safe fallback and clamping for paste_ratio to valid range [0.0, 1.0]
+        try:
+            if paste_ratio is None:
+                valid_paste_ratio = 0.0
+            else:
+                p_float = float(paste_ratio)
+                if math.isnan(p_float):
+                    valid_paste_ratio = 0.0
+                else:
+                    valid_paste_ratio = min(1.0, max(0.0, p_float))
+        except (TypeError, ValueError):
+            valid_paste_ratio = 0.0
+
+        # 2. Apply paste adjustment factor
+        if valid_paste_ratio <= 0.30:
+            return s_inc_base
+
+        paste_factor = min(1.0, max(0.0, (1.0 - valid_paste_ratio) / 0.70))
+        return s_inc_base * paste_factor
 
     @classmethod
     def compute_features(
@@ -48,9 +92,10 @@ class ProcessTelemetryService:
 
         # Ensure events are ordered chronologically
         sorted_events = sorted(events, key=lambda e: e.timestamp or datetime.min)
-        t0 = sorted_events[0].timestamp
-        tn = sorted_events[-1].timestamp
-        total_duration = max(0.0, (tn - t0).total_seconds())
+        now_utc = datetime.now(timezone.utc)
+        t0 = sorted_events[0].timestamp or now_utc
+        tn = sorted_events[-1].timestamp or t0
+        total_duration = max(0.0, (tn - t0).total_seconds()) if (tn and t0) else 0.0
 
         total_events = len(sorted_events)
         edit_count = sum(1 for e in sorted_events if e.event_type == "edit")
@@ -74,7 +119,7 @@ class ProcessTelemetryService:
 
         for e in sorted_events:
             if e.event_type in ("edit", "paste"):
-                if last_edit_ts is not None:
+                if last_edit_ts is not None and e.timestamp is not None:
                     delta = max(0.0, (e.timestamp - last_edit_ts).total_seconds())
                     intervals.append(delta)
                     if delta < cls.BURST_THRESHOLD_SECONDS and e.event_type == "edit":
@@ -88,7 +133,7 @@ class ProcessTelemetryService:
         time_to_first_run: Optional[float] = None
         for e in sorted_events:
             if e.event_type in ("run", "error"):
-                time_to_first_run = round(max(0.0, (e.timestamp - t0).total_seconds()), 1)
+                time_to_first_run = round(max(0.0, ((e.timestamp or t0) - t0).total_seconds()), 1)
                 break
 
         # Error recovery rate
@@ -125,16 +170,8 @@ class ProcessTelemetryService:
 
         # Interpretable Process Feature Calculations (Configurable Sub-weights)
         # 1. Incremental development score (S_incremental, weight 0.30)
-        # Evaluates building code incrementally through sequential edits.
-        # Zero penalties for pasting; pasted logic with subsequent refinement scores highly.
-        if edit_count >= 15:
-            incremental_score = 1.00
-        elif edit_count >= 8:
-            incremental_score = 0.92
-        elif edit_count >= 3:
-            incremental_score = 0.85
-        else:
-            incremental_score = 0.80  # Non-punitive baseline for clean complete drafts
+        # Evaluates building code incrementally through sequential edits, adjusted for paste ratio.
+        incremental_score = round(cls.calculate_incremental_score(edit_count, paste_ratio), 2)
 
         # 2. Debugging & Error recovery score (S_debugging, weight 0.30)
         # Assesses how student handles runtime/syntax errors.
@@ -186,7 +223,7 @@ class ProcessTelemetryService:
         # Generate timeline milestone summaries
         timeline_events: List[TimelineEventSummary] = []
         for e in sorted_events:
-            offset = round(max(0.0, (e.timestamp - t0).total_seconds()), 1)
+            offset = round(max(0.0, ((e.timestamp or t0) - t0).total_seconds()), 1)
             if e.event_type == "paste":
                 timeline_events.append(
                     TimelineEventSummary(

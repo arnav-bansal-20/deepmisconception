@@ -111,3 +111,119 @@ def test_telemetry_features_api_endpoint():
     assert data["run_count"] == 1
     assert "ethical_disclaimer" in data
     assert len(data["timeline_events"]) >= 2
+
+
+def test_incremental_score_paste_ratio_zero():
+    """Requirement 1: Existing incremental score remains unchanged when paste ratio is 0."""
+    assert ProcessTelemetryService.calculate_incremental_score(edit_count=20, paste_ratio=0.0) == 1.00
+    assert ProcessTelemetryService.calculate_incremental_score(edit_count=10, paste_ratio=0.0) == 0.92
+    assert ProcessTelemetryService.calculate_incremental_score(edit_count=5, paste_ratio=0.0) == 0.85
+    assert ProcessTelemetryService.calculate_incremental_score(edit_count=1, paste_ratio=0.0) == 0.80
+
+
+def test_incremental_score_paste_ratio_threshold_30():
+    """Requirement 2: Existing incremental score remains unchanged when paste ratio is 0.30."""
+    assert ProcessTelemetryService.calculate_incremental_score(edit_count=20, paste_ratio=0.30) == 1.00
+    assert ProcessTelemetryService.calculate_incremental_score(edit_count=10, paste_ratio=0.30) == 0.92
+    assert ProcessTelemetryService.calculate_incremental_score(edit_count=5, paste_ratio=0.30) == 0.85
+    assert ProcessTelemetryService.calculate_incremental_score(edit_count=1, paste_ratio=0.30) == 0.80
+
+    # Intermediate value below 0.30
+    assert ProcessTelemetryService.calculate_incremental_score(edit_count=20, paste_ratio=0.15) == 1.00
+
+
+def test_incremental_score_paste_ratio_50():
+    """Requirement 3: Incremental score decreases when paste ratio is 0.50."""
+    base_score = ProcessTelemetryService.calculate_incremental_score(edit_count=20, paste_ratio=0.0)
+    score_50 = ProcessTelemetryService.calculate_incremental_score(edit_count=20, paste_ratio=0.50)
+
+    # Expected factor: (1 - 0.50) / 0.70 = 0.50 / 0.70 ≈ 0.7142857
+    expected = 1.00 * ((1.0 - 0.50) / 0.70)
+    assert score_50 < base_score
+    assert abs(score_50 - expected) < 1e-6
+
+
+def test_incremental_score_paste_ratio_70():
+    """Requirement 4: Incremental score decreases when paste ratio is 0.70."""
+    score_50 = ProcessTelemetryService.calculate_incremental_score(edit_count=20, paste_ratio=0.50)
+    score_70 = ProcessTelemetryService.calculate_incremental_score(edit_count=20, paste_ratio=0.70)
+
+    # Expected factor: (1 - 0.70) / 0.70 = 0.30 / 0.70 ≈ 0.4285714
+    expected = 1.00 * ((1.0 - 0.70) / 0.70)
+    assert score_70 < score_50
+    assert abs(score_70 - expected) < 1e-6
+
+
+def test_incremental_score_paste_ratio_100_percent():
+    """Requirement 5: Incremental score becomes exactly 0 when paste ratio is 1.00."""
+    assert ProcessTelemetryService.calculate_incremental_score(edit_count=20, paste_ratio=1.00) == 0.0
+    assert ProcessTelemetryService.calculate_incremental_score(edit_count=10, paste_ratio=1.00) == 0.0
+    assert ProcessTelemetryService.calculate_incremental_score(edit_count=1, paste_ratio=1.00) == 0.0
+
+    # Also test via compute_features with telemetry events where all content is pasted
+    events = [
+        ProcessEvent(session_id="s_full_paste", event_type="paste", delta_chars=200, paste_length=200),
+    ]
+    features = ProcessTelemetryService.compute_features("s_full_paste", events)
+    assert features.paste_ratio == 1.0
+    assert features.incremental_score == 0.0
+
+
+def test_missing_telemetry_does_not_produce_zero_score():
+    """Requirement 6: Missing telemetry preserves existing no-telemetry behaviour and does not produce zero."""
+    features = ProcessTelemetryService.compute_features("s_empty", [])
+    assert features.incremental_score == 0.75
+    assert features.process_score == 0.75
+    assert features.debugging_score == 0.90
+    assert features.revision_score == 0.75
+    assert features.testing_score == 0.60
+
+
+def test_missing_or_invalid_paste_ratio_fallback():
+    """Requirement 7: Missing or invalid paste ratio uses the safe fallback (no accidental zero)."""
+    assert ProcessTelemetryService.calculate_incremental_score(edit_count=15, paste_ratio=None) == 1.00
+    assert ProcessTelemetryService.calculate_incremental_score(edit_count=15, paste_ratio=float("nan")) == 1.00
+    assert ProcessTelemetryService.calculate_incremental_score(edit_count=15, paste_ratio=-0.25) == 1.00
+    assert ProcessTelemetryService.calculate_incremental_score(edit_count=15, paste_ratio=1.5) == 0.0
+
+
+def test_debugging_revision_testing_scores_remain_unchanged_by_paste_ratio():
+    """Requirement 8: Debugging, revision, and testing scores remain unchanged regardless of paste ratio."""
+    t0 = datetime(2026, 1, 1, 10, 0, 0, tzinfo=timezone.utc)
+
+    # Session 1: No paste (paste_ratio = 0.0)
+    events_no_paste = [
+        ProcessEvent(session_id="s_norm", event_type="edit", delta_chars=20, paste_length=0, timestamp=t0),
+        ProcessEvent(session_id="s_norm", event_type="run", delta_chars=0, paste_length=0, timestamp=t0 + timedelta(seconds=2), event_metadata={"is_error": True}),
+        ProcessEvent(session_id="s_norm", event_type="edit", delta_chars=10, paste_length=0, timestamp=t0 + timedelta(seconds=4)),
+        ProcessEvent(session_id="s_norm", event_type="run", delta_chars=0, paste_length=0, timestamp=t0 + timedelta(seconds=6), event_metadata={"is_error": False}),
+    ]
+    feat_no_paste = ProcessTelemetryService.compute_features("s_norm", events_no_paste)
+
+    # Session 2: Same actions plus a paste event (paste_ratio > 0.50)
+    events_with_paste = [
+        ProcessEvent(session_id="s_paste", event_type="paste", delta_chars=100, paste_length=100, timestamp=t0),
+        ProcessEvent(session_id="s_paste", event_type="edit", delta_chars=20, paste_length=0, timestamp=t0 + timedelta(seconds=1)),
+        ProcessEvent(session_id="s_paste", event_type="run", delta_chars=0, paste_length=0, timestamp=t0 + timedelta(seconds=2), event_metadata={"is_error": True}),
+        ProcessEvent(session_id="s_paste", event_type="edit", delta_chars=10, paste_length=0, timestamp=t0 + timedelta(seconds=4)),
+        ProcessEvent(session_id="s_paste", event_type="run", delta_chars=0, paste_length=0, timestamp=t0 + timedelta(seconds=6), event_metadata={"is_error": False}),
+    ]
+    feat_with_paste = ProcessTelemetryService.compute_features("s_paste", events_with_paste)
+
+    # S_DEBUG, S_REV, S_TEST must be completely identical between the two sessions
+    assert feat_with_paste.debugging_score == feat_no_paste.debugging_score
+    assert feat_with_paste.revision_score == feat_no_paste.revision_score
+    assert feat_with_paste.testing_score == feat_no_paste.testing_score
+
+    # Only S_INC is reduced by the paste ratio
+    assert feat_with_paste.incremental_score < feat_no_paste.incremental_score
+
+    # Final Process Score formula remains: 0.30*S_INC + 0.30*S_DEBUG + 0.25*S_REV + 0.15*S_TEST
+    expected_process_score = round(
+        0.30 * feat_with_paste.incremental_score
+        + 0.30 * feat_with_paste.debugging_score
+        + 0.25 * feat_with_paste.revision_score
+        + 0.15 * feat_with_paste.testing_score,
+        3
+    )
+    assert abs(feat_with_paste.process_score - expected_process_score) < 1e-4

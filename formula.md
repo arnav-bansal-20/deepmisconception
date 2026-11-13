@@ -236,33 +236,3 @@ $$\text{Logits} = W_2 \cdot \text{Dropout}\left(\text{GELU}\left(W_1 H_{\text{fu
 
 $$P(y = c \mid X) = \frac{\exp(\text{Logits}_c)}{\sum_{j=1}^{3} \exp(\text{Logits}_j)}, \quad c \in \{\text{Understood}, \text{Partial}, \text{Misconception}\}$$
 
----
-
-## 8. Statistical & Empirical Evaluation Metrics
-
-Implemented in [`backend/app/services/inter_rater.py`](backend/app/services/inter_rater.py) and benchmark scripts:
-
-### 8.1 Cohen's Kappa ($\kappa$) Inter-Rater Reliability
-Measures agreement between AI comprehension diagnosis and expert human faculty audits, corrected for chance:
-
-$$\kappa = \frac{P_o - P_e}{1 - P_e}$$
-
-- **Observed Agreement ($P_o$)**:
-  $$P_o = \frac{\sum_{i=1}^k C_{ii}}{N}$$
-
-- **Expected Chance Agreement ($P_e$)**:
-  $$P_e = \frac{1}{N^2} \sum_{i=1}^k \left(\sum_{j=1}^k C_{ij} \cdot \sum_{j=1}^k C_{ji}\right)$$
-
-Where $C$ is the $k \times k$ confusion matrix and $N = \sum_{i,j} C_{ij}$.
-
-### 8.2 Per-Class Classification Metrics
-For each diagnostic category $c \in \{1, \dots, C\}$:
-
-$$\text{Precision}_c = \frac{TP_c}{TP_c + FP_c}$$
-
-$$\text{Recall}_c = \frac{TP_c}{TP_c + FN_c}$$
-
-$$F1_c = \frac{2 \cdot \text{Precision}_c \cdot \text{Recall}_c}{\text{Precision}_c + \text{Recall}_c}$$
-
-$$\text{Macro-F1} = \frac{1}{C}\sum_{c=1}^{C} F1_c$$
-

@@ -47,29 +47,29 @@ Incremental Dev    Error Recovery       Revision Cycles   Sandbox Testing
 
 Accounts for continuous sequential edits while discounting non-incremental block pasting:
 
-#### Step 1: Base Incremental Score ($S_{\text{INC\_BASE}}$)
+#### Step 1: Base Incremental Score ($S_{\text{INC-BASE}}$)
 Derived from sequential edit volume:
-$$S_{\text{INC\_BASE}} = \begin{cases}
-1.00 & \text{if } \text{edit\_count} \ge 15 \\
-0.92 & \text{if } \text{edit\_count} \ge 8 \\
-0.85 & \text{if } \text{edit\_count} \ge 3 \\
+$$S_{\text{INC-BASE}} = \begin{cases}
+1.00 & \text{if } \text{edit count} \ge 15 \\
+0.92 & \text{if } \text{edit count} \ge 8 \\
+0.85 & \text{if } \text{edit count} \ge 3 \\
 0.80 & \text{otherwise (baseline for clean complete drafts)}
 \end{cases}$$
 
-#### Step 2: Paste Adjustment Factor ($\text{PASTE\_FACTOR}$)
-$$\text{PASTE\_FACTOR} = \min\left(1.0, \max\left(0.0, \frac{1.0 - \text{paste\_ratio}}{0.70}\right)\right)$$
+#### Step 2: Paste Adjustment Factor ($\text{PASTE-FACTOR}$)
+$$\text{PASTE-FACTOR} = \min\left(1.0, \max\left(0.0, \frac{1.0 - \text{paste ratio}}{0.70}\right)\right)$$
 
 #### Step 3: Final Incremental Score
 $$S_{\text{INC}} = \begin{cases}
-S_{\text{INC\_BASE}} & \text{if } \text{paste\_ratio} \le 0.30 \\
-S_{\text{INC\_BASE}} \times \text{PASTE\_FACTOR} & \text{if } 0.30 < \text{paste\_ratio} < 1.00 \\
-0.0 & \text{if } \text{paste\_ratio} \ge 1.00
+S_{\text{INC-BASE}} & \text{if } \text{paste ratio} \le 0.30 \\
+S_{\text{INC-BASE}} \times \text{PASTE-FACTOR} & \text{if } 0.30 < \text{paste ratio} < 1.00 \\
+0.0 & \text{if } \text{paste ratio} \ge 1.00
 \end{cases}$$
 
-- $\text{paste\_ratio} \in [0.00, 0.30] \implies \text{factor} = 1.00$ (no reduction)
-- $\text{paste\_ratio} = 0.50 \implies \text{factor} \approx 0.714$ (partial proportional reduction)
-- $\text{paste\_ratio} = 0.70 \implies \text{factor} \approx 0.429$ (proportional reduction)
-- $\text{paste\_ratio} = 1.00 \implies \text{factor} = 0.00$ (score forced to exactly $0.0$)
+- $\text{paste ratio} \in [0.00, 0.30] \implies \text{factor} = 1.00$ (no reduction)
+- $\text{paste ratio} = 0.50 \implies \text{factor} \approx 0.714$ (partial proportional reduction)
+- $\text{paste ratio} = 0.70 \implies \text{factor} \approx 0.429$ (proportional reduction)
+- $\text{paste ratio} = 1.00 \implies \text{factor} = 0.00$ (score forced to exactly $0.0$)
 
 ---
 
@@ -78,12 +78,12 @@ S_{\text{INC\_BASE}} \times \text{PASTE\_FACTOR} & \text{if } 0.30 < \text{paste
 Assesses how the student handles runtime errors, syntax errors, and test failures:
 
 $$S_{\text{DEBUG}} = \begin{cases}
-0.90 & \text{if } \text{error\_count} = 0 \text{ (clean execution without errors)} \\
-\min\left(1.0, \max\left(0.40, 0.50 + 0.50 \cdot \text{error\_recovery\_rate}\right)\right) & \text{if } \text{error\_count} > 0
+0.90 & \text{if } \text{error count} = 0 \text{ (clean execution without errors)} \\
+\min\left(1.0, \max\left(0.40, 0.50 + 0.50 \cdot \text{error recovery rate}\right)\right) & \text{if } \text{error count} > 0
 \end{cases}$$
 
 Where the error recovery rate measures whether error events were resolved by subsequent corrective edits or a clean execution:
-$$\text{error\_recovery\_rate} = \frac{\sum_{i \in \text{errors}} \mathbb{I}(\text{followed by edit or clean run})}{\text{total\_errors}}$$
+$$\text{error recovery rate} = \frac{\sum_{i \in \text{errors}} \mathbb{I}(\text{followed by edit or clean run})}{\text{total errors}}$$
 
 ---
 
@@ -92,9 +92,9 @@ $$\text{error\_recovery\_rate} = \frac{\sum_{i \in \text{errors}} \mathbb{I}(\te
 Measures iterative refinement loops (cycles of editing code after running or checking output):
 
 $$S_{\text{REV}} = \begin{cases}
-1.00 & \text{if } \text{revision\_cycles} \ge 2 \\
-0.88 & \text{if } \text{revision\_cycles} = 1 \\
-0.82 & \text{if } \text{edit\_count} \ge 5 \\
+1.00 & \text{if } \text{revision cycles} \ge 2 \\
+0.88 & \text{if } \text{revision cycles} = 1 \\
+0.82 & \text{if } \text{edit count} \ge 5 \\
 0.75 & \text{baseline for direct first-pass submissions}
 \end{cases}$$
 
@@ -105,21 +105,21 @@ $$S_{\text{REV}} = \begin{cases}
 Measures active verification habits inside the isolated execution environment:
 
 $$S_{\text{TEST}} = \begin{cases}
-1.00 & \text{if } \text{run\_count} \ge 3 \\
-0.90 & \text{if } \text{run\_count} = 2 \\
-0.82 & \text{if } \text{run\_count} = 1 \\
-0.70 & \text{if } \text{run\_count} = 0 \text{ (baseline when final submission executes)}
+1.00 & \text{if } \text{run count} \ge 3 \\
+0.90 & \text{if } \text{run count} = 2 \\
+0.82 & \text{if } \text{run count} = 1 \\
+0.70 & \text{if } \text{run count} = 0 \text{ (baseline when final submission executes)}
 \end{cases}$$
 
 ---
 
 ### 2.5 Raw Telemetry Metrics & Extraction Ratios
 
-$$\text{Paste Ratio} = \frac{\text{total\_chars\_pasted}}{\text{total\_chars\_pasted} + \text{total\_chars\_edited}} \in [0.0, 1.0]$$
+$$\text{Paste Ratio} = \frac{\text{total chars pasted}}{\text{total chars pasted} + \text{total chars edited}} \in [0.0, 1.0]$$
 
-$$\text{Burstiness Ratio} = \frac{\sum \mathbb{I}(\Delta t_i < 0.5\text{s})}{\text{total\_edits}} \in [0.0, 1.0]$$
+$$\text{Burstiness Ratio} = \frac{\sum \mathbb{I}(\Delta t_i < 0.5\text{ s})}{\text{total edits}} \in [0.0, 1.0]$$
 
-$$\text{Typing Speed (CPM)} = \frac{\text{total\_chars\_edited}}{\max(0.1, \text{duration\_minutes})}$$
+$$\text{Typing Speed (CPM)} = \frac{\text{total chars edited}}{\max(0.1, \text{duration minutes})}$$
 
 ---
 
@@ -128,7 +128,7 @@ $$\text{Typing Speed (CPM)} = \frac{\text{total\_chars\_edited}}{\max(0.1, \text
 Evaluates the algorithmic sophistication, syntactic validity, and programmatic structure of the student's solution:
 
 $$S_{\text{ast}} = \begin{cases}
-\min\left(1.00, 0.75 + 0.10 \cdot \mathbb{I}(\text{cyclomatic\_complexity} \ge 2) + 0.10 \cdot \mathbb{I}(\text{loops or functions present})\right) & \text{if AST is syntactically valid} \\
+\min\left(1.00, 0.75 + 0.10 \cdot \mathbb{I}(\text{cyclomatic complexity} \ge 2) + 0.10 \cdot \mathbb{I}(\text{loops or functions present})\right) & \text{if AST is syntactically valid} \\
 0.15 & \text{if syntax error / parse failure}
 \end{cases}$$
 
@@ -265,3 +265,4 @@ $$\text{Recall}_c = \frac{TP_c}{TP_c + FN_c}$$
 $$F1_c = \frac{2 \cdot \text{Precision}_c \cdot \text{Recall}_c}{\text{Precision}_c + \text{Recall}_c}$$
 
 $$\text{Macro-F1} = \frac{1}{C}\sum_{c=1}^{C} F1_c$$
+

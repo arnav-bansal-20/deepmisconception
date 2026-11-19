@@ -9,15 +9,12 @@ from app.models.submission import CodeSubmission
 from app.models.viva_question import VivaQuestion
 from app.models.answer_assessment import AnswerAssessment
 from app.models.process_event import ProcessEvent
-from app.ml.feature_extractor import MultimodalFeatureExtractor
-from app.ml.multimodal_transformer import MultimodalCrossAttentionFusion
-from app.ml.ablation import AblationRunner
+from app.ml.multimodal_transformer import get_multimodal_transformer, LABELS
+from app.ml.evaluation_pipeline import ABLATION_CONFIGURATIONS
+from app.ml.multimodal_inputs import MultimodalStudentInputBundle
 from app.services.process_telemetry import ProcessTelemetryService
 
 router = APIRouter(prefix="/ml", tags=["Machine Learning"])
-
-# Pre-trained / cached default model instance
-_model_instance = MultimodalCrossAttentionFusion(seed=42)
 
 
 @router.get("/status")
@@ -30,6 +27,7 @@ def get_ml_status() -> Dict[str, Any]:
     codebert_stat = CodeBERTEmbedder.get_status()
     st_stat = SentenceTransformerEmbedder.get_status()
     device = get_optimal_device()
+    model = get_multimodal_transformer()
 
     return {
         "status": "healthy",
@@ -53,25 +51,27 @@ def get_ml_status() -> Dict[str, Any]:
                 "fallback_feature": "Rubric semantic score" if not st_stat["is_available"] else None,
             },
             "multimodal_transformer": {
-                "name": _model_instance.model_name,
-                "framework": _model_instance.model_framework,
+                "name": model.model_name,
+                "framework": model.model_framework,
                 "is_available": TORCH_AVAILABLE,
-                "is_trained": _model_instance.is_trained,
-                "device": str(_model_instance.device),
-                "num_classes": _model_instance.num_classes,
-                "class_labels": ["Understood", "Partial Understanding", "Possible Misconception"],
+                "is_trained": model.is_trained,
+                "device": str(model.device),
+                "num_classes": model.num_classes,
+                "class_labels": LABELS,
             },
         },
     }
 
 
 @router.get("/ablation")
-def get_ablation_benchmarks(
-    samples: int = Query(180, ge=30, le=600, description="Number of synthetic student samples"),
-    seed: int = Query(42, description="Random seed for reproducibility"),
-) -> Dict[str, Any]:
-    """Execute systematic multimodal ablation study across Code, Explanation, and Process."""
-    return AblationRunner.run_ablation(n_samples=samples, seed=seed)
+def get_ablation_benchmarks() -> Dict[str, Any]:
+    """Return the 9 systematic ablation configurations prepared for empirical benchmarking."""
+    return {
+        "status": "CONFIGURED",
+        "total_configurations": len(ABLATION_CONFIGURATIONS),
+        "configurations": ABLATION_CONFIGURATIONS,
+        "note": "Ablation matrix is configured and ready to execute once the multimodal dataset is collected and models are trained.",
+    }
 
 
 @router.post("/predict/{session_id}")
@@ -79,7 +79,7 @@ def predict_session_comprehension(
     session_id: str,
     db: Session = Depends(get_db),
 ) -> Dict[str, Any]:
-    """Run multimodal cross-attention neural inference on live session data."""
+    """Run multimodal cross-attention neural inference on live session data adhering to Section 15 schema."""
     session = db.query(CodingSession).filter(CodingSession.id == session_id).first()
     if not session:
         raise HTTPException(status_code=404, detail="Coding session not found")
@@ -95,35 +95,44 @@ def predict_session_comprehension(
         .filter(AnswerAssessment.session_id == session_id)
         .all()
     )
+    questions = (
+        db.query(VivaQuestion)
+        .filter(VivaQuestion.session_id == session_id)
+        .all()
+    )
     proc_events = (
         db.query(ProcessEvent)
         .filter(ProcessEvent.session_id == session_id)
         .all()
     )
 
-    code = latest_sub.code if latest_sub else ""
-    ast_sum = latest_sub.ast_summary if latest_sub else None
-    explanation = " ".join(a.student_answer for a in assessments) if assessments else ""
     proc_features = ProcessTelemetryService.compute_features(session_id, proc_events)
 
-    feat = MultimodalFeatureExtractor.extract(code, explanation, proc_features, ast_sum)
-    X = np.expand_dims(feat, axis=0)
+    input_bundle = MultimodalStudentInputBundle.from_session_data(
+        session_id=session_id,
+        events=proc_events,
+        telemetry_features=proc_features,
+        code=latest_sub.code if latest_sub else "",
+        ast_summary=latest_sub.ast_summary if latest_sub else {},
+        exec_output=latest_sub.execution_output if latest_sub else "",
+        err_output=latest_sub.error_output if latest_sub else "",
+        exit_code=0 if (latest_sub and latest_sub.execution_output and not latest_sub.error_output) else 1,
+        is_valid=latest_sub.is_valid if latest_sub else True,
+        viva_assessments=assessments,
+        viva_questions=questions,
+    )
 
-    probs = _model_instance.predict_proba(X)[0]
-    pred_idx = int(np.argmax(probs))
-    labels = ["Understood", "Partial Understanding", "Possible Misconception"]
+    classifier = get_multimodal_transformer()
+    pred_res = classifier.predict_session_bundle(input_bundle)
 
     return {
         "session_id": session_id,
-        "predicted_label": labels[pred_idx],
-        "confidence": round(float(probs[pred_idx]), 4),
-        "class_probabilities": {
-            labels[i]: round(float(probs[i]), 4) for i in range(len(labels))
-        },
-        "feature_dimensions": {
-            "ast_features_dim": 16,
-            "explanation_features_dim": 16,
-            "process_features_dim": 8,
-            "total_dim": 40,
-        },
+        "predicted_class": pred_res.predicted_class,
+        "class_probabilities": pred_res.class_probabilities,
+        "model_status": pred_res.model_status,
+        "model_version": pred_res.model_version,
+        "modality_availability": pred_res.modality_availability,
+        "supporting_feature_scores": pred_res.supporting_feature_scores,
+        "needs_instructor_review": pred_res.needs_instructor_review,
+        "confidence": pred_res.confidence,
     }

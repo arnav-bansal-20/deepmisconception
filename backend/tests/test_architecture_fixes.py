@@ -41,6 +41,8 @@ from app.ml.config import (
     ALIGN_DIM,
     NUM_FEATURES_DIM,
     D_MODEL,
+    NUM_HEADS,
+    NUM_ENCODER_LAYERS,
     NUM_CLASSES,
     LABELS,
     LABEL_MAP,
@@ -69,7 +71,7 @@ from app.ml.multimodal_transformer import (
     MultimodalFusionTransformerModel,
     MultimodalCrossAttentionFusion,
 )
-from app.ml.training_pipeline import MultimodalTrainer
+from app.ml.training_pipeline import MultimodalTrainer, MultimodalSample
 
 
 # ==============================================================================
@@ -419,3 +421,210 @@ def test_formula_score_cannot_override_transformer_prediction():
     assert res.predicted_class != "Understood"
     # Even though formula scores are high (0.95), Transformer output is the sole classifier
     assert res.class_probabilities["Possible Misconception"] > 0.95
+
+
+# ==============================================================================
+# 7. End-to-End Process Transformer Training & Gradient Propagation (Phase 2)
+# ==============================================================================
+def test_process_transformer_gradient_propagation_and_parameter_update():
+    """Verify raw process events flow through Process Transformer during training and update weights."""
+    fusion_model = MultimodalFusionTransformerModel()
+    process_transformer = PyTorchProcessTransformer()
+    trainer = MultimodalTrainer(
+        model=fusion_model,
+        process_transformer=process_transformer,
+        lr=0.01,
+    )
+
+    # Create dummy samples with raw chronological process events
+    samples = []
+    for i in range(4):
+        raw_events = [
+            {"event_type": "edit", "delta_chars": 5 + i, "timestamp": datetime.datetime(2026, 1, 1, 10, 0, 0)},
+            {"event_type": "run", "delta_chars": 0, "timestamp": datetime.datetime(2026, 1, 1, 10, 0, 15)},
+            {"event_type": "error", "delta_chars": 0, "timestamp": datetime.datetime(2026, 1, 1, 10, 0, 20)},
+        ]
+        s = MultimodalSample(
+            session_id=f"SESS-TRAIN-{i}",
+            code_emb=np.random.randn(CODE_DIM).astype(np.float32),
+            exp_emb=np.random.randn(EXP_DIM).astype(np.float32),
+            num_features=np.random.rand(NUM_FEATURES_DIM).astype(np.float32),
+            label=i % 3,
+            proc_events=raw_events,
+        )
+        samples.append(s)
+
+    from torch.utils.data import DataLoader
+    from app.ml.training_pipeline import MultimodalDataset, collate_multimodal_batch
+
+    dataset = MultimodalDataset(samples)
+    loader = DataLoader(dataset, batch_size=2, shuffle=False, collate_fn=collate_multimodal_batch)
+
+    # Record parameter values before step
+    initial_param = process_transformer.out_proj[0].weight.clone().detach()
+
+    # Run single training epoch
+    loss = trainer.train_epoch(loader)
+    assert loss > 0.0
+
+    # 1. Verify gradients reached Process Transformer parameters
+    assert process_transformer.out_proj[0].weight.grad is not None
+    grad_norm = process_transformer.out_proj[0].weight.grad.norm().item()
+    assert grad_norm > 0.0
+
+    # 2. Verify parameter changed after optimizer step
+    updated_param = process_transformer.out_proj[0].weight.detach()
+    param_diff = (updated_param - initial_param).abs().sum().item()
+    assert param_diff > 0.0
+
+
+# ==============================================================================
+# 8. Checkpoint Cross-Compatibility (Phase 4)
+# ==============================================================================
+def test_checkpoint_cross_compatibility_trainer_and_inference(tmp_path):
+    """Verify checkpoint saved by MultimodalTrainer can be loaded by MultimodalCrossAttentionFusion."""
+    fusion_model = MultimodalFusionTransformerModel()
+    align_module = CrossModalSemanticAlignment()
+    process_transformer = PyTorchProcessTransformer()
+
+    trainer = MultimodalTrainer(
+        model=fusion_model,
+        alignment_module=align_module,
+        process_transformer=process_transformer,
+    )
+
+    ckpt_path = str(tmp_path / "trainer_saved_ckpt.pt")
+    # Save checkpoint via trainer
+    torch.save({
+        "schema_version": "2.0-multimodal-fusion",
+        "epoch": 1,
+        "model_state": trainer.model.state_dict(),
+        "align_state": trainer.alignment_module.state_dict(),
+        "process_state": trainer.process_transformer.state_dict(),
+        "optimizer_state": trainer.optimizer.state_dict(),
+        "feature_config": {
+            "code_dim": CODE_DIM,
+            "exp_dim": EXP_DIM,
+            "proc_dim": PROC_DIM,
+            "align_dim": ALIGN_DIM,
+            "num_features_dim": NUM_FEATURES_DIM,
+            "d_model": D_MODEL,
+            "num_classes": NUM_CLASSES,
+            "num_heads": NUM_HEADS,
+            "num_encoder_layers": NUM_ENCODER_LAYERS,
+        },
+        "val_loss": 0.42,
+        "val_accuracy": 0.85,
+        "is_trained": True,
+        "model_version": "v2.0-multimodal-transformer",
+    }, ckpt_path)
+
+    # Load in production inference pipeline
+    inference_fusion = MultimodalCrossAttentionFusion(seed=999)
+    assert inference_fusion.is_trained is False
+
+    inference_fusion.load_checkpoint(ckpt_path)
+    assert inference_fusion.is_trained is True
+
+    # Verify model weights match exactly
+    for k in fusion_model.state_dict():
+        assert torch.equal(fusion_model.state_dict()[k], inference_fusion.model.state_dict()[k])
+    for k in process_transformer.state_dict():
+        assert torch.equal(process_transformer.state_dict()[k], inference_fusion.process_transformer.state_dict()[k])
+
+
+def test_incompatible_checkpoint_rejected(tmp_path):
+    """Verify that checkpoint with incompatible dimensions or missing keys raises ValueError."""
+    ckpt_path = str(tmp_path / "corrupt_ckpt.pt")
+    torch.save({
+        "schema_version": "2.0-multimodal-fusion",
+        "model_state": {},
+        "feature_config": {
+            "code_dim": 512,  # Incompatible dimension (expected 768)
+            "exp_dim": EXP_DIM,
+            "proc_dim": PROC_DIM,
+            "num_classes": NUM_CLASSES,
+        },
+    }, ckpt_path)
+
+    inference_fusion = MultimodalCrossAttentionFusion()
+    with pytest.raises(ValueError, match="dimension mismatch"):
+        inference_fusion.load_checkpoint(ckpt_path)
+
+
+# ==============================================================================
+# 9. Missing-Modality Masking & No-NaN Guarantees (Phase 5)
+# ==============================================================================
+def test_all_modalities_masked_produces_no_nan():
+    """Verify that passing an all-masked modality mask produces finite outputs without NaN."""
+    model = MultimodalFusionTransformerModel()
+    proc = torch.randn(2, PROC_DIM)
+    code = torch.randn(2, CODE_DIM)
+    exp = torch.randn(2, EXP_DIM)
+    align = torch.randn(2, ALIGN_DIM)
+    num_f = torch.randn(2, NUM_FEATURES_DIM)
+
+    # All 5 modalities masked
+    all_mask = torch.ones((2, 5), dtype=torch.bool)
+    logits, probs, attn = model(proc, code, exp, align, num_f, modality_key_padding_mask=all_mask)
+
+    assert not torch.isnan(logits).any()
+    assert not torch.isnan(probs).any()
+    assert not torch.isinf(logits).any()
+    assert not torch.isinf(probs).any()
+
+
+def test_masked_modality_does_not_influence_dense_fusion():
+    """Verify that changing values of a masked modality does not alter the output representation."""
+    model = MultimodalFusionTransformerModel()
+    model.eval()
+
+    code = torch.randn(1, CODE_DIM)
+    exp = torch.randn(1, EXP_DIM)
+    align = torch.randn(1, ALIGN_DIM)
+    num_f = torch.randn(1, NUM_FEATURES_DIM)
+
+    # Mask process modality (index 0)
+    mask = torch.tensor([[True, False, False, False, False]], dtype=torch.bool)
+
+    # Run with process vector 1
+    proc_1 = torch.randn(1, PROC_DIM)
+    with torch.no_grad():
+        logits_1, probs_1, _ = model(proc_1, code, exp, align, num_f, modality_key_padding_mask=mask)
+
+    # Run with drastically different process vector 2
+    proc_2 = proc_1 + 100.0
+    with torch.no_grad():
+        logits_2, probs_2, _ = model(proc_2, code, exp, align, num_f, modality_key_padding_mask=mask)
+
+    # Because process token is masked and zeroed before dense fusion, outputs are identical!
+    torch.testing.assert_close(logits_1, logits_2, atol=1e-5, rtol=1e-5)
+    torch.testing.assert_close(probs_1, probs_2, atol=1e-5, rtol=1e-5)
+
+
+# ==============================================================================
+# 10. Label Leakage Prevention & Feature Modes (Phase 7)
+# ==============================================================================
+def test_label_leakage_audit_and_feature_modes():
+    """Verify target labels are never in features and feature modes support formula-free ablation."""
+    # 1. Verify default mode masks s_overall to 0.0
+    vec_default, fdict = NumericalFeaturePreprocessor.transform(
+        ast_summary={"cyclomatic_complexity": 2},
+        is_valid=True,
+        include_s_overall=False,
+        feature_mode="default",
+    )
+    assert vec_default[0] == 0.0
+    assert "label" not in fdict
+    assert "session_target" not in fdict
+
+    # 2. Verify no_formula mode zeros out all formula scores (indices 0..8)
+    vec_no_form, _ = NumericalFeaturePreprocessor.transform(
+        ast_summary={"cyclomatic_complexity": 2},
+        is_valid=True,
+        feature_mode="no_formula",
+    )
+    assert (vec_no_form[0:9] == 0.0).all()
+    # But objective telemetry metrics remain active
+    assert vec_no_form[15] > 0.0  # cyclomatic complexity norm
+

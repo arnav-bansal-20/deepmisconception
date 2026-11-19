@@ -96,6 +96,7 @@ if TORCH_AVAILABLE:
             self.num_features_dim = num_features_dim
             self.d_model = d_model
             self.nhead = nhead
+            self.num_encoder_layers = num_encoder_layers
             self.num_classes = num_classes
 
             # ==============================================================
@@ -246,6 +247,19 @@ if TORCH_AVAILABLE:
             # Form sequence of 5 modality tokens: (B, 5, d_model)
             modality_seq = torch.stack([h_proc, h_code, h_exp, h_align, h_num], dim=1)
 
+            # Zero out any initially masked modality tokens before attention
+            all_masked = None
+            safe_mask = modality_key_padding_mask
+            if modality_key_padding_mask is not None:
+                valid_mask = (~modality_key_padding_mask).unsqueeze(-1).float()
+                modality_seq = modality_seq * valid_mask
+
+                # Prevent PyTorch MultiheadAttention NaN if all modalities are masked
+                all_masked = modality_key_padding_mask.all(dim=-1)
+                if all_masked.any():
+                    safe_mask = modality_key_padding_mask.clone()
+                    safe_mask[all_masked, :] = False  # Temporarily unmask during attention calculation
+
             # --------------------------------------------------------------
             # Step 3: Multi-Head Inter-Modality Cross-Attention
             # --------------------------------------------------------------
@@ -253,7 +267,7 @@ if TORCH_AVAILABLE:
                 modality_seq,
                 modality_seq,
                 modality_seq,
-                key_padding_mask=modality_key_padding_mask,
+                key_padding_mask=safe_mask,
             )
             modality_seq = self.attn_norm(modality_seq + attn_out)
 
@@ -262,15 +276,27 @@ if TORCH_AVAILABLE:
             # --------------------------------------------------------------
             encoded_modalities = self.transformer_encoder(
                 modality_seq,
-                src_key_padding_mask=modality_key_padding_mask,
+                src_key_padding_mask=safe_mask,
             )  # (B, 5, d_model)
 
             # --------------------------------------------------------------
             # Step 5: Fully Connected Dense Fusion Layer
             # --------------------------------------------------------------
+            # Strictly zero out masked modality tokens so they CANNOT influence dense fusion
+            if modality_key_padding_mask is not None:
+                valid_mask = (~modality_key_padding_mask).unsqueeze(-1).float()
+                encoded_modalities = encoded_modalities * valid_mask
+                if all_masked is not None and all_masked.any():
+                    encoded_modalities[all_masked] = 0.0
+
             # Flatten tokens across modality dimension: (B, 5 * d_model)
             flattened = encoded_modalities.reshape(batch_size, -1)
             fused_rep = self.dense_fusion(flattened)  # (B, d_model)
+
+            # If all modalities were masked, zero out fused representation to prevent noise
+            if all_masked is not None and all_masked.any():
+                fused_rep = fused_rep.clone()
+                fused_rep[all_masked] = 0.0
 
             # --------------------------------------------------------------
             # Step 6: 3-Class Classification Head & Softmax
@@ -300,15 +326,15 @@ class MultimodalCrossAttentionFusion:
 
     def __init__(
         self,
-        code_dim: int = 768,
-        viva_dim: int = 384,
-        proc_dim: int = 64,
-        align_dim: int = 64,
-        num_features_dim: int = 24,
-        hidden_dim: int = 32,
-        nhead: int = 4,
-        num_encoder_layers: int = 2,
-        num_classes: int = 3,
+        code_dim: int = CODE_DIM,
+        viva_dim: int = EXP_DIM,
+        proc_dim: int = PROC_DIM,
+        align_dim: int = ALIGN_DIM,
+        num_features_dim: int = NUM_FEATURES_DIM,
+        hidden_dim: int = D_MODEL,
+        nhead: int = NUM_HEADS,
+        num_encoder_layers: int = NUM_ENCODER_LAYERS,
+        num_classes: int = NUM_CLASSES,
         dropout: float = 0.1,
         seed: int = 42,
     ):
@@ -318,6 +344,8 @@ class MultimodalCrossAttentionFusion:
         self.align_dim = align_dim
         self.num_features_dim = num_features_dim
         self.hidden_dim = hidden_dim
+        self.nhead = nhead
+        self.num_encoder_layers = num_encoder_layers
         self.num_classes = num_classes
         self.model_name = "Multimodal Cross-Attention Transformer"
         self.model_framework = "PyTorch" if TORCH_AVAILABLE else "NumPy"
@@ -346,8 +374,8 @@ class MultimodalCrossAttentionFusion:
                 event_emb_dim=16,
                 num_event_features=7,
                 global_feature_dim=8,
-                d_model=hidden_dim,
-                nhead=nhead,
+                d_model=64,
+                nhead=4,
                 num_encoder_layers=2,
                 output_dim=proc_dim,
             ).to(self.device)
@@ -466,27 +494,57 @@ class MultimodalCrossAttentionFusion:
 
         return probs_np, fused_np
 
+    def _adapt_legacy_40d_matrix(self, X: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+        """Explicit adapter isolating legacy 40-D input matrix (AST:16, Viva:16, Process:8).
+        
+        Maps legacy low-dimensional prototypes into the canonical representation spaces.
+        Production pipelines use canonical 768/384/64/64/24 representations directly.
+        """
+        logger.info("Routing through legacy 40-D feature adapter (AST:16, Viva:16, Process:8).")
+        B = X.shape[0]
+        x_ast_16 = X[:, :16]
+        x_viva_16 = X[:, 16:32]
+        x_proc_8 = X[:, 32:40]
+
+        # Zero-pad into canonical spaces
+        x_code = np.zeros((B, self.code_dim), dtype=np.float32)
+        x_code[:, :16] = x_ast_16
+
+        x_viva = np.zeros((B, self.viva_dim), dtype=np.float32)
+        x_viva[:, :16] = x_viva_16
+
+        x_proc = np.zeros((B, self.proc_dim), dtype=np.float32)
+        x_proc[:, :8] = x_proc_8
+
+        # 24-D numerical feature: 16-D AST + 8-D Process
+        num_feat = np.concatenate([x_ast_16, x_proc_8], axis=-1).astype(np.float32)
+        return x_code, x_viva, x_proc, num_feat
+
     def predict_proba(self, X: np.ndarray) -> np.ndarray:
-        """Predict class probabilities for multimodal feature matrix X."""
+        """Predict class probabilities for multimodal feature matrix X with strict dimension validation."""
         if X.ndim == 1:
             X = X[np.newaxis, :]
         B = X.shape[0]
 
-        # Support 40-D legacy feature matrix: (code:16, viva:16, proc:8)
+        # Explicit legacy 40-D adapter
         if X.shape[1] == 40:
-            x_code = X[:, :16]
-            x_viva = X[:, 16:32]
-            x_proc = X[:, 32:40]
+            x_code, x_viva, x_proc, num_feat = self._adapt_legacy_40d_matrix(X)
+            probs, _ = self.forward(x_code, x_viva, x_proc, num_features=num_feat)
+            return probs
+
+        expected_concat_dim = self.code_dim + self.viva_dim + self.proc_dim
+        if X.shape[1] == expected_concat_dim:
+            x_code = X[:, :self.code_dim]
+            x_viva = X[:, self.code_dim:self.code_dim + self.viva_dim]
+            x_proc = X[:, self.code_dim + self.viva_dim:]
             probs, _ = self.forward(x_code, x_viva, x_proc)
             return probs
 
-        # Support full concatenated feature matrix
-        x_code = X[:, :self.code_dim] if X.shape[1] >= self.code_dim else X
-        x_viva = X[:, self.code_dim:self.code_dim + self.viva_dim] if X.shape[1] >= (self.code_dim + self.viva_dim) else np.zeros((B, self.viva_dim))
-        x_proc = X[:, -self.proc_dim:] if X.shape[1] >= self.proc_dim else np.zeros((B, self.proc_dim))
-
-        probs, _ = self.forward(x_code, x_viva, x_proc)
-        return probs
+        raise ValueError(
+            f"Input feature matrix dimension mismatch: got shape {X.shape}, expected (*, {expected_concat_dim}) "
+            f"for concatenated canonical modalities (code={self.code_dim}, exp={self.viva_dim}, proc={self.proc_dim}) "
+            "or (*, 40) via legacy adapter."
+        )
 
     def fit(self, X: np.ndarray, y: np.ndarray, epochs: int = 25, lr: float = 0.003, batch_size: int = 16) -> Dict[str, Any]:
         """Architecturally prepare and support training across trainable parameters."""
@@ -572,10 +630,11 @@ class MultimodalCrossAttentionFusion:
         }
 
     def save_checkpoint(self, path: str):
-        """Save PyTorch weights to disk including model, alignment, and process transformer states."""
+        """Save PyTorch weights to disk with full schema and compatibility verification."""
         if TORCH_AVAILABLE and self.model is not None:
             os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
             torch.save({
+                "schema_version": "2.0-multimodal-fusion",
                 "model_state": self.model.state_dict(),
                 "align_state": self.alignment_module.state_dict() if self.alignment_module else None,
                 "process_state": self.process_transformer.state_dict() if self.process_transformer else None,
@@ -585,23 +644,52 @@ class MultimodalCrossAttentionFusion:
                     "proc_dim": self.proc_dim,
                     "align_dim": self.align_dim,
                     "num_features_dim": self.num_features_dim,
-                    "hidden_dim": self.hidden_dim,
+                    "d_model": self.model.d_model,
+                    "num_classes": self.num_classes,
+                    "num_heads": self.model.nhead,
+                    "num_encoder_layers": self.model.num_encoder_layers,
                 },
                 "is_trained": self.is_trained,
             }, path)
 
     def load_checkpoint(self, path: str):
-        """Load PyTorch weights from disk with compatibility validation."""
-        if TORCH_AVAILABLE and self.model is not None and os.path.exists(path):
-            ckpt = torch.load(path, map_location=self.device)
-            if not isinstance(ckpt, dict) or "model_state" not in ckpt:
-                raise ValueError(f"Incompatible or corrupt checkpoint file at '{path}'")
-            self.model.load_state_dict(ckpt["model_state"])
-            if ckpt.get("align_state") and self.alignment_module:
-                self.alignment_module.load_state_dict(ckpt["align_state"])
-            if ckpt.get("process_state") and self.process_transformer:
-                self.process_transformer.load_state_dict(ckpt["process_state"])
-            self.is_trained = ckpt.get("is_trained", False)
+        """Load PyTorch weights from disk with strict compatibility validation."""
+        if not TORCH_AVAILABLE or self.model is None:
+            return
+        if not os.path.exists(path):
+            raise FileNotFoundError(f"Checkpoint file not found at '{path}'")
+
+        ckpt = torch.load(path, map_location=self.device)
+        if not isinstance(ckpt, dict) or "model_state" not in ckpt:
+            raise ValueError(f"Incompatible or corrupt checkpoint file at '{path}': missing 'model_state'")
+
+        # Validate feature config dimensions before loading
+        if "feature_config" in ckpt:
+            cfg = ckpt["feature_config"]
+            if cfg.get("code_dim") is not None and cfg.get("code_dim") != self.code_dim:
+                raise ValueError(f"Checkpoint dimension mismatch: code_dim={cfg.get('code_dim')} vs expected {self.code_dim}")
+            if cfg.get("exp_dim") is not None and cfg.get("exp_dim") != self.viva_dim:
+                raise ValueError(f"Checkpoint dimension mismatch: exp_dim={cfg.get('exp_dim')} vs expected {self.viva_dim}")
+            if cfg.get("proc_dim") is not None and cfg.get("proc_dim") != self.proc_dim:
+                raise ValueError(f"Checkpoint dimension mismatch: proc_dim={cfg.get('proc_dim')} vs expected {self.proc_dim}")
+            if cfg.get("num_classes") is not None and cfg.get("num_classes") != self.num_classes:
+                raise ValueError(f"Checkpoint dimension mismatch: num_classes={cfg.get('num_classes')} vs expected {self.num_classes}")
+
+        self.model.load_state_dict(ckpt["model_state"])
+
+        align_st = ckpt.get("align_state") or ckpt.get("alignment_state")
+        if self.alignment_module:
+            if align_st is None:
+                raise ValueError(f"Incomplete checkpoint at '{path}': missing alignment state for active alignment_module")
+            self.alignment_module.load_state_dict(align_st)
+
+        proc_st = ckpt.get("process_state")
+        if self.process_transformer:
+            if proc_st is None:
+                raise ValueError(f"Incomplete checkpoint at '{path}': missing process state for active process_transformer")
+            self.process_transformer.load_state_dict(proc_st)
+
+        self.is_trained = ckpt.get("is_trained", False)
 
     DEFAULT_CHECKPOINT_PATH = os.path.join(
         os.path.dirname(__file__), "checkpoints", "fusion_transformer_best.pt"

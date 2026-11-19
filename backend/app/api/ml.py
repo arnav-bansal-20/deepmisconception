@@ -50,6 +50,13 @@ def get_ml_status() -> Dict[str, Any]:
                 "dimension": st_stat["dimension"],
                 "fallback_feature": "Rubric semantic score" if not st_stat["is_available"] else None,
             },
+            "process_transformer": {
+                "name": "Process Transformer Encoder",
+                "framework": "PyTorch",
+                "is_available": TORCH_AVAILABLE,
+                "dimension": model.proc_dim,
+                "is_trained": model.is_trained,
+            },
             "multimodal_transformer": {
                 "name": model.model_name,
                 "framework": model.model_framework,

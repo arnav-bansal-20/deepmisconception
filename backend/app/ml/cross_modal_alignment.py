@@ -1,34 +1,36 @@
 """Cross-Modal Semantic Alignment Module for DeepMisconception.
 
 Learns semantic consistency, entailment, and contradiction between submitted
-source code (CodeBERT + AST), student explanations (Sentence-Transformer), and
-execution evidence using bidirectional cross-attention and interaction tensors.
+source code (CodeBERT), student explanations (Sentence-Transformer), and
+execution evidence using vector-level bidirectional cross-attention, contradiction
+difference tensors (|c - e|), bilinear product interactions (c * e), and bilinear similarity.
 """
 from typing import Dict, Any, Tuple, Optional
 import math
 import numpy as np
 import torch
 import torch.nn as nn
+from app.ml.config import CODE_DIM, EXP_DIM, ALIGN_DIM, FEATURE_CONTRACT
 
 
 class CrossModalSemanticAlignment(nn.Module):
     """Dedicated Neural Alignment Module evaluating Code-Explanation consistency.
     
     Novelty Component 4 of DeepMisconception:
-    Evaluates consistency between submitted code and student explanation using
-    bidirectional cross-attention, contradiction-sensitive difference and product
-    interactions, and execution ground-truth signals.
+    Evaluates consistency between pooled contextual code representations and
+    student explanations using bidirectional cross-attention, contradiction-sensitive
+    difference and product interactions, and execution ground-truth signals.
     """
 
     def __init__(
         self,
-        code_dim: int = 768,         # Pretrained CodeBERT dimension
-        exp_dim: int = 384,          # Pretrained Sentence-Transformer dimension
-        ast_dim: int = 16,           # AST structural metric dimension
-        exec_dim: int = 4,           # Execution outcome feature dimension
-        d_align: int = 128,          # Common latent alignment dimension
-        nhead: int = 4,              # Multihead cross-attention heads
-        alignment_dim: int = 64,     # Output alignment representation dimension
+        code_dim: int = CODE_DIM,         # Pretrained CodeBERT dimension (768)
+        exp_dim: int = EXP_DIM,           # Pretrained Sentence-Transformer dimension (384)
+        ast_dim: int = 16,                # AST structural metric dimension
+        exec_dim: int = 4,                # Execution outcome feature dimension
+        d_align: int = 128,               # Common latent alignment dimension
+        nhead: int = 4,                   # Multihead cross-attention heads
+        alignment_dim: int = ALIGN_DIM,   # Output alignment representation dimension (64)
         dropout: float = 0.1,
     ):
         super().__init__()

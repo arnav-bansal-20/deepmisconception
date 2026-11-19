@@ -9,6 +9,7 @@ from typing import List, Dict, Any, Optional, Tuple
 from dataclasses import dataclass, field
 import numpy as np
 import torch
+from app.ml.process_transformer import normalize_process_event_timestamps
 
 
 @dataclass
@@ -69,21 +70,8 @@ class MultimodalStudentInputBundle:
         viva_questions: Optional[List[Any]] = None,
     ) -> "MultimodalStudentInputBundle":
         """Factory method to construct a standard MultimodalStudentInputBundle from DB models/APIs."""
-        # 1. Process Event Normalization
-        norm_events: List[Dict[str, Any]] = []
-        for ev in events:
-            if isinstance(ev, dict):
-                norm_events.append(ev)
-            else:
-                norm_events.append({
-                    "event_type": getattr(ev, "event_type", "edit"),
-                    "delta_chars": getattr(ev, "delta_chars", 0),
-                    "paste_length": getattr(ev, "paste_length", 0),
-                    "cursor_line": getattr(ev, "cursor_line", 1),
-                    "cursor_column": getattr(ev, "cursor_column", 1),
-                    "timestamp_s": getattr(ev, "timestamp", None),
-                    "is_error": bool(getattr(ev, "event_type", "") == "error"),
-                })
+        # 1. Process Event Normalization with robust timestamp conversion
+        norm_events: List[Dict[str, Any]] = normalize_process_event_timestamps(events)
 
         # Process numerical features dict
         num_dict = {}

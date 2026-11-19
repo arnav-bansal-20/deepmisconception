@@ -7,6 +7,7 @@ dense process representation.
 """
 import math
 from typing import List, Dict, Any, Optional, Tuple, Union
+from datetime import datetime, timezone
 import numpy as np
 
 try:
@@ -16,6 +17,8 @@ try:
 except ImportError:
     TORCH_AVAILABLE = False
     nn = object
+
+from app.ml.config import PROC_DIM, D_MODEL, NUM_HEADS, NUM_ENCODER_LAYERS
 
 EVENT_TYPE_MAP = {
     "pad": 0,
@@ -31,6 +34,126 @@ EVENT_TYPE_MAP = {
     "unknown": 9,
 }
 NUM_EVENT_TYPES = 12
+
+
+def parse_timestamp_to_utc(ts: Any) -> Optional[datetime]:
+    """Safely convert diverse timestamp types (datetime, ISO string, epoch float/int) to UTC datetime."""
+    if ts is None:
+        return None
+    if isinstance(ts, datetime):
+        if ts.tzinfo is None:
+            return ts.replace(tzinfo=timezone.utc)
+        return ts.astimezone(timezone.utc)
+    if isinstance(ts, str):
+        s = ts.strip()
+        if not s:
+            return None
+        if s.endswith("Z"):
+            s = s[:-1] + "+00:00"
+        try:
+            dt = datetime.fromisoformat(s)
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=timezone.utc)
+            return dt.astimezone(timezone.utc)
+        except ValueError:
+            return None
+    if isinstance(ts, (int, float)):
+        val = float(ts)
+        if val > 1e11:  # Milliseconds epoch
+            val /= 1000.0
+        try:
+            return datetime.fromtimestamp(val, tz=timezone.utc)
+        except (ValueError, OSError):
+            return None
+    return None
+
+
+def normalize_process_event_timestamps(events: List[Any]) -> List[Dict[str, Any]]:
+    """Accepts heterogeneous events (DB models, dicts) with datetime, ISO strings, or numeric timestamps,
+    sorts them chronologically, and converts timestamps into numerical elapsed seconds from reference event T0.
+    
+    Guarantees:
+    1. Preserves chronological event ordering (stable sort on parsed UTC timestamp).
+    2. Converts timestamps into numerical elapsed seconds from T0 (Event 1 -> 0.0s, Event 2 -> delta, ...).
+    3. Handles timezone-aware, naive, ISO strings, and epoch values consistently.
+    4. Safely handles missing/invalid timestamps without crashing.
+    5. Calculates time gaps between consecutive events.
+    """
+    if not events:
+        return []
+
+    # 1. Standardize to raw dicts with parsed UTC timestamp
+    extracted: List[Dict[str, Any]] = []
+    for idx, ev in enumerate(events):
+        if isinstance(ev, dict):
+            etype = ev.get("event_type", "edit")
+            raw_ts = ev.get("timestamp") or ev.get("timestamp_s") or ev.get("created_at")
+            delta_chars = ev.get("delta_chars", 0)
+            paste_len = ev.get("paste_length", 0)
+            line = ev.get("cursor_line", 1)
+            col = ev.get("cursor_column", 1)
+            is_err = bool(ev.get("is_error") or "error" in str(etype).lower())
+        else:
+            etype = getattr(ev, "event_type", "edit")
+            raw_ts = getattr(ev, "timestamp", None)
+            delta_chars = getattr(ev, "delta_chars", 0)
+            paste_len = getattr(ev, "paste_length", 0)
+            line = getattr(ev, "cursor_line", 1)
+            col = getattr(ev, "cursor_column", 1)
+            is_err = bool(getattr(ev, "event_type", "") == "error")
+
+        parsed_ts = parse_timestamp_to_utc(raw_ts)
+        extracted.append({
+            "original_index": idx,
+            "event_type": str(etype).lower(),
+            "delta_chars": int(delta_chars or 0),
+            "paste_length": int(paste_len or 0),
+            "cursor_line": int(line or 1),
+            "cursor_column": int(col or 1),
+            "parsed_dt": parsed_ts,
+            "is_error": is_err,
+        })
+
+    # 2. Sort chronologically by parsed_dt (events without dt maintain stable relative order at the end)
+    fallback_dt = datetime.max.replace(tzinfo=timezone.utc)
+    sorted_events = sorted(
+        extracted,
+        key=lambda item: (item["parsed_dt"] if item["parsed_dt"] is not None else fallback_dt, item["original_index"])
+    )
+
+    # 3. Determine reference timestamp T0 from first event with valid timestamp
+    t0: Optional[datetime] = None
+    for ev in sorted_events:
+        if ev["parsed_dt"] is not None:
+            t0 = ev["parsed_dt"]
+            break
+
+    # 4. Compute elapsed seconds from T0 and consecutive time gaps
+    normalized: List[Dict[str, Any]] = []
+    prev_elapsed = 0.0
+
+    for idx, ev in enumerate(sorted_events):
+        if t0 is not None and ev["parsed_dt"] is not None:
+            elapsed = max(0.0, (ev["parsed_dt"] - t0).total_seconds())
+        else:
+            elapsed = prev_elapsed + (0.5 if idx > 0 else 0.0)
+
+        gap = max(0.0, elapsed - prev_elapsed) if idx > 0 else 0.0
+        prev_elapsed = elapsed
+
+        normalized.append({
+            "event_type": ev["event_type"],
+            "delta_chars": ev["delta_chars"],
+            "paste_length": ev["paste_length"],
+            "cursor_line": ev["cursor_line"],
+            "cursor_column": ev["cursor_column"],
+            "elapsed_seconds": round(float(elapsed), 4),
+            "time_gap_seconds": round(float(gap), 4),
+            "timestamp_s": round(float(elapsed), 4),  # backward compatibility alias
+            "is_error": ev["is_error"],
+        })
+
+    return normalized
 
 
 class PositionalEncoding(nn.Module if TORCH_AVAILABLE else object):
@@ -65,7 +188,7 @@ if TORCH_AVAILABLE:
             num_encoder_layers: int = 2,
             dim_feedforward: int = 128,
             dropout: float = 0.1,
-            output_dim: int = 64,
+            output_dim: int = PROC_DIM,
             max_seq_len: int = 256,
         ):
             super().__init__()
@@ -179,9 +302,9 @@ class ProcessTransformerEncoder:
 
     def __init__(
         self,
-        output_dim: int = 16,
-        d_model: int = 64,
-        nhead: int = 4,
+        output_dim: int = PROC_DIM,
+        d_model: int = D_MODEL,
+        nhead: int = NUM_HEADS,
         num_encoder_layers: int = 2,
         seed: int = 42,
     ):
@@ -212,8 +335,13 @@ class ProcessTransformerEncoder:
         paste_len = float(event.get("paste_length", 0) or 0)
         line = float(event.get("cursor_line", 1) or 1)
         col = float(event.get("cursor_column", 1) or 1)
-        curr_time = float(event.get("timestamp_s", 0) or 0)
-        gap = (curr_time - prev_time) if prev_time is not None else 0.5
+        
+        # Numerical elapsed seconds & time gap normalized safely
+        curr_time = float(event.get("elapsed_seconds", event.get("timestamp_s", 0)) or 0)
+        if "time_gap_seconds" in event:
+            gap = float(event["time_gap_seconds"])
+        else:
+            gap = (curr_time - prev_time) if prev_time is not None else 0.5
 
         num_features = np.zeros(7, dtype=np.float32)
         num_features[0] = max(-1.0, min(1.0, delta / 50.0))          # Delta chars normalized
@@ -228,22 +356,24 @@ class ProcessTransformerEncoder:
 
     def encode_sequence(
         self,
-        events: List[Dict[str, Any]],
+        events: List[Any],
         max_len: int = 32,
         global_features: Optional[np.ndarray] = None,
     ) -> np.ndarray:
         """Encode a single event sequence and return an (output_dim,) numpy array.
         
-        Backward compatible with existing tests while executing PyTorch Transformer operations.
+        Automatically normalizes diverse event types and timestamps into chronological order
+        and numerical elapsed seconds from reference event T0.
         """
         if not events:
             return np.zeros(self.output_dim, dtype=np.float32)
 
         if not TORCH_AVAILABLE or self.model is None:
-            # Fallback for environments without PyTorch
             return np.zeros(self.output_dim, dtype=np.float32)
 
-        seq_events = events[-max_len:] if len(events) > max_len else events
+        # 1. Normalize heterogeneous timestamps and order chronologically
+        norm_events = normalize_process_event_timestamps(events)
+        seq_events = norm_events[-max_len:] if len(norm_events) > max_len else norm_events
         T = len(seq_events)
 
         type_ids = np.zeros((1, T), dtype=np.int64)
@@ -254,7 +384,7 @@ class ProcessTransformerEncoder:
             tid, nslice = self._event_to_feature_slice(ev, prev_time)
             type_ids[0, t] = tid
             num_feats[0, t] = nslice
-            prev_time = float(ev.get("timestamp_s", 0) or 0)
+            prev_time = float(ev.get("elapsed_seconds", 0) or 0)
 
         t_types = torch.from_numpy(type_ids)
         t_nums = torch.from_numpy(num_feats)
@@ -294,14 +424,15 @@ class ProcessTransformerEncoder:
         pad_mask = np.ones((B, actual_max_len), dtype=bool)  # True = padded
 
         for b, evs in enumerate(batch_events):
-            seq = evs[-actual_max_len:] if len(evs) > actual_max_len else evs
+            norm_evs = normalize_process_event_timestamps(evs)
+            seq = norm_evs[-actual_max_len:] if len(norm_evs) > actual_max_len else norm_evs
             prev_time = None
             for t, ev in enumerate(seq):
                 tid, nslice = self._event_to_feature_slice(ev, prev_time)
                 type_ids[b, t] = tid
                 num_feats[b, t] = nslice
                 pad_mask[b, t] = False  # Valid token
-                prev_time = float(ev.get("timestamp_s", 0) or 0)
+                prev_time = float(ev.get("elapsed_seconds", 0) or 0)
 
         t_types = torch.from_numpy(type_ids)
         t_nums = torch.from_numpy(num_feats)

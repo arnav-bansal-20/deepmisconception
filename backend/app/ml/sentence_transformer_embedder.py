@@ -8,6 +8,7 @@ import logging
 from typing import Optional, Dict, Any
 import numpy as np
 from pydantic import BaseModel, Field
+from app.ml.config import EXP_DIM
 
 logger = logging.getLogger(__name__)
 
@@ -173,6 +174,72 @@ class SentenceTransformerEmbedder:
                 fallback_used=True,
                 error=str(e),
             )
+
+    @classmethod
+    def extract_embedding_checked(
+        cls, text: str, max_length: int = 128
+    ) -> Tuple[Optional[np.ndarray], Dict[str, Any]]:
+        """Extract Sentence-Transformer embedding with strict status and finite validation.
+        
+        Returns:
+            embedding: (384,) float32 array if successful and finite, else None
+            meta: dict with is_available, status, and error details
+        """
+        if not text or not text.strip():
+            return None, {
+                "is_available": True,
+                "status": "empty_input",
+                "error": "Explanation text is empty",
+                "dimension": cls.EMBEDDING_DIM,
+            }
+
+        result = cls.extract_embedding_detailed(text, max_length)
+        if not result.is_available or result.embedding is None:
+            return None, {
+                "is_available": False,
+                "status": result.status,
+                "error": result.error or "Sentence-Transformer encoder unavailable",
+                "dimension": cls.EMBEDDING_DIM,
+            }
+
+        arr = np.array(result.embedding, dtype=np.float32)
+        if arr.shape != (cls.EMBEDDING_DIM,):
+            return None, {
+                "is_available": False,
+                "status": "dimension_mismatch",
+                "error": f"Expected shape ({cls.EMBEDDING_DIM},), got {arr.shape}",
+                "dimension": cls.EMBEDDING_DIM,
+            }
+
+        if not np.isfinite(arr).all():
+            return None, {
+                "is_available": False,
+                "status": "non_finite_values",
+                "error": "Embedding contains NaN or infinite values",
+                "dimension": cls.EMBEDDING_DIM,
+            }
+
+        return arr, {
+            "is_available": True,
+            "status": "loaded",
+            "error": None,
+            "dimension": cls.EMBEDDING_DIM,
+        }
+
+    @classmethod
+    def extract_tensor_checked(
+        cls, text: str, max_length: int = 128, device: Optional[str] = None
+    ) -> Tuple[Optional[Any], Dict[str, Any]]:
+        """Extract Sentence-Transformer embedding as a validated torch.Tensor with shape (1, 384)."""
+        emb, meta = cls.extract_embedding_checked(text, max_length)
+        if emb is None:
+            return None, meta
+
+        import torch
+        t = torch.from_numpy(emb).unsqueeze(0).float()
+        if device is not None:
+            t = t.to(device)
+        return t, meta
 
     @classmethod
     def extract_embedding(cls, text: str, max_length: int = 128) -> np.ndarray:

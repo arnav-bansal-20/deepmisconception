@@ -36,10 +36,24 @@ except ImportError:
     logger.warning("PyTorch is not installed. MultimodalTransformer will run in NumPy fallback mode.")
 
 from app.ml.cross_modal_alignment import CrossModalSemanticAlignment
-
-LABELS = ["Understood", "Partial Understanding", "Possible Misconception"]
-LABEL_MAP = {lbl: i for i, lbl in enumerate(LABELS)}
-REV_LABEL_MAP = {i: lbl for i, lbl in enumerate(LABELS)}
+from app.ml.config import (
+    CODE_DIM,
+    EXP_DIM,
+    PROC_DIM,
+    ALIGN_DIM,
+    NUM_FEATURES_DIM,
+    D_MODEL,
+    NUM_HEADS,
+    NUM_ENCODER_LAYERS,
+    NUM_CLASSES,
+    LABELS,
+    LABEL_MAP,
+    REV_LABEL_MAP,
+    STATUS_READY,
+    STATUS_MODEL_NOT_TRAINED,
+    STATUS_INSUFFICIENT_EVIDENCE,
+    FEATURE_CONTRACT,
+)
 
 
 @dataclass
@@ -312,11 +326,12 @@ class MultimodalCrossAttentionFusion:
 
         if TORCH_AVAILABLE:
             from app.ml.codebert_embedder import get_optimal_device
+            from app.ml.process_transformer import PyTorchProcessTransformer
             self.device = get_optimal_device()
             torch.manual_seed(seed)
             np.random.seed(seed)
 
-            # Initialize Alignment Module and Fusion Model
+            # Initialize Alignment Module, Process Transformer, and Fusion Model
             self.alignment_module = CrossModalSemanticAlignment(
                 code_dim=code_dim,
                 exp_dim=viva_dim,
@@ -326,6 +341,17 @@ class MultimodalCrossAttentionFusion:
                 alignment_dim=align_dim,
                 dropout=dropout,
             ).to(self.device)
+
+            self.process_transformer = PyTorchProcessTransformer(
+                event_emb_dim=16,
+                num_event_features=7,
+                global_feature_dim=8,
+                d_model=hidden_dim,
+                nhead=nhead,
+                num_encoder_layers=2,
+                output_dim=proc_dim,
+            ).to(self.device)
+            self.process_transformer.eval()
 
             self.model = MultimodalFusionTransformerModel(
                 proc_dim=proc_dim,
@@ -342,7 +368,44 @@ class MultimodalCrossAttentionFusion:
             self.model.eval()
         else:
             self.alignment_module = None
+            self.process_transformer = None
             self.model = None
+
+    def encode_process_events(
+        self,
+        events: List[Any],
+        global_features: Optional[np.ndarray] = None,
+        max_len: int = 64,
+    ) -> torch.Tensor:
+        """Encode process telemetry events into a (1, proc_dim) tensor using persistent process_transformer."""
+        if not TORCH_AVAILABLE or self.process_transformer is None or not events:
+            return torch.zeros(1, self.proc_dim, device=self.device)
+
+        from app.ml.process_transformer import normalize_process_event_timestamps, ProcessTransformerEncoder
+        norm_events = normalize_process_event_timestamps(events)
+        if not norm_events:
+            return torch.zeros(1, self.proc_dim, device=self.device)
+
+        seq_events = norm_events[-max_len:] if len(norm_events) > max_len else norm_events
+        T = len(seq_events)
+
+        type_ids = np.zeros((1, T), dtype=np.int64)
+        num_feats = np.zeros((1, T, 7), dtype=np.float32)
+
+        prev_time = None
+        for t, ev in enumerate(seq_events):
+            tid, nslice = ProcessTransformerEncoder._event_to_feature_slice(ev, prev_time)
+            type_ids[0, t] = tid
+            num_feats[0, t] = nslice
+            prev_time = float(ev.get("elapsed_seconds", 0) or 0)
+
+        t_types = torch.from_numpy(type_ids).to(self.device)
+        t_nums = torch.from_numpy(num_feats).to(self.device)
+        t_glob = torch.from_numpy(global_features).float().unsqueeze(0).to(self.device) if global_features is not None else None
+
+        with torch.no_grad():
+            proc_rep = self.process_transformer(t_types, t_nums, padding_mask=None, global_features=t_glob)
+        return proc_rep
 
     def forward(
         self,
@@ -509,22 +572,35 @@ class MultimodalCrossAttentionFusion:
         }
 
     def save_checkpoint(self, path: str):
-        """Save PyTorch weights to disk."""
+        """Save PyTorch weights to disk including model, alignment, and process transformer states."""
         if TORCH_AVAILABLE and self.model is not None:
             os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
             torch.save({
                 "model_state": self.model.state_dict(),
                 "align_state": self.alignment_module.state_dict() if self.alignment_module else None,
+                "process_state": self.process_transformer.state_dict() if self.process_transformer else None,
+                "feature_config": {
+                    "code_dim": self.code_dim,
+                    "exp_dim": self.viva_dim,
+                    "proc_dim": self.proc_dim,
+                    "align_dim": self.align_dim,
+                    "num_features_dim": self.num_features_dim,
+                    "hidden_dim": self.hidden_dim,
+                },
                 "is_trained": self.is_trained,
             }, path)
 
     def load_checkpoint(self, path: str):
-        """Load PyTorch weights from disk."""
+        """Load PyTorch weights from disk with compatibility validation."""
         if TORCH_AVAILABLE and self.model is not None and os.path.exists(path):
             ckpt = torch.load(path, map_location=self.device)
+            if not isinstance(ckpt, dict) or "model_state" not in ckpt:
+                raise ValueError(f"Incompatible or corrupt checkpoint file at '{path}'")
             self.model.load_state_dict(ckpt["model_state"])
             if ckpt.get("align_state") and self.alignment_module:
                 self.alignment_module.load_state_dict(ckpt["align_state"])
+            if ckpt.get("process_state") and self.process_transformer:
+                self.process_transformer.load_state_dict(ckpt["process_state"])
             self.is_trained = ckpt.get("is_trained", False)
 
     DEFAULT_CHECKPOINT_PATH = os.path.join(
@@ -541,28 +617,41 @@ class MultimodalCrossAttentionFusion:
         bundle: Any,
         allow_untrained: bool = False,
     ) -> MultimodalPredictionResult:
-        """Execute multimodal prediction obeying evidence validation and checkpoint requirements.
+        """Execute multimodal prediction obeying evidence validation, pretrained encoder safety,
+        and checkpoint verification requirements.
         
         Rules:
-        - If required evidence (code, viva explanations) is missing: returns INSUFFICIENT_EVIDENCE.
-        - If no trained checkpoint exists (and allow_untrained=False): returns MODEL_NOT_TRAINED.
+        - Checks pretrained CodeBERT and Sentence-Transformer with extract_tensor_checked.
+        - If encoder fails or required evidence (code, viva explanations) is missing:
+          returns STATUS_INSUFFICIENT_EVIDENCE (predicted_class=None).
+        - If no trained checkpoint exists (and allow_untrained=False): returns STATUS_MODEL_NOT_TRAINED.
           (Does not present random weights as genuine predictions).
-        - If trained checkpoint is loaded: runs forward pass, picks argmax(probabilities), returns READY.
+        - Encodes process events with persistent self.process_transformer.
+        - Applies modality_key_padding_mask so unavailable modalities do not influence attention.
+        - Extracts 3 logits -> softmax probabilities -> argmax -> predicted_class.
         """
         from app.ml.feature_preprocessor import NumericalFeaturePreprocessor
         from app.ml.codebert_embedder import CodeBERTEmbedder
         from app.ml.sentence_transformer_embedder import SentenceTransformerEmbedder
-        from app.ml.process_transformer import ProcessTransformerEncoder
 
-        # 1. Modality Availability Check
-        has_code = bool(bundle.code and bundle.code.code and bundle.code.code.strip())
-        has_exp = bool(bundle.explanation and bundle.explanation.full_transcript and bundle.explanation.full_transcript.strip())
-        has_proc = bool(bundle.process and (bundle.process.events or bundle.process.numerical_features))
+        # 1. Extract Pretrained Encoders with Finite & Availability Verification
+        code_str = bundle.code.code if (bundle.code and bundle.code.code) else ""
+        exp_str = bundle.explanation.full_transcript if (bundle.explanation and bundle.explanation.full_transcript) else ""
+        proc_events = bundle.process.events if (bundle.process and bundle.process.events) else []
+
+        code_t, code_meta = CodeBERTEmbedder.extract_tensor_checked(code_str, device=self.device)
+        exp_t, exp_meta = SentenceTransformerEmbedder.extract_tensor_checked(exp_str, device=self.device)
+
+        has_code = bool(code_t is not None and code_meta.get("is_available", False))
+        has_exp = bool(exp_t is not None and exp_meta.get("is_available", False))
+        has_proc = bool(len(proc_events) > 0)
 
         modality_avail = {
             "code": has_code,
             "explanation": has_exp,
             "process": has_proc,
+            "codebert_status": code_meta.get("status", "unknown"),
+            "sentence_transformer_status": exp_meta.get("status", "unknown"),
         }
 
         # 2. Extract supporting numerical formula scores regardless of model status
@@ -574,6 +663,7 @@ class MultimodalCrossAttentionFusion:
             is_valid=bundle.code.is_valid if bundle.code else True,
             viva_assessments=bundle.explanation.answers if bundle.explanation else None,
             telemetry_features=bundle.process.numerical_features if bundle.process else None,
+            include_s_overall=False,
         )
         supporting_scores = {
             "S_AST": fdict.get("s_ast"),
@@ -587,10 +677,10 @@ class MultimodalCrossAttentionFusion:
             "S_TEST": fdict.get("s_test"),
         }
 
-        # 3. Evidence Validation Check
+        # 3. Evidence Validation Check: Code and Explanation are mandatory
         if not has_code or not has_exp:
             return MultimodalPredictionResult(
-                model_status="INSUFFICIENT_EVIDENCE",
+                model_status=STATUS_INSUFFICIENT_EVIDENCE,
                 predicted_class=None,
                 class_probabilities=None,
                 modality_availability=modality_avail,
@@ -599,14 +689,14 @@ class MultimodalCrossAttentionFusion:
                 confidence=0.0,
             )
 
-        # 4. Checkpoint Status Check
+        # 4. Checkpoint Status Check: Refuse random weights
         if not self.is_trained and not allow_untrained:
             if self.is_trained_checkpoint_available():
                 self.load_checkpoint(self.DEFAULT_CHECKPOINT_PATH)
             
             if not self.is_trained and not allow_untrained:
                 return MultimodalPredictionResult(
-                    model_status="MODEL_NOT_TRAINED",
+                    model_status=STATUS_MODEL_NOT_TRAINED,
                     predicted_class=None,
                     class_probabilities=None,
                     modality_availability=modality_avail,
@@ -615,14 +705,13 @@ class MultimodalCrossAttentionFusion:
                     confidence=0.0,
                 )
 
-        # 5. Extract Full Modal Representations
-        code_t = CodeBERTEmbedder.extract_tensor(bundle.code.code, device=self.device)
-        exp_t = SentenceTransformerEmbedder.extract_tensor(bundle.explanation.full_transcript, device=self.device)
+        # 5. Process Telemetry Encoding with persistent self.process_transformer
+        if has_proc:
+            proc_t = self.encode_process_events(proc_events)
+        else:
+            proc_t = torch.zeros(1, self.proc_dim, device=self.device)
 
-        proc_encoder = ProcessTransformerEncoder(output_dim=self.proc_dim)
-        proc_vec = proc_encoder.encode_sequence(bundle.process.events if bundle.process else [])
-        proc_t = torch.from_numpy(proc_vec).unsqueeze(0).float().to(self.device)
-
+        # Numerical feature tensor with S_OVERALL masked to prevent redundant leakage
         num_vec, _ = NumericalFeaturePreprocessor.transform(
             ast_summary=bundle.code.ast_summary if bundle.code else None,
             exec_output=bundle.code.execution_output if bundle.code else None,
@@ -631,13 +720,23 @@ class MultimodalCrossAttentionFusion:
             is_valid=bundle.code.is_valid if bundle.code else True,
             viva_assessments=bundle.explanation.answers if bundle.explanation else None,
             telemetry_features=bundle.process.numerical_features if bundle.process else None,
+            include_s_overall=False,
         )
         num_t = torch.from_numpy(num_vec).unsqueeze(0).float().to(self.device)
 
+        # Cross-modal alignment
         align_t = None
         if self.alignment_module:
-            ast_t = num_t[:, 15:31] if num_t.size(1) >= 31 else None
-            align_t, _, _ = self.alignment_module(code_t, exp_t, ast_t)
+            align_t, _, _ = self.alignment_module(code_t, exp_t)
+
+        # Modality key padding mask: (1, 5) with True for padded/missing modalities
+        key_mask = torch.tensor([[
+            not has_proc,               # Index 0: Process
+            False,                      # Index 1: Code (available)
+            False,                      # Index 2: Explanation (available)
+            False,                      # Index 3: Alignment (computed from code + exp)
+            False,                      # Index 4: Numerical features (computed)
+        ]], dtype=torch.bool, device=self.device)
 
         with torch.no_grad():
             logits, probs, attn_dict = self.model(
@@ -646,6 +745,7 @@ class MultimodalCrossAttentionFusion:
                 exp_emb=exp_t,
                 align_rep=align_t,
                 num_features=num_t,
+                modality_key_padding_mask=key_mask,
             )
             probs_np = probs.cpu().numpy()[0]
             pred_idx = int(np.argmax(probs_np))
@@ -655,7 +755,7 @@ class MultimodalCrossAttentionFusion:
         class_probs = {LABELS[i]: round(float(probs_np[i]), 4) for i in range(len(LABELS))}
 
         return MultimodalPredictionResult(
-            model_status="READY",
+            model_status=STATUS_READY,
             predicted_class=pred_class,
             class_probabilities=class_probs,
             modality_availability=modality_avail,

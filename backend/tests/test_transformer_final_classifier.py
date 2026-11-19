@@ -251,7 +251,7 @@ def test_8_classification_head_three_logits():
     logits, _, _ = model(proc_emb=proc_emb, code_emb=code_emb, exp_emb=exp_emb)
     assert logits.size(-1) == 3
     assert len(LABELS) == 3
-    assert LABELS == ["Understood", "Partial Understanding", "Possible Misconception"]
+    assert list(LABELS) == ["Understood", "Partial Understanding", "Possible Misconception"]
 
 
 # ==============================================================================

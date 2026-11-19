@@ -23,13 +23,24 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
 
+from app.ml.config import (
+    CODE_DIM,
+    EXP_DIM,
+    PROC_DIM,
+    ALIGN_DIM,
+    NUM_FEATURES_DIM,
+    D_MODEL,
+    NUM_CLASSES,
+    LABELS,
+    LABEL_MAP,
+    REV_LABEL_MAP,
+)
 from app.ml.multimodal_transformer import (
     MultimodalFusionTransformerModel,
     MultimodalCrossAttentionFusion,
-    LABELS,
-    LABEL_MAP,
 )
 from app.ml.cross_modal_alignment import CrossModalSemanticAlignment
+from app.ml.process_transformer import PyTorchProcessTransformer
 
 logger = logging.getLogger(__name__)
 
@@ -128,6 +139,7 @@ class MultimodalTrainer:
         self,
         model: MultimodalFusionTransformerModel,
         alignment_module: Optional[CrossModalSemanticAlignment] = None,
+        process_transformer: Optional[PyTorchProcessTransformer] = None,
         lr: float = 1e-4,
         weight_decay: float = 1e-4,
         class_weights: Optional[List[float]] = None,
@@ -136,11 +148,14 @@ class MultimodalTrainer:
         self.device = device or ("cuda" if torch.cuda.is_available() else ("mps" if torch.backends.mps.is_available() else "cpu"))
         self.model = model.to(self.device)
         self.alignment_module = alignment_module.to(self.device) if alignment_module else None
+        self.process_transformer = process_transformer.to(self.device) if process_transformer else None
 
-        # Trainable parameters
+        # Trainable parameters across all trainable components
         params = list(self.model.parameters())
         if self.alignment_module:
             params += list(self.alignment_module.parameters())
+        if self.process_transformer:
+            params += list(self.process_transformer.parameters())
 
         self.optimizer = optim.AdamW(params, lr=lr, weight_decay=weight_decay)
 
@@ -155,6 +170,8 @@ class MultimodalTrainer:
         self.model.train()
         if self.alignment_module:
             self.alignment_module.train()
+        if self.process_transformer:
+            self.process_transformer.train()
 
         total_loss = 0.0
         for batch in dataloader:
@@ -196,6 +213,8 @@ class MultimodalTrainer:
         self.model.eval()
         if self.alignment_module:
             self.alignment_module.eval()
+        if self.process_transformer:
+            self.process_transformer.eval()
 
         total_loss = 0.0
         all_preds = []
@@ -275,6 +294,7 @@ class MultimodalTrainer:
                     "epoch": epoch,
                     "model_state": self.model.state_dict(),
                     "alignment_state": self.alignment_module.state_dict() if self.alignment_module else None,
+                    "process_state": self.process_transformer.state_dict() if self.process_transformer else None,
                     "optimizer_state": self.optimizer.state_dict(),
                     "val_loss": val_loss,
                     "val_accuracy": val_acc,
@@ -292,3 +312,18 @@ class MultimodalTrainer:
             "checkpoint_path": ckpt_path,
             "history": history,
         }
+
+    def load_checkpoint(self, checkpoint_path: str) -> Dict[str, Any]:
+        """Load model, alignment module, and process transformer states from checkpoint."""
+        if not os.path.exists(checkpoint_path):
+            raise FileNotFoundError(f"Checkpoint not found at {checkpoint_path}")
+
+        checkpoint = torch.load(checkpoint_path, map_location=self.device)
+        self.model.load_state_dict(checkpoint["model_state"])
+        if self.alignment_module and checkpoint.get("alignment_state"):
+            self.alignment_module.load_state_dict(checkpoint["alignment_state"])
+        if self.process_transformer and checkpoint.get("process_state"):
+            self.process_transformer.load_state_dict(checkpoint["process_state"])
+        if "optimizer_state" in checkpoint:
+            self.optimizer.load_state_dict(checkpoint["optimizer_state"])
+        return checkpoint

@@ -9,48 +9,17 @@ import math
 import numpy as np
 from app.config import settings
 from app.services.process_telemetry import ProcessTelemetryService
+from app.ml.config import NUMERICAL_FEATURE_NAMES, NUM_FEATURES_DIM, FEATURE_CONTRACT
 
-# Configurable, ordered feature names list preserved for reproducibility and future training
-NUMERICAL_FEATURE_NAMES: List[str] = [
-    # 1-5: High-Level Composite & Modality Formula Scores
-    "s_overall",
-    "s_ast",
-    "s_exec",
-    "s_viva",
-    "s_process",
-    # 6-9: Process Telemetry Sub-dimension Formula Scores
-    "s_inc",
-    "s_debug",
-    "s_rev",
-    "s_test",
-    # 10-15: Fine-Grained Process Dynamics
-    "paste_ratio",
-    "burstiness_ratio",
-    "coding_duration_norm",
-    "total_events_norm",
-    "error_recovery_rate",
-    "typing_speed_cpm_norm",
-    # 16-20: AST Structural Complexity Metrics
-    "cyclomatic_complexity_norm",
-    "total_nodes_norm",
-    "total_lines_norm",
-    "max_depth_norm",
-    "has_recursion",
-    # 21-24: Execution & Validity Evidence
-    "is_syntax_valid",
-    "exit_code_zero",
-    "has_execution_error",
-    "has_stdout_output",
-]
-
-NUMERICAL_FEATURE_DIM: int = len(NUMERICAL_FEATURE_NAMES)  # 24 features
+# Compatibility aliases
+NUMERICAL_FEATURE_DIM = NUM_FEATURES_DIM
 
 
 class NumericalFeaturePreprocessor:
     """Extracts, normalizes, and encodes formula-derived scores and evidence into a numerical tensor."""
 
     FEATURE_NAMES = NUMERICAL_FEATURE_NAMES
-    FEATURE_DIM = NUMERICAL_FEATURE_DIM
+    FEATURE_DIM = NUM_FEATURES_DIM
 
     @classmethod
     def extract_scores(

@@ -26,10 +26,31 @@ class ComprehensionEngine:
 
     # Configurable multimodal weights from central settings:
     # S_overall = 0.15*S_ast + 0.20*S_exec + 0.45*S_viva + 0.20*S_process
+    # RETAINED STRICTLY AS NUMERICAL SUPPORTING EVIDENCE FEATURES
     WEIGHT_AST = settings.weight_ast
     WEIGHT_EXEC = settings.weight_exec
     WEIGHT_VIVA = settings.weight_viva
     WEIGHT_PROC = settings.weight_process
+
+    _classifier_override: Optional[Any] = None
+
+    @classmethod
+    def set_classifier_override(cls, classifier: Any):
+        """Set a test/mock classifier override for integration testing."""
+        cls._classifier_override = classifier
+
+    @classmethod
+    def reset_classifier_override(cls):
+        """Clear any test classifier override."""
+        cls._classifier_override = None
+
+    @classmethod
+    def get_classifier(cls):
+        """Get the Multimodal Fusion Transformer instance (or override)."""
+        if cls._classifier_override is not None:
+            return cls._classifier_override
+        from app.ml.multimodal_transformer import get_multimodal_transformer
+        return get_multimodal_transformer()
 
     @classmethod
     def evaluate_modalities(
@@ -242,59 +263,97 @@ class ComprehensionEngine:
             if a.answer_label == "Insufficient Evidence" or not (a.student_answer and a.student_answer.strip())
         )
 
-        # Classification Logic based on Multimodal Formula:
-        # S_overall = 0.15*S_ast + 0.20*S_exec + 0.45*S_viva + 0.20*S_process
-        #
-        # Rule 1: Missing or Insufficient Evidence -> Explicit Insufficient Evidence Status
-        # Appears when viva answers have not been submitted or are empty whitespace,
-        # or single non-committal answer without substantive verification
-        if len(assessments) == 0 or len(submitted_answers) == 0 or (len(valid_answers) == 0 and len(assessments) <= 1):
+        # Construct standardized MultimodalStudentInputBundle
+        from app.ml.multimodal_inputs import MultimodalStudentInputBundle
+        input_bundle = MultimodalStudentInputBundle.from_session_data(
+            session_id=session_id,
+            events=proc_events,
+            telemetry_features=proc_features,
+            code=latest_sub.code if latest_sub else "",
+            ast_summary=latest_sub.ast_summary if latest_sub else {},
+            exec_output=latest_sub.execution_output if latest_sub else "",
+            err_output=latest_sub.error_output if latest_sub else "",
+            exit_code=0 if (latest_sub and latest_sub.execution_output and not latest_sub.error_output) else 1,
+            is_valid=latest_sub.is_valid if latest_sub else True,
+            viva_assessments=assessments,
+            viva_questions=questions,
+        )
+
+        # ------------------------------------------------------------------
+        # EVIDENCE VALIDATION (Separate from misconception classification)
+        # ------------------------------------------------------------------
+        has_code = bool(latest_sub and latest_sub.code and latest_sub.code.strip())
+        is_insufficient_evidence = (
+            not has_code 
+            or len(assessments) == 0 
+            or len(submitted_answers) == 0 
+            or (len(valid_answers) == 0 and len(assessments) <= 1)
+        )
+
+        classifier = cls.get_classifier()
+
+        if is_insufficient_evidence:
             overall_label = "Insufficient Evidence"
             confidence = 0.35
             needs_review = True
-
-        # Rule 2: Possible Misconception triggers based on multimodal formula
-        # (Composite multimodal score < 0.50 with conceptual flaws or execution failures)
-        # OR acute cross-modal divergence between code sophistication and verbal reasoning
-        elif (
-            (composite_score < 0.50 and (incorrect_vivas > 0 or len(detected_contradictions) > 0 or len(detected_misconceptions) > 0))
-            or (incorrect_vivas >= 2)
-            or (len(detected_contradictions) >= 2)
-            or (incorrect_vivas == 1 and len(detected_contradictions) >= 1)
-            or (
-                scores["ast_structural_score"] >= 0.85 
-                and scores["viva_reasoning_score"] < 0.45 
-                and correct_vivas == 0 
-                and len(submitted_answers) >= 2
-                and len(detected_misconceptions) >= 2
-            )
-        ):
-            overall_label = "Possible Misconception"
-            confidence = round(max(0.70, min(0.95, 0.60 + 0.10 * max(incorrect_vivas, len(detected_misconceptions)))), 2)
-
-        # Rule 3: Understood requires solid multimodal composite score (>= 0.70), zero errors/contradictions, and all valid answers are Correct
-        # A student who pastes code but explains it correctly is NOT penalized and receives 'Understood'.
-        elif (
-            composite_score >= 0.70 
-            and incorrect_vivas == 0 
-            and len(detected_contradictions) == 0 
-            and len(valid_answers) > 0
-            and all(a.answer_label == "Correct" for a in valid_answers)
-        ):
-            overall_label = "Understood"
-            confidence = round(max(0.75, min(0.98, composite_score)), 2)
-
-        # Rule 4: Partial Understanding (Default balanced multimodal state: 0.50 <= composite < 0.70)
-        # Captures single error, partially correct answers, or fragile boundary knowledge
+            model_status = "INSUFFICIENT_EVIDENCE"
+            transformer_pred = {
+                "model_status": "INSUFFICIENT_EVIDENCE",
+                "predicted_class": None,
+                "class_probabilities": None,
+                "modality_availability": {
+                    "code": has_code,
+                    "explanation": len(submitted_answers) > 0,
+                    "process": len(proc_events) > 0,
+                },
+                "supporting_feature_scores": {
+                    "S_AST": scores["ast_structural_score"],
+                    "S_EXEC": scores["execution_fidelity_score"],
+                    "S_VIVA": scores["viva_reasoning_score"],
+                    "S_PROCESS": scores["process_overall_score"],
+                    "S_OVERALL": composite_score,
+                },
+                "needs_instructor_review": True,
+            }
         else:
-            overall_label = "Partial Understanding"
-            confidence = round(max(0.60, min(0.85, composite_score + 0.05)), 2)
+            # ------------------------------------------------------------------
+            # MULTIMODAL FUSION TRANSFORMER: Sole Authority for Classification
+            # NOTE: All formula-based thresholds & if-else rules are strictly bypassed!
+            # ------------------------------------------------------------------
+            pred_res = classifier.predict_session_bundle(input_bundle)
+
+            if pred_res.model_status == "READY":
+                overall_label = pred_res.predicted_class
+                confidence = pred_res.confidence
+                needs_review = pred_res.needs_instructor_review or needs_review
+                model_status = "READY"
+            elif pred_res.model_status == "INSUFFICIENT_EVIDENCE":
+                overall_label = "Insufficient Evidence"
+                confidence = 0.35
+                needs_review = True
+                model_status = "INSUFFICIENT_EVIDENCE"
+            else:
+                # MODEL_NOT_TRAINED
+                # When no checkpoint exists, report MODEL_NOT_TRAINED status explicitly
+                overall_label = "Pending / Awaiting Model Training"
+                confidence = 0.0
+                needs_review = True
+                model_status = "MODEL_NOT_TRAINED"
+
+            transformer_pred = {
+                "model_status": pred_res.model_status,
+                "predicted_class": pred_res.predicted_class,
+                "class_probabilities": pred_res.class_probabilities,
+                "modality_availability": pred_res.modality_availability,
+                "supporting_feature_scores": pred_res.supporting_feature_scores,
+                "needs_instructor_review": pred_res.needs_instructor_review,
+            }
 
         # Generate Evidence Summary Narrative (descriptive, not punitive)
         summary_parts = []
         if overall_label == "Understood":
             summary_parts.append(
-                f"Candidate exhibited robust conceptual comprehension (Composite Index: {int(composite_score*100)}%). "
+                f"Candidate exhibited robust conceptual comprehension (Predicted by Multimodal Fusion Transformer; Composite Index: {int(composite_score*100)}%). "
                 f"Code structure adheres to programmatic invariants with verified execution."
             )
             if assessments:
@@ -303,21 +362,26 @@ class ComprehensionEngine:
                 )
         elif overall_label == "Possible Misconception":
             summary_parts.append(
-                f"Definite conceptual gaps identified (Composite Index: {int(composite_score*100)}%). "
+                f"Definite conceptual gaps identified (Predicted by Multimodal Fusion Transformer; Composite Index: {int(composite_score*100)}%). "
                 f"The candidate's explanations contradict or fail to substantiate the operational reality of the executed code."
             )
             if detected_misconceptions:
                 summary_parts.append(f"Specific identified flaws: {', '.join(detected_misconceptions[:3])}.")
-        elif overall_label == "Insufficient Evidence":
+        elif overall_label == "Pending / Awaiting Model Training":
+            summary_parts.append(
+                f"Student session completed and multimodal evidence extracted (Composite Index: {int(composite_score*100)}%). "
+                "Final misconception classification is pending project-specific model training on the multimodal dataset."
+            )
+        elif overall_label in ("Insufficient Evidence", "Pending / Insufficient Evidence"):
             summary_parts.append(
                 f"Candidate evaluation reflects insufficient viva explanation evidence (Composite Index: {int(composite_score*100)}%). "
                 "Syntactic code snapshot is present, but verbal/conceptual justification has not been completed or is insufficient."
             )
             if detected_misconceptions:
                 summary_parts.append(f"Preliminary flagged points: {', '.join(detected_misconceptions[:3])}.")
-        else:
+        else: # Partial Understanding
             summary_parts.append(
-                f"Candidate demonstrated partial comprehension (Composite Index: {int(composite_score*100)}%). "
+                f"Candidate demonstrated partial comprehension (Predicted by Multimodal Fusion Transformer; Composite Index: {int(composite_score*100)}%). "
                 f"Foundational code structures are present, but nuanced edge-case handling or state transformations remain incomplete."
             )
             if detected_misconceptions:
@@ -485,6 +549,7 @@ class ComprehensionEngine:
         }
 
         evidence_breakdown = {
+            "transformer_prediction": transformer_pred,
             "detected_misconceptions": detected_misconceptions,
             "detected_contradictions": detected_contradictions,
             "review_flags": review_reasons,

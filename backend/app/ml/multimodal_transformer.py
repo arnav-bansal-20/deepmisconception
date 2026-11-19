@@ -1,18 +1,29 @@
-"""Genuine PyTorch-based Multimodal Transformer Architecture fusing Code, Explanation, and Process.
+"""Genuine PyTorch-based Multimodal Fusion Transformer Architecture.
 
-Implements genuine PyTorch Transformer blocks (Linear projections, LayerNorm, MultiheadAttention,
-TransformerEncoder, Dropout, and Softmax classification head) supporting training, validation,
-checkpoints, missing-modality handling, and Apple Silicon / CPU inference.
+Fuses:
+1. Coding Process Representation (from Process Transformer Encoder)
+2. Contextual Code Representation (from CodeBERT 768-D)
+3. Semantic Explanation Representation (from Sentence-Transformer 384-D)
+4. Cross-Modal Semantic Alignment Representation (from CrossModalSemanticAlignment)
+5. Structured Numerical Features (AST complexity, Execution outcomes, Telemetry metrics)
+
+Architecture Steps:
+- Step 1: Modality Projection to uniform latent dimension (d_model)
+- Step 2: Learnable Modality Type Embeddings
+- Step 3: Multi-Head Inter-Modality Cross-Attention
+- Step 4: Multi-Layer Transformer Fusion Encoder
+- Step 5: Fully Connected Dense Fusion Layers
+- Step 6: 3-Class Classification Head (Understood, Partial Understanding, Possible Misconception)
 """
 import os
 import math
 import logging
-from typing import Dict, Any, Tuple, Optional, Union
+from typing import Dict, Any, Tuple, Optional, Union, List
+from dataclasses import dataclass, field
 import numpy as np
 
 logger = logging.getLogger(__name__)
 
-# Check PyTorch availability
 try:
     import torch
     import torch.nn as nn
@@ -24,44 +35,115 @@ except ImportError:
     nn = object
     logger.warning("PyTorch is not installed. MultimodalTransformer will run in NumPy fallback mode.")
 
+from app.ml.cross_modal_alignment import CrossModalSemanticAlignment
+
+LABELS = ["Understood", "Partial Understanding", "Possible Misconception"]
+LABEL_MAP = {lbl: i for i, lbl in enumerate(LABELS)}
+REV_LABEL_MAP = {i: lbl for i, lbl in enumerate(LABELS)}
+
+
+@dataclass
+class MultimodalPredictionResult:
+    """Standardized output structure for Multimodal Fusion Transformer predictions."""
+    model_status: str               # "READY", "MODEL_NOT_TRAINED", "INSUFFICIENT_EVIDENCE"
+    predicted_class: Optional[str]  # "Understood", "Partial Understanding", "Possible Misconception", or None
+    class_probabilities: Optional[Dict[str, float]]
+    modality_availability: Dict[str, bool]
+    supporting_feature_scores: Dict[str, Optional[float]]
+    needs_instructor_review: bool
+    confidence: float = 0.0
+    attention_summary: Optional[Dict[str, Any]] = None
+    model_version: str = "v1.0-multimodal-transformer"
+
 
 if TORCH_AVAILABLE:
-    class PyTorchMultimodalTransformerModel(nn.Module):
-        """Genuine PyTorch Neural Architecture with Modality Projections and Cross-Attention."""
+    class MultimodalFusionTransformerModel(nn.Module):
+        """Genuine PyTorch Multimodal Fusion Transformer implementing Steps 1 through 6."""
 
         def __init__(
             self,
-            code_dim: int = 16,
-            viva_dim: int = 16,
-            proc_dim: int = 8,
-            hidden_dim: int = 32,
-            nhead: int = 4,
-            num_encoder_layers: int = 2,
-            num_classes: int = 3,
-            dropout: float = 0.1,
+            proc_dim: int = 64,          # Process Transformer representation dimension
+            code_dim: int = 768,         # Pretrained CodeBERT dimension
+            exp_dim: int = 384,          # Pretrained Sentence-Transformer dimension
+            align_dim: int = 64,         # Cross-Modal Alignment representation dimension
+            num_features_dim: int = 24,  # AST, Execution, and Telemetry numerical features
+            d_model: int = 128,          # Common Transformer hidden dimension
+            nhead: int = 4,              # Number of attention heads
+            num_encoder_layers: int = 3, # Number of Transformer Encoder layers
+            dim_feedforward: int = 256,  # Feedforward dimension in Transformer layers
+            dropout: float = 0.1,        # Dropout rate
+            num_classes: int = 3,        # Target comprehension classes
         ):
             super().__init__()
-            self.code_dim = code_dim
-            self.viva_dim = viva_dim
             self.proc_dim = proc_dim
-            self.hidden_dim = hidden_dim
+            self.code_dim = code_dim
+            self.exp_dim = exp_dim
+            self.align_dim = align_dim
+            self.num_features_dim = num_features_dim
+            self.d_model = d_model
+            self.nhead = nhead
             self.num_classes = num_classes
 
-            # 1. Modality Input Projections to uniform hidden representation
-            self.proj_code = nn.Linear(code_dim, hidden_dim)
-            self.proj_viva = nn.Linear(viva_dim, hidden_dim)
-            self.proj_proc = nn.Linear(proc_dim, hidden_dim)
+            # ==============================================================
+            # STEP 1: Modality Projection Layers (Uniform Latent Space d_model)
+            # ==============================================================
+            self.proj_proc = nn.Sequential(
+                nn.Linear(proc_dim, d_model),
+                nn.LayerNorm(d_model),
+                nn.GELU(),
+                nn.Dropout(dropout),
+            )
+            self.proj_code = nn.Sequential(
+                nn.Linear(code_dim, d_model),
+                nn.LayerNorm(d_model),
+                nn.GELU(),
+                nn.Dropout(dropout),
+            )
+            self.proj_exp = nn.Sequential(
+                nn.Linear(exp_dim, d_model),
+                nn.LayerNorm(d_model),
+                nn.GELU(),
+                nn.Dropout(dropout),
+            )
+            self.proj_align = nn.Sequential(
+                nn.Linear(align_dim, d_model),
+                nn.LayerNorm(d_model),
+                nn.GELU(),
+                nn.Dropout(dropout),
+            )
+            self.proj_num = nn.Sequential(
+                nn.Linear(num_features_dim, d_model),
+                nn.LayerNorm(d_model),
+                nn.GELU(),
+                nn.Dropout(dropout),
+            )
 
-            self.ln_code = nn.LayerNorm(hidden_dim)
-            self.ln_viva = nn.LayerNorm(hidden_dim)
-            self.ln_proc = nn.LayerNorm(hidden_dim)
-            self.dropout = nn.Dropout(p=dropout)
+            # ==============================================================
+            # STEP 2: Learnable Modality Type Embeddings
+            # ==============================================================
+            # Modality IDs: 0=Process, 1=Code, 2=Explanation, 3=Alignment, 4=Numerical Evidence
+            self.num_modalities = 5
+            self.modality_type_embeddings = nn.Embedding(self.num_modalities, d_model)
+            self.modality_norm = nn.LayerNorm(d_model)
 
-            # 2. Modality Sequence Transformer Encoder (models inter-modality dependencies)
+            # ==============================================================
+            # STEP 3: Multi-Head Cross-Attention Across Modalities
+            # ==============================================================
+            self.inter_modality_attention = nn.MultiheadAttention(
+                embed_dim=d_model,
+                num_heads=nhead,
+                dropout=dropout,
+                batch_first=True,
+            )
+            self.attn_norm = nn.LayerNorm(d_model)
+
+            # ==============================================================
+            # STEP 4: Transformer Fusion Encoder Layers
+            # ==============================================================
             encoder_layer = nn.TransformerEncoderLayer(
-                d_model=hidden_dim,
+                d_model=d_model,
                 nhead=nhead,
-                dim_feedforward=hidden_dim * 4,
+                dim_feedforward=dim_feedforward,
                 dropout=dropout,
                 activation="gelu",
                 batch_first=True,
@@ -71,171 +153,316 @@ if TORCH_AVAILABLE:
                 num_layers=num_encoder_layers,
             )
 
-            # 3. Cross-Attention: Code Query attends to Explanation Key & Value
-            # Attention(Q, K, V) = softmax(Q K^T / sqrt(d_k)) V
-            self.cross_attn = nn.MultiheadAttention(
-                embed_dim=hidden_dim,
-                num_heads=nhead,
-                dropout=dropout,
-                batch_first=True,
-            )
-            self.ln_cross = nn.LayerNorm(hidden_dim)
-
-            # 4. Fusion Classification Head
-            # Concatenates: [Attended Code || Modality Token Pool || Process Representation]
-            fusion_dim = hidden_dim * 3
-            self.classifier = nn.Sequential(
-                nn.Linear(fusion_dim, hidden_dim),
+            # ==============================================================
+            # STEP 5: Fully Connected Dense Fusion Layer
+            # ==============================================================
+            # Concatenates all 5 encoded modality representations: (d_model * 5)
+            dense_input_dim = d_model * self.num_modalities
+            self.dense_fusion = nn.Sequential(
+                nn.Linear(dense_input_dim, d_model * 2),
+                nn.LayerNorm(d_model * 2),
                 nn.GELU(),
-                nn.Dropout(p=dropout),
-                nn.Linear(hidden_dim, num_classes),
+                nn.Dropout(dropout),
+                nn.Linear(d_model * 2, d_model),
+                nn.LayerNorm(d_model),
+            )
+
+            # ==============================================================
+            # STEP 6: 3-Class Classification Head
+            # ==============================================================
+            self.classifier = nn.Sequential(
+                nn.Dropout(dropout),
+                nn.Linear(d_model, num_classes),
             )
 
         def forward(
             self,
-            x_code: torch.Tensor,
-            x_viva: torch.Tensor,
-            x_proc: torch.Tensor,
-            key_padding_mask: Optional[torch.Tensor] = None,
-        ) -> Tuple[torch.Tensor, torch.Tensor]:
-            """Compute forward pass and return (class_logits, attention_weights)."""
-            # Project modalities to shared hidden space: (batch, hidden_dim)
-            h_code = self.dropout(self.ln_code(torch.relu(self.proj_code(x_code))))
-            h_viva = self.dropout(self.ln_viva(torch.relu(self.proj_viva(x_viva))))
-            h_proc = self.dropout(self.ln_proc(torch.relu(self.proj_proc(x_proc))))
+            proc_emb: torch.Tensor,                               # (B, proc_dim)
+            code_emb: torch.Tensor,                               # (B, code_dim)
+            exp_emb: torch.Tensor,                                # (B, exp_dim)
+            align_rep: Optional[torch.Tensor] = None,             # (B, align_dim)
+            num_features: Optional[torch.Tensor] = None,          # (B, num_features_dim)
+            modality_key_padding_mask: Optional[torch.Tensor] = None, # (B, 5) BoolTensor
+        ) -> Tuple[torch.Tensor, torch.Tensor, Dict[str, torch.Tensor]]:
+            """Forward pass through Multimodal Fusion Transformer.
+            
+            Returns:
+                logits: (B, 3) raw prediction scores
+                probabilities: (B, 3) softmax probabilities
+                attention_dict: cross-attention weights and intermediate activations
+            """
+            batch_size = proc_emb.size(0)
+            device = proc_emb.device
 
-            # Form sequence of modality tokens: (batch, 3, hidden_dim)
-            modality_seq = torch.stack([h_code, h_viva, h_proc], dim=1)
+            # Validate primary input tensor dimensions
+            if proc_emb.size(-1) != self.proc_dim:
+                raise ValueError(f"Expected proc_dim={self.proc_dim}, got {proc_emb.size(-1)}")
+            if code_emb.size(-1) != self.code_dim:
+                raise ValueError(f"Expected code_dim={self.code_dim}, got {code_emb.size(-1)}")
+            if exp_emb.size(-1) != self.exp_dim:
+                raise ValueError(f"Expected exp_dim={self.exp_dim}, got {exp_emb.size(-1)}")
 
-            # Apply Transformer Encoder across modalities
-            encoded_seq = self.transformer_encoder(
+            # Handle optional inputs gracefully with zero-padding
+            if align_rep is None:
+                align_rep = torch.zeros(batch_size, self.align_dim, device=device)
+            if num_features is None:
+                num_features = torch.zeros(batch_size, self.num_features_dim, device=device)
+
+            # --------------------------------------------------------------
+            # Step 1: Project modalities to common latent space d_model
+            # --------------------------------------------------------------
+            h_proc = self.proj_proc(proc_emb)   # (B, d_model)
+            h_code = self.proj_code(code_emb)   # (B, d_model)
+            h_exp = self.proj_exp(exp_emb)      # (B, d_model)
+            h_align = self.proj_align(align_rep) # (B, d_model)
+            h_num = self.proj_num(num_features) # (B, d_model)
+
+            # --------------------------------------------------------------
+            # Step 2: Add learnable modality type embeddings
+            # --------------------------------------------------------------
+            modality_ids = torch.arange(self.num_modalities, device=device)
+            type_embs = self.modality_type_embeddings(modality_ids)  # (5, d_model)
+
+            h_proc = self.modality_norm(h_proc + type_embs[0])
+            h_code = self.modality_norm(h_code + type_embs[1])
+            h_exp = self.modality_norm(h_exp + type_embs[2])
+            h_align = self.modality_norm(h_align + type_embs[3])
+            h_num = self.modality_norm(h_num + type_embs[4])
+
+            # Form sequence of 5 modality tokens: (B, 5, d_model)
+            modality_seq = torch.stack([h_proc, h_code, h_exp, h_align, h_num], dim=1)
+
+            # --------------------------------------------------------------
+            # Step 3: Multi-Head Inter-Modality Cross-Attention
+            # --------------------------------------------------------------
+            attn_out, attn_weights = self.inter_modality_attention(
                 modality_seq,
-                src_key_padding_mask=key_padding_mask,
+                modality_seq,
+                modality_seq,
+                key_padding_mask=modality_key_padding_mask,
             )
+            modality_seq = self.attn_norm(modality_seq + attn_out)
 
-            # Cross-Attention: Code queries Viva explanation tokens
-            q = h_code.unsqueeze(1)  # (batch, 1, hidden_dim)
-            k = h_viva.unsqueeze(1)  # (batch, 1, hidden_dim)
-            v = h_viva.unsqueeze(1)  # (batch, 1, hidden_dim)
+            # --------------------------------------------------------------
+            # Step 4: Transformer Fusion Encoder
+            # --------------------------------------------------------------
+            encoded_modalities = self.transformer_encoder(
+                modality_seq,
+                src_key_padding_mask=modality_key_padding_mask,
+            )  # (B, 5, d_model)
 
-            attn_output, attn_weights = self.cross_attn(q, k, v)
-            attended_code = self.ln_cross(h_code + attn_output.squeeze(1))
+            # --------------------------------------------------------------
+            # Step 5: Fully Connected Dense Fusion Layer
+            # --------------------------------------------------------------
+            # Flatten tokens across modality dimension: (B, 5 * d_model)
+            flattened = encoded_modalities.reshape(batch_size, -1)
+            fused_rep = self.dense_fusion(flattened)  # (B, d_model)
 
-            # Global average pool of encoded sequence tokens
-            seq_pool = encoded_seq.mean(dim=1)
+            # --------------------------------------------------------------
+            # Step 6: 3-Class Classification Head & Softmax
+            # --------------------------------------------------------------
+            logits = self.classifier(fused_rep)  # (B, 3)
+            probs = torch.softmax(logits, dim=-1)
 
-            # Fused multimodal embedding: (batch, hidden_dim * 3)
-            fused = torch.cat([attended_code, seq_pool, h_proc], dim=-1)
+            attention_dict = {
+                "cross_attention_weights": attn_weights,
+                "fused_representation": fused_rep,
+                "encoded_modalities": encoded_modalities,
+            }
 
-            logits = self.classifier(fused)
-            return logits, attn_output.squeeze(1)
+            return logits, probs, attention_dict
+
+
+    # Backward compatibility alias for legacy callers
+    PyTorchMultimodalTransformerModel = MultimodalFusionTransformerModel
 
 
 class MultimodalCrossAttentionFusion:
-    """High-level interface for training, evaluation, inference, and checkpointing.
+    """High-level service API for the Multimodal Fusion Transformer.
     
-    Seamlessly operates on PyTorch with MPS / CPU acceleration, and provides
-    transparent metadata on whether the model is loaded, trained, or experimental.
+    Provides training, evaluation, inference, and serialization utilities with
+    device detection (Apple Silicon MPS / CUDA / CPU) and full backward compatibility.
     """
 
     def __init__(
         self,
-        code_dim: int = 16,
-        viva_dim: int = 16,
-        proc_dim: int = 8,
+        code_dim: int = 768,
+        viva_dim: int = 384,
+        proc_dim: int = 64,
+        align_dim: int = 64,
+        num_features_dim: int = 24,
         hidden_dim: int = 32,
         nhead: int = 4,
         num_encoder_layers: int = 2,
         num_classes: int = 3,
         dropout: float = 0.1,
         seed: int = 42,
-        device: Optional[str] = None,
     ):
         self.code_dim = code_dim
         self.viva_dim = viva_dim
         self.proc_dim = proc_dim
+        self.align_dim = align_dim
+        self.num_features_dim = num_features_dim
         self.hidden_dim = hidden_dim
         self.num_classes = num_classes
-        self.seed = seed
+        self.model_name = "Multimodal Cross-Attention Transformer"
+        self.model_framework = "PyTorch" if TORCH_AVAILABLE else "NumPy"
         self.is_trained = False
-        self.model_framework = "PyTorch" if TORCH_AVAILABLE else "NumPy-Fallback"
-        self.model_name = "PyTorch Multimodal Cross-Attention Transformer"
+        self.device = "cpu"
 
-        # Resolve compute device
         if TORCH_AVAILABLE:
+            from app.ml.codebert_embedder import get_optimal_device
+            self.device = get_optimal_device()
             torch.manual_seed(seed)
             np.random.seed(seed)
-            if device:
-                self.device = torch.device(device)
-            elif torch.backends.mps.is_available():
-                self.device = torch.device("mps")
-            elif torch.cuda.is_available():
-                self.device = torch.device("cuda")
-            else:
-                self.device = torch.device("cpu")
 
-            self.model = PyTorchMultimodalTransformerModel(
+            # Initialize Alignment Module and Fusion Model
+            self.alignment_module = CrossModalSemanticAlignment(
                 code_dim=code_dim,
-                viva_dim=viva_dim,
-                proc_dim=proc_dim,
-                hidden_dim=hidden_dim,
-                nhead=nhead,
-                num_encoder_layers=num_encoder_layers,
-                num_classes=num_classes,
+                exp_dim=viva_dim,
+                ast_dim=16,
+                exec_dim=4,
+                d_align=128,
+                alignment_dim=align_dim,
                 dropout=dropout,
             ).to(self.device)
+
+            self.model = MultimodalFusionTransformerModel(
+                proc_dim=proc_dim,
+                code_dim=code_dim,
+                exp_dim=viva_dim,
+                align_dim=align_dim,
+                num_features_dim=num_features_dim,
+                d_model=hidden_dim,
+                nhead=nhead,
+                num_encoder_layers=num_encoder_layers,
+                dropout=dropout,
+                num_classes=num_classes,
+            ).to(self.device)
+            self.model.eval()
         else:
-            self.device = "cpu"
+            self.alignment_module = None
             self.model = None
 
-    def _split_input_matrix(self, X: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-        """Split 2D feature matrix (N, 40) into code, viva, and process slices."""
-        if X.ndim == 1:
-            X = X.reshape(1, -1)
-        x_code = X[:, : self.code_dim]
-        x_viva = X[:, self.code_dim : self.code_dim + self.viva_dim]
-        x_proc = X[:, self.code_dim + self.viva_dim : self.code_dim + self.viva_dim + self.proc_dim]
-        return x_code.astype(np.float32), x_viva.astype(np.float32), x_proc.astype(np.float32)
-
-    def fit(
+    def forward(
         self,
-        X: Union[np.ndarray, Tuple[np.ndarray, np.ndarray, np.ndarray]],
-        y: np.ndarray,
-        val_data: Optional[Tuple[Any, np.ndarray]] = None,
-        epochs: int = 25,
-        lr: float = 0.003,
-        batch_size: int = 16,
-        weight_decay: float = 1e-4,
-    ) -> Dict[str, Any]:
-        """Train the PyTorch Transformer model with backpropagation and validation."""
+        x_code: Union[np.ndarray, torch.Tensor],
+        x_viva: Union[np.ndarray, torch.Tensor],
+        x_proc: Union[np.ndarray, torch.Tensor],
+        align_rep: Optional[Union[np.ndarray, torch.Tensor]] = None,
+        num_features: Optional[Union[np.ndarray, torch.Tensor]] = None,
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        """Compute forward pass and return (probs, attention_rep).
+        
+        Seamlessly handles both 768/384/64 inputs and legacy 16/16/8 inputs via adaptive projection.
+        """
+        if not TORCH_AVAILABLE or self.model is None:
+            # Fallback for NumPy
+            B = x_code.shape[0] if hasattr(x_code, "shape") else 1
+            return np.ones((B, self.num_classes)) / self.num_classes, np.zeros((B, self.hidden_dim))
+
+        # Convert NumPy inputs to PyTorch tensors
+        def to_tensor(arr, expected_dim):
+            if arr is None:
+                return None
+            if isinstance(arr, np.ndarray):
+                t = torch.from_numpy(arr).float()
+            else:
+                t = arr.float()
+            if t.dim() == 1:
+                t = t.unsqueeze(0)
+            # Adaptive zero-padding or linear pad if legacy dimension is passed
+            if t.size(-1) < expected_dim:
+                pad = torch.zeros(t.size(0), expected_dim - t.size(-1), device=t.device)
+                t = torch.cat([t, pad], dim=-1)
+            elif t.size(-1) > expected_dim:
+                t = t[:, :expected_dim]
+            return t.to(self.device)
+
+        t_code = to_tensor(x_code, self.code_dim)
+        t_viva = to_tensor(x_viva, self.viva_dim)
+        t_proc = to_tensor(x_proc, self.proc_dim)
+        t_align = to_tensor(align_rep, self.align_dim) if align_rep is not None else None
+        t_num = to_tensor(num_features, self.num_features_dim) if num_features is not None else None
+
+        # If align_rep was not provided, compute it via alignment_module
+        if t_align is None and self.alignment_module is not None:
+            with torch.no_grad():
+                t_align, _, _ = self.alignment_module(t_code, t_viva)
+
+        with torch.no_grad():
+            logits, probs, attn_dict = self.model(
+                proc_emb=t_proc,
+                code_emb=t_code,
+                exp_emb=t_viva,
+                align_rep=t_align,
+                num_features=t_num,
+            )
+            probs_np = probs.cpu().numpy()
+            fused_np = attn_dict["fused_representation"].cpu().numpy()
+
+        return probs_np, fused_np
+
+    def predict_proba(self, X: np.ndarray) -> np.ndarray:
+        """Predict class probabilities for multimodal feature matrix X."""
+        if X.ndim == 1:
+            X = X[np.newaxis, :]
+        B = X.shape[0]
+
+        # Support 40-D legacy feature matrix: (code:16, viva:16, proc:8)
+        if X.shape[1] == 40:
+            x_code = X[:, :16]
+            x_viva = X[:, 16:32]
+            x_proc = X[:, 32:40]
+            probs, _ = self.forward(x_code, x_viva, x_proc)
+            return probs
+
+        # Support full concatenated feature matrix
+        x_code = X[:, :self.code_dim] if X.shape[1] >= self.code_dim else X
+        x_viva = X[:, self.code_dim:self.code_dim + self.viva_dim] if X.shape[1] >= (self.code_dim + self.viva_dim) else np.zeros((B, self.viva_dim))
+        x_proc = X[:, -self.proc_dim:] if X.shape[1] >= self.proc_dim else np.zeros((B, self.proc_dim))
+
+        probs, _ = self.forward(x_code, x_viva, x_proc)
+        return probs
+
+    def fit(self, X: np.ndarray, y: np.ndarray, epochs: int = 25, lr: float = 0.003, batch_size: int = 16) -> Dict[str, Any]:
+        """Architecturally prepare and support training across trainable parameters."""
         if not TORCH_AVAILABLE:
             self.is_trained = True
-            return {"epochs_trained": epochs, "framework": self.model_framework}
+            return {"epochs": epochs, "loss": 0.0, "framework": "NumPy"}
 
-        if isinstance(X, tuple):
-            x_code, x_viva, x_proc = X
+        effective_lr = min(lr, 0.005)
+        self.model.train()
+        optimizer = optim.AdamW(self.model.parameters(), lr=effective_lr, weight_decay=1e-4)
+        criterion = nn.CrossEntropyLoss()
+
+        B = X.shape[0]
+        if X.shape[1] == 40:
+            x_code = X[:, :16]
+            x_viva = X[:, 16:32]
+            x_proc = X[:, 32:40]
         else:
-            x_code, x_viva, x_proc = self._split_input_matrix(X)
+            x_code = X[:, :min(X.shape[1], 16)]
+            x_viva = X[:, 16:min(X.shape[1], 32)]
+            x_proc = X[:, -min(X.shape[1], 8):]
 
-        t_code = torch.tensor(x_code, dtype=torch.float32)
-        t_viva = torch.tensor(x_viva, dtype=torch.float32)
-        t_proc = torch.tensor(x_proc, dtype=torch.float32)
-        t_y = torch.tensor(y, dtype=torch.long)
+        def to_pad_tensor(arr, dim):
+            t = torch.from_numpy(arr).float()
+            if t.size(1) < dim:
+                pad = torch.zeros(B, dim - t.size(1))
+                t = torch.cat([t, pad], dim=-1)
+            return t
+
+        t_code = to_pad_tensor(x_code, self.code_dim)
+        t_viva = to_pad_tensor(x_viva, self.viva_dim)
+        t_proc = to_pad_tensor(x_proc, self.proc_dim)
+        t_y = torch.from_numpy(y).long()
 
         dataset = TensorDataset(t_code, t_viva, t_proc, t_y)
         loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
-        optimizer = optim.AdamW(self.model.parameters(), lr=lr, weight_decay=weight_decay)
-        criterion = nn.CrossEntropyLoss()
-
-        self.model.train()
-        history = []
-
-        for epoch in range(epochs):
-            epoch_loss = 0.0
-            correct = 0
-            total = 0
-
+        last_loss = 0.0
+        for _ in range(epochs):
             for b_code, b_viva, b_proc, b_y in loader:
                 b_code = b_code.to(self.device)
                 b_viva = b_viva.to(self.device)
@@ -243,143 +470,214 @@ class MultimodalCrossAttentionFusion:
                 b_y = b_y.to(self.device)
 
                 optimizer.zero_grad()
-                logits, _ = self.model(b_code, b_viva, b_proc)
+                logits, _, _ = self.model(proc_emb=b_proc, code_emb=b_code, exp_emb=b_viva)
                 loss = criterion(logits, b_y)
                 loss.backward()
                 nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=1.0)
                 optimizer.step()
+                last_loss = float(loss.item())
 
-                epoch_loss += loss.item() * len(b_y)
-                preds = logits.argmax(dim=-1)
-                correct += (preds == b_y).sum().item()
-                total += len(b_y)
-
-            train_acc = correct / max(total, 1)
-            train_loss = epoch_loss / max(total, 1)
-            history.append({"epoch": epoch + 1, "loss": train_loss, "accuracy": train_acc})
-
+        self.model.eval()
         self.is_trained = True
-        return {
-            "epochs_trained": epochs,
-            "final_train_loss": round(history[-1]["loss"], 4),
-            "final_train_accuracy": round(history[-1]["accuracy"], 4),
-            "device": str(self.device),
-            "framework": "PyTorch",
-        }
+        return {"epochs": epochs, "final_loss": round(last_loss, 4), "framework": "PyTorch"}
 
-    def predict_proba(
-        self,
-        X: Union[np.ndarray, Tuple[np.ndarray, np.ndarray, np.ndarray]],
-    ) -> np.ndarray:
-        """Inference returning class probabilities (Softmax)."""
-        if not TORCH_AVAILABLE:
-            if isinstance(X, tuple):
-                n_samples = len(X[0])
-            else:
-                n_samples = len(X)
-            probs = np.full((n_samples, self.num_classes), 1.0 / self.num_classes, dtype=np.float32)
-            return probs
-
-        if isinstance(X, tuple):
-            x_code, x_viva, x_proc = X
-        else:
-            x_code, x_viva, x_proc = self._split_input_matrix(X)
-
-        self.model.eval()
-        with torch.no_grad():
-            t_code = torch.tensor(x_code, dtype=torch.float32).to(self.device)
-            t_viva = torch.tensor(x_viva, dtype=torch.float32).to(self.device)
-            t_proc = torch.tensor(x_proc, dtype=torch.float32).to(self.device)
-
-            logits, _ = self.model(t_code, t_viva, t_proc)
-            probs = torch.softmax(logits, dim=-1).cpu().numpy()
-            return probs
-
-    def predict(
-        self,
-        X: Union[np.ndarray, Tuple[np.ndarray, np.ndarray, np.ndarray]],
-    ) -> np.ndarray:
-        """Inference returning predicted class labels."""
+    def evaluate(self, X: np.ndarray, y: np.ndarray) -> Dict[str, Any]:
+        """Compute evaluation metrics on validation/test split."""
         probs = self.predict_proba(X)
-        return probs.argmax(axis=-1)
+        preds = np.argmax(probs, axis=1)
+        acc = float(np.mean(preds == y))
 
-    def forward(
-        self,
-        x_code: np.ndarray,
-        x_viva: np.ndarray,
-        x_proc: np.ndarray,
-    ) -> Tuple[np.ndarray, np.ndarray]:
-        """Forward pass for compatibility returning (probabilities, attention_weights)."""
-        if not TORCH_AVAILABLE:
-            probs = np.full((len(x_code), self.num_classes), 1.0 / self.num_classes, dtype=np.float32)
-            attn = np.ones((len(x_code), self.hidden_dim), dtype=np.float32)
-            return probs, attn
+        f1_list = []
+        for c in range(self.num_classes):
+            tp = np.sum((preds == c) & (y == c))
+            fp = np.sum((preds == c) & (y != c))
+            fn = np.sum((preds != c) & (y == c))
+            prec = tp / (tp + fp) if (tp + fp) > 0 else 0.0
+            rec = tp / (tp + fn) if (tp + fn) > 0 else 0.0
+            f1 = 2 * prec * rec / (prec + rec) if (prec + rec) > 0 else 0.0
+            f1_list.append(f1)
 
-        self.model.eval()
-        with torch.no_grad():
-            t_code = torch.tensor(x_code, dtype=torch.float32).to(self.device)
-            t_viva = torch.tensor(x_viva, dtype=torch.float32).to(self.device)
-            t_proc = torch.tensor(x_proc, dtype=torch.float32).to(self.device)
-
-            logits, attn = self.model(t_code, t_viva, t_proc)
-            probs = torch.softmax(logits, dim=-1).cpu().numpy()
-            attn_weights = attn.cpu().numpy()
-            return probs, attn_weights
-
-    def evaluate(
-        self,
-        X: Union[np.ndarray, Tuple[np.ndarray, np.ndarray, np.ndarray]],
-        y: np.ndarray,
-    ) -> Dict[str, Any]:
-        """Compute standard metrics on test set."""
-        from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, confusion_matrix
-
-        preds = self.predict(X)
-        probs = self.predict_proba(X)
-
-        acc = float(accuracy_score(y, preds))
-        macro_f1 = float(f1_score(y, preds, average="macro", zero_division=0))
-        prec = float(precision_score(y, preds, average="macro", zero_division=0))
-        rec = float(recall_score(y, preds, average="macro", zero_division=0))
-        cm = confusion_matrix(y, preds, labels=[0, 1, 2]).tolist()
+        macro_f1 = float(np.mean(f1_list))
+        cm = np.zeros((self.num_classes, self.num_classes), dtype=int)
+        for true_c, pred_c in zip(y, preds):
+            cm[int(true_c), int(pred_c)] += 1
 
         return {
             "accuracy": round(acc, 4),
             "macro_f1": round(macro_f1, 4),
-            "precision": round(prec, 4),
-            "recall": round(rec, 4),
-            "confusion_matrix": cm,
-            "device": str(self.device),
-            "is_trained": self.is_trained,
+            "confusion_matrix": cm.tolist(),
         }
 
-    def save_checkpoint(self, filepath: str):
-        """Save PyTorch weights and model configuration to checkpoint."""
-        if not TORCH_AVAILABLE:
-            raise RuntimeError("Cannot save PyTorch checkpoint: PyTorch not installed.")
-        os.makedirs(os.path.dirname(filepath), exist_ok=True)
-        torch.save(
-            {
-                "model_state_dict": self.model.state_dict(),
-                "config": {
-                    "code_dim": self.code_dim,
-                    "viva_dim": self.viva_dim,
-                    "proc_dim": self.proc_dim,
-                    "hidden_dim": self.hidden_dim,
-                    "num_classes": self.num_classes,
-                    "seed": self.seed,
-                },
+    def save_checkpoint(self, path: str):
+        """Save PyTorch weights to disk."""
+        if TORCH_AVAILABLE and self.model is not None:
+            os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+            torch.save({
+                "model_state": self.model.state_dict(),
+                "align_state": self.alignment_module.state_dict() if self.alignment_module else None,
                 "is_trained": self.is_trained,
-            },
-            filepath,
-        )
-        logger.info(f"Saved PyTorch multimodal checkpoint to: {filepath}")
+            }, path)
 
-    def load_checkpoint(self, filepath: str):
-        """Load PyTorch model weights from saved checkpoint."""
-        if not TORCH_AVAILABLE:
-            raise RuntimeError("Cannot load PyTorch checkpoint: PyTorch not installed.")
-        checkpoint = torch.load(filepath, map_location=self.device)
-        self.model.load_state_dict(checkpoint["model_state_dict"])
-        self.is_trained = checkpoint.get("is_trained", True)
-        logger.info(f"Loaded PyTorch multimodal checkpoint from: {filepath}")
+    def load_checkpoint(self, path: str):
+        """Load PyTorch weights from disk."""
+        if TORCH_AVAILABLE and self.model is not None and os.path.exists(path):
+            ckpt = torch.load(path, map_location=self.device)
+            self.model.load_state_dict(ckpt["model_state"])
+            if ckpt.get("align_state") and self.alignment_module:
+                self.alignment_module.load_state_dict(ckpt["align_state"])
+            self.is_trained = ckpt.get("is_trained", False)
+
+    DEFAULT_CHECKPOINT_PATH = os.path.join(
+        os.path.dirname(__file__), "checkpoints", "fusion_transformer_best.pt"
+    )
+
+    def is_trained_checkpoint_available(self, checkpoint_path: Optional[str] = None) -> bool:
+        """Check if a valid trained checkpoint file exists on disk."""
+        path = checkpoint_path or self.DEFAULT_CHECKPOINT_PATH
+        return os.path.exists(path)
+
+    def predict_session_bundle(
+        self,
+        bundle: Any,
+        allow_untrained: bool = False,
+    ) -> MultimodalPredictionResult:
+        """Execute multimodal prediction obeying evidence validation and checkpoint requirements.
+        
+        Rules:
+        - If required evidence (code, viva explanations) is missing: returns INSUFFICIENT_EVIDENCE.
+        - If no trained checkpoint exists (and allow_untrained=False): returns MODEL_NOT_TRAINED.
+          (Does not present random weights as genuine predictions).
+        - If trained checkpoint is loaded: runs forward pass, picks argmax(probabilities), returns READY.
+        """
+        from app.ml.feature_preprocessor import NumericalFeaturePreprocessor
+        from app.ml.codebert_embedder import CodeBERTEmbedder
+        from app.ml.sentence_transformer_embedder import SentenceTransformerEmbedder
+        from app.ml.process_transformer import ProcessTransformerEncoder
+
+        # 1. Modality Availability Check
+        has_code = bool(bundle.code and bundle.code.code and bundle.code.code.strip())
+        has_exp = bool(bundle.explanation and bundle.explanation.full_transcript and bundle.explanation.full_transcript.strip())
+        has_proc = bool(bundle.process and (bundle.process.events or bundle.process.numerical_features))
+
+        modality_avail = {
+            "code": has_code,
+            "explanation": has_exp,
+            "process": has_proc,
+        }
+
+        # 2. Extract supporting numerical formula scores regardless of model status
+        _, fdict = NumericalFeaturePreprocessor.transform(
+            ast_summary=bundle.code.ast_summary if bundle.code else None,
+            exec_output=bundle.code.execution_output if bundle.code else None,
+            err_output=bundle.code.error_output if bundle.code else None,
+            exit_code=bundle.code.exit_code if bundle.code else 0,
+            is_valid=bundle.code.is_valid if bundle.code else True,
+            viva_assessments=bundle.explanation.answers if bundle.explanation else None,
+            telemetry_features=bundle.process.numerical_features if bundle.process else None,
+        )
+        supporting_scores = {
+            "S_AST": fdict.get("s_ast"),
+            "S_EXEC": fdict.get("s_exec"),
+            "S_VIVA": fdict.get("s_viva"),
+            "S_PROCESS": fdict.get("s_process"),
+            "S_OVERALL": fdict.get("s_overall"),
+            "S_INC": fdict.get("s_inc"),
+            "S_DEBUG": fdict.get("s_debug"),
+            "S_REV": fdict.get("s_rev"),
+            "S_TEST": fdict.get("s_test"),
+        }
+
+        # 3. Evidence Validation Check
+        if not has_code or not has_exp:
+            return MultimodalPredictionResult(
+                model_status="INSUFFICIENT_EVIDENCE",
+                predicted_class=None,
+                class_probabilities=None,
+                modality_availability=modality_avail,
+                supporting_feature_scores=supporting_scores,
+                needs_instructor_review=True,
+                confidence=0.0,
+            )
+
+        # 4. Checkpoint Status Check
+        if not self.is_trained and not allow_untrained:
+            if self.is_trained_checkpoint_available():
+                self.load_checkpoint(self.DEFAULT_CHECKPOINT_PATH)
+            
+            if not self.is_trained and not allow_untrained:
+                return MultimodalPredictionResult(
+                    model_status="MODEL_NOT_TRAINED",
+                    predicted_class=None,
+                    class_probabilities=None,
+                    modality_availability=modality_avail,
+                    supporting_feature_scores=supporting_scores,
+                    needs_instructor_review=True,
+                    confidence=0.0,
+                )
+
+        # 5. Extract Full Modal Representations
+        code_t = CodeBERTEmbedder.extract_tensor(bundle.code.code, device=self.device)
+        exp_t = SentenceTransformerEmbedder.extract_tensor(bundle.explanation.full_transcript, device=self.device)
+
+        proc_encoder = ProcessTransformerEncoder(output_dim=self.proc_dim)
+        proc_vec = proc_encoder.encode_sequence(bundle.process.events if bundle.process else [])
+        proc_t = torch.from_numpy(proc_vec).unsqueeze(0).float().to(self.device)
+
+        num_vec, _ = NumericalFeaturePreprocessor.transform(
+            ast_summary=bundle.code.ast_summary if bundle.code else None,
+            exec_output=bundle.code.execution_output if bundle.code else None,
+            err_output=bundle.code.error_output if bundle.code else None,
+            exit_code=bundle.code.exit_code if bundle.code else 0,
+            is_valid=bundle.code.is_valid if bundle.code else True,
+            viva_assessments=bundle.explanation.answers if bundle.explanation else None,
+            telemetry_features=bundle.process.numerical_features if bundle.process else None,
+        )
+        num_t = torch.from_numpy(num_vec).unsqueeze(0).float().to(self.device)
+
+        align_t = None
+        if self.alignment_module:
+            ast_t = num_t[:, 15:31] if num_t.size(1) >= 31 else None
+            align_t, _, _ = self.alignment_module(code_t, exp_t, ast_t)
+
+        with torch.no_grad():
+            logits, probs, attn_dict = self.model(
+                proc_emb=proc_t,
+                code_emb=code_t,
+                exp_emb=exp_t,
+                align_rep=align_t,
+                num_features=num_t,
+            )
+            probs_np = probs.cpu().numpy()[0]
+            pred_idx = int(np.argmax(probs_np))
+            pred_class = LABELS[pred_idx]
+            conf = float(probs_np[pred_idx])
+
+        class_probs = {LABELS[i]: round(float(probs_np[i]), 4) for i in range(len(LABELS))}
+
+        return MultimodalPredictionResult(
+            model_status="READY",
+            predicted_class=pred_class,
+            class_probabilities=class_probs,
+            modality_availability=modality_avail,
+            supporting_feature_scores=supporting_scores,
+            needs_instructor_review=(pred_class == "Possible Misconception"),
+            confidence=round(conf, 4),
+            attention_summary={
+                "predicted_label": pred_class,
+                "confidence": round(conf, 4),
+            },
+        )
+
+
+_GLOBAL_TRANSFORMER_INSTANCE: Optional[MultimodalCrossAttentionFusion] = None
+
+
+def get_multimodal_transformer() -> MultimodalCrossAttentionFusion:
+    """Return the global MultimodalCrossAttentionFusion singleton, loading checkpoint if available."""
+    global _GLOBAL_TRANSFORMER_INSTANCE
+    if _GLOBAL_TRANSFORMER_INSTANCE is None:
+        _GLOBAL_TRANSFORMER_INSTANCE = MultimodalCrossAttentionFusion(seed=42)
+        if _GLOBAL_TRANSFORMER_INSTANCE.is_trained_checkpoint_available():
+            _GLOBAL_TRANSFORMER_INSTANCE.load_checkpoint(_GLOBAL_TRANSFORMER_INSTANCE.DEFAULT_CHECKPOINT_PATH)
+    return _GLOBAL_TRANSFORMER_INSTANCE
+

@@ -185,6 +185,28 @@ class SentenceTransformerEmbedder:
         return np.zeros(cls.EMBEDDING_DIM, dtype=np.float32)
 
     @classmethod
+    def extract_tensor(cls, text: str, max_length: int = 128, device: Optional[str] = None) -> Any:
+        """Extract Sentence-Transformer embedding as a torch.Tensor with shape (1, 384)."""
+        import torch
+        emb = cls.extract_embedding(text, max_length)
+        t = torch.from_numpy(emb).unsqueeze(0).float()
+        if device is not None:
+            t = t.to(device)
+        return t
+
+    @classmethod
+    def extract_qa_embedding(cls, question: str, answer: str, concept: Optional[str] = None) -> np.ndarray:
+        """Extract explanation representation preserving the associated question and concept context."""
+        if not answer or not answer.strip():
+            return cls.extract_embedding("")
+
+        prefix = f"Question: {question}" if question else ""
+        if concept:
+            prefix += f" (Concept: {concept})"
+        full_text = f"{prefix} Student Explanation: {answer}" if prefix else answer
+        return cls.extract_embedding(full_text)
+
+    @classmethod
     def extract_projected(cls, text: str, target_dim: int = 16) -> np.ndarray:
         """Linearly pool/project Sentence-Transformer embedding to target dimensions."""
         full_emb = cls.extract_embedding(text)

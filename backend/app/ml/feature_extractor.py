@@ -186,10 +186,12 @@ class ProcessFeatureExtractor:
 
 
 class MultimodalFeatureExtractor:
-    """Combines AST (16-D), Explanation (16-D), Process (8-D), and optional CodeBERT (768-D)."""
+    """Combines AST (16-D), Explanation (16-D), Process (8-D), and pretrained encoders."""
 
     TOTAL_DIM = 40
     CODEBERT_DIM = 768
+    SENTENCE_TRANSFORMER_DIM = 384
+    PROCESS_TRANSFORMER_DIM = 64
 
     @classmethod
     def is_codebert_available(cls) -> bool:
@@ -200,6 +202,44 @@ class MultimodalFeatureExtractor:
     def extract_codebert(cls, code: str) -> np.ndarray:
         """Extract 768-dimensional CodeBERT embedding directly."""
         return CodeBERTEmbedder.extract_embedding(code)
+
+    @classmethod
+    def extract_full_representations(
+        cls,
+        code: str,
+        explanation: str,
+        process_events: Optional[List[Dict[str, Any]]] = None,
+        process_features: Any = None,
+        ast_summary: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, np.ndarray]:
+        """Extract full-dimensional multimodal representations across all pretrained encoders."""
+        from app.ml.sentence_transformer_embedder import SentenceTransformerEmbedder
+        from app.ml.process_transformer import ProcessTransformerEncoder
+
+        # 1. CodeBERT 768-D
+        code_emb = CodeBERTEmbedder.extract_embedding(code)
+
+        # 2. Sentence-Transformer 384-D
+        exp_emb = SentenceTransformerEmbedder.extract_embedding(explanation)
+
+        # 3. Process Transformer representation (64-D)
+        proc_encoder = ProcessTransformerEncoder(output_dim=64)
+        proc_global = ProcessFeatureExtractor.extract(process_features)
+        proc_emb = proc_encoder.encode_sequence(process_events or [], global_features=proc_global)
+
+        # 4. AST 16-D
+        ast_vec = ASTFeatureExtractor.extract(code, ast_summary)
+
+        # 5. Combined Numerical Features (AST 16-D + Process 8-D = 24-D)
+        num_vec = np.concatenate([ast_vec, proc_global], axis=-1).astype(np.float32)
+
+        return {
+            "code_emb": code_emb,
+            "exp_emb": exp_emb,
+            "proc_emb": proc_emb,
+            "ast_vec": ast_vec,
+            "num_vec": num_vec,
+        }
 
     @classmethod
     def extract(

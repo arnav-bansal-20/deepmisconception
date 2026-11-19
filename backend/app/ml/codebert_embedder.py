@@ -181,6 +181,16 @@ class CodeBERTEmbedder:
         return np.zeros(cls.EMBEDDING_DIM, dtype=np.float32)
 
     @classmethod
+    def extract_tensor(cls, code: str, max_length: int = 256, device: Optional[str] = None) -> Any:
+        """Extract [CLS] embedding as a torch.Tensor with shape (1, 768)."""
+        import torch
+        emb = cls.extract_embedding(code, max_length)
+        t = torch.from_numpy(emb).unsqueeze(0).float()
+        if device is not None:
+            t = t.to(device)
+        return t
+
+    @classmethod
     def extract_projected(cls, code: str, target_dim: int = 16) -> np.ndarray:
         """Linearly pool/project CodeBERT embedding to target dimensions."""
         full_emb = cls.extract_embedding(code)

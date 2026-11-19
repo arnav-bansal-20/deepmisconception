@@ -178,27 +178,28 @@ $$\text{score}(a_i) = \begin{cases}
 
 ---
 
-## 6. Diagnostic Verdict Classification & Confidence Calibration
+## 6. Mathematical Formulas as Numerical Input Features (Architectural Transition)
 
-### 6.1 Verdict Rules
+> **Architectural Transition Statement:**
+> "The multimodal architecture and prediction integration are being prepared. The final dataset has not yet been generated, and project-specific model training and evaluation are future development stages."
+>
+> In accordance with the multimodal Transformer methodology, the rule-based if-else classifications below have been **strictly retired as decision-making mechanisms**. They are retained solely as numerical supporting features and baseline comparators. The final misconception label is assigned **exclusively by the Multimodal Fusion Transformer**.
 
-The categorical verdict is determined by combining $S_{\text{overall}}$ with cross-modal consistency rules:
+### 6.1 Legacy Decision Boundary (Now Used for Baseline Comparison Only)
 
-$$\text{Verdict} = \begin{cases}
+$$\text{Verdict}_{\text{baseline}} = \begin{cases}
 \text{"Insufficient Evidence"} & \text{if } N_{\text{answers}} = 0 \text{ or all answers empty whitespace} \\
 \text{"Possible Misconception"} & \text{if } (S_{\text{overall}} < 0.50 \text{ with errors}) \lor (N_{\text{incorrect}} \ge 2) \lor (N_{\text{contradictions}} \ge 2) \\
 \text{"Understood"} & \text{if } S_{\text{overall}} \ge 0.70 \land N_{\text{incorrect}} = 0 \land N_{\text{contradictions}} = 0 \land \forall a \in \text{valid}: a = \text{"Correct"} \\
 \text{"Partial Understanding"} & \text{otherwise (default balanced state: } 0.50 \le S_{\text{overall}} < 0.70\text{)}
 \end{cases}$$
 
-### 6.2 Diagnostic Confidence ($\text{Conf}$)
-
-$$\text{Conf} = \begin{cases}
-\max(0.75, \min(0.98, S_{\text{overall}})) & \text{for "Understood"} \\
-\max(0.70, \min(0.95, 0.60 + 0.10 \cdot \max(N_{\text{incorrect}}, N_{\text{misconceptions}}))) & \text{for "Possible Misconception"} \\
-\max(0.60, \min(0.85, S_{\text{overall}} + 0.05)) & \text{for "Partial Understanding"} \\
-0.35 & \text{for "Insufficient Evidence"}
-\end{cases}$$
+### 6.2 Preprocessed Numerical Feature Vector (24-D)
+The numerical feature vector is normalized to $[0.0, 1.0]$ by `NumericalFeaturePreprocessor` and fed into the Transformer:
+- **Indices 0–8**: Formula scores ($S_{\text{overall}}$ masked to $0.0$ by default to prevent redundant composite leakage, $S_{\text{ast}}, S_{\text{exec}}, S_{\text{viva}}, S_{\text{process}}, S_{\text{inc}}, S_{\text{debug}}, S_{\text{rev}}, S_{\text{test}}$).
+- **Indices 9–14**: Telemetry metrics (paste ratio, burstiness ratio, duration, event count, error recovery rate, CPM).
+- **Indices 15–19**: AST complexity metrics (cyclomatic complexity, nodes, lines, depth, recursion).
+- **Indices 20–23**: Execution runtime flags (syntax validity, exit code 0, error flag, stdout flag).
 
 ---
 

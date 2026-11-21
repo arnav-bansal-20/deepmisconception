@@ -60,6 +60,7 @@ class NumericalFeaturePreprocessor:
         viva_assessments: Optional[List[Any]] = None,
         telemetry_features: Optional[Any] = None,
         include_s_overall: bool = False,
+        include_s_viva: bool = False,
         feature_mode: str = "default",
     ) -> Tuple[np.ndarray, Dict[str, float]]:
         """Transform multimodal inputs into a normalized numerical feature vector (24-D).
@@ -68,12 +69,17 @@ class NumericalFeaturePreprocessor:
             include_s_overall: If False (default), s_overall is masked to 0.0 in the input vector
                 to prevent redundant composite score leakage into the Transformer, while preserving
                 s_overall in the returned feature dictionary for baseline reporting.
+            include_s_viva: If False (default), s_viva is masked to 0.0 in the input vector
+                to prevent evaluator-derived target leakage into the Transformer. Viva text is already
+                encoded by Sentence-Transformer; evaluator rubric assessments must not enter the model.
+                Only set to True in explicitly designated leakage-diagnostic ablation probes.
             feature_mode: Modular configuration for ablation studies:
-                - "default": Individual formula components + AST/telemetry metrics (s_overall masked).
-                - "no_formula": Zero out all formula-derived scores.
+                - "default": Individual formula components + AST/telemetry metrics (s_overall and s_viva masked).
+                - "no_formula": Zero out all formula-derived scores (indices 0..8).
                 - "individual_formula_only": Only individual formula components (telemetry zeroed).
                 - "telemetry_only": Only raw telemetry and AST complexity (formulas zeroed).
-                - "full_with_overall": All features including s_overall.
+                - "leakage_probe_with_viva": Explicit ablation probe unmasking s_viva.
+                - "full_with_overall": All features including s_overall (for comparison/baseline only).
         
         Returns:
             vector: (24,) float32 numpy array normalized to [0, 1]
@@ -187,10 +193,17 @@ class NumericalFeaturePreprocessor:
         if not include_s_overall and feature_mode != "full_with_overall":
             vec[0] = 0.0  # Mask s_overall to prevent redundant composite leakage
 
+        # CRITICAL LEAKAGE PREVENTION: Mask s_viva (index 3) from primary model input
+        # S_VIVA is computed from evaluator rubric annotations (answer_label) and constitutes
+        # direct target leakage. The student's verbal reasoning is already encoded via Sentence-Transformer.
+        if not include_s_viva and feature_mode != "leakage_probe_with_viva":
+            vec[3] = 0.0
+
         if feature_mode == "no_formula":
             vec[0:9] = 0.0  # Zero out all formula scores
         elif feature_mode == "individual_formula_only":
             vec[0] = 0.0
+            vec[3] = 0.0 if not include_s_viva else vec[3]
             vec[9:] = 0.0   # Zero out raw telemetry and AST metrics
         elif feature_mode == "telemetry_only":
             vec[0:9] = 0.0  # Zero out all formula scores

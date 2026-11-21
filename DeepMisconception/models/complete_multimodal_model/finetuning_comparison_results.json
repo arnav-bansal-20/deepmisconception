@@ -1,0 +1,18 @@
+{
+  "frozen_encoder": {
+    "val_accuracy": 1.0,
+    "val_macro_f1": 1.0,
+    "test_accuracy": 0.9075,
+    "test_macro_f1": 0.885,
+    "test_roc_auc": 0.9888,
+    "recommendation": "Optimal and Scientifically Superior: Avoids scenario-family overfitting"
+  },
+  "fine_tuned_codebert": {
+    "val_accuracy": 0.9986,
+    "val_macro_f1": 0.9985,
+    "test_accuracy": 0.8421,
+    "test_macro_f1": 0.8175,
+    "test_roc_auc": 0.9412,
+    "recommendation": "Overfits to training scenario-family syntax and naming conventions"
+  }
+}

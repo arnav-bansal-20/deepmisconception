@@ -24,16 +24,21 @@ EVENT_TYPE_MAP = {
     "pad": 0,
     "idle": 1,
     "edit": 2,
+    "insert": 2,           # Unified edit/text-insertion
     "delete": 3,
     "paste": 4,
     "run": 5,
+    "success_run": 5,       # Execution success
     "compile_error": 6,
+    "syntax_error": 6,      # Syntax / compilation error
     "runtime_error": 7,
-    "error": 7,
-    "navigation": 8,
-    "unknown": 9,
+    "error": 7,             # General runtime error
+    "test_run": 8,          # Sandbox test execution
+    "debug_action": 9,      # Debugger / inspect action
+    "navigation": 10,
+    "unknown": 11,
 }
-NUM_EVENT_TYPES = 12
+NUM_EVENT_TYPES = 16
 
 
 def parse_timestamp_to_utc(ts: Any) -> Optional[datetime]:
@@ -82,61 +87,119 @@ def normalize_process_event_timestamps(events: List[Any]) -> List[Dict[str, Any]
     if not events:
         return []
 
-    # 1. Standardize to raw dicts with parsed UTC timestamp
+    # 1. Standardize to raw dicts with parsed UTC timestamp or numerical elapsed seconds
     extracted: List[Dict[str, Any]] = []
+    has_precomputed_elapsed = False
+
     for idx, ev in enumerate(events):
         if isinstance(ev, dict):
             etype = ev.get("event_type", "edit")
             raw_ts = ev.get("timestamp") or ev.get("timestamp_s") or ev.get("created_at")
-            delta_chars = ev.get("delta_chars", 0)
+            raw_elapsed = ev.get("elapsed_seconds") if "elapsed_seconds" in ev else ev.get("t_sec")
+            delta_chars = ev.get("delta_chars", ev.get("chars", 0))
             paste_len = ev.get("paste_length", 0)
-            line = ev.get("cursor_line", 1)
+            line = ev.get("cursor_line", ev.get("line", 1))
             col = ev.get("cursor_column", 1)
-            is_err = bool(ev.get("is_error") or "error" in str(etype).lower())
+            res = ev.get("result", "")
+            err_type = ev.get("error_type", None)
+            is_err = bool(ev.get("is_error") or res == "error" or err_type or "error" in str(etype).lower())
         else:
             etype = getattr(ev, "event_type", "edit")
             raw_ts = getattr(ev, "timestamp", None)
-            delta_chars = getattr(ev, "delta_chars", 0)
+            raw_elapsed = getattr(ev, "elapsed_seconds", getattr(ev, "t_sec", None))
+            delta_chars = getattr(ev, "delta_chars", getattr(ev, "chars", 0))
             paste_len = getattr(ev, "paste_length", 0)
-            line = getattr(ev, "cursor_line", 1)
+            line = getattr(ev, "cursor_line", getattr(ev, "line", 1))
             col = getattr(ev, "cursor_column", 1)
-            is_err = bool(getattr(ev, "event_type", "") == "error")
+            is_err = bool(getattr(ev, "is_error", False) or "error" in str(etype).lower())
+
+        # Validate and sanitize numerical attributes against non-finite values
+        def sanitize_num(val, default, min_val=None):
+            try:
+                fval = float(val)
+                if not math.isfinite(fval):
+                    return default
+                if min_val is not None:
+                    fval = max(min_val, fval)
+                return fval
+            except (ValueError, TypeError):
+                return default
+
+        delta_chars = sanitize_num(delta_chars, 0.0)
+        paste_len = sanitize_num(paste_len, 0.0, min_val=0.0)
+        line = sanitize_num(line, 1.0, min_val=1.0)
+        col = sanitize_num(col, 1.0, min_val=1.0)
+
+        # Parse elapsed seconds if available
+        parsed_elapsed = None
+        if raw_elapsed is not None:
+            try:
+                f_el = float(raw_elapsed)
+                if math.isfinite(f_el) and f_el >= 0:
+                    parsed_elapsed = f_el
+                    has_precomputed_elapsed = True
+            except (ValueError, TypeError):
+                parsed_elapsed = None
 
         parsed_ts = parse_timestamp_to_utc(raw_ts)
         extracted.append({
             "original_index": idx,
             "event_type": str(etype).lower(),
-            "delta_chars": int(delta_chars or 0),
-            "paste_length": int(paste_len or 0),
-            "cursor_line": int(line or 1),
-            "cursor_column": int(col or 1),
+            "delta_chars": int(delta_chars),
+            "paste_length": int(paste_len),
+            "cursor_line": int(line),
+            "cursor_column": int(col),
             "parsed_dt": parsed_ts,
+            "parsed_elapsed": parsed_elapsed,
             "is_error": is_err,
         })
 
-    # 2. Sort chronologically by parsed_dt (events without dt maintain stable relative order at the end)
+    # 2. Sort chronologically:
+    # If precomputed elapsed seconds are present, sort on parsed_elapsed;
+    # otherwise sort on parsed_dt UTC datetimes.
     fallback_dt = datetime.max.replace(tzinfo=timezone.utc)
-    sorted_events = sorted(
-        extracted,
-        key=lambda item: (item["parsed_dt"] if item["parsed_dt"] is not None else fallback_dt, item["original_index"])
-    )
+    fallback_elapsed = float("inf")
 
-    # 3. Determine reference timestamp T0 from first event with valid timestamp
-    t0: Optional[datetime] = None
-    for ev in sorted_events:
-        if ev["parsed_dt"] is not None:
-            t0 = ev["parsed_dt"]
-            break
+    if has_precomputed_elapsed:
+        sorted_events = sorted(
+            extracted,
+            key=lambda item: (item["parsed_elapsed"] if item["parsed_elapsed"] is not None else fallback_elapsed, item["original_index"])
+        )
+    else:
+        sorted_events = sorted(
+            extracted,
+            key=lambda item: (item["parsed_dt"] if item["parsed_dt"] is not None else fallback_dt, item["original_index"])
+        )
 
-    # 4. Compute elapsed seconds from T0 and consecutive time gaps
+    # 3. Determine reference timestamp T0
+    t0_dt: Optional[datetime] = None
+    t0_el: Optional[float] = None
+    if has_precomputed_elapsed:
+        for ev in sorted_events:
+            if ev["parsed_elapsed"] is not None:
+                t0_el = ev["parsed_elapsed"]
+                break
+    else:
+        for ev in sorted_events:
+            if ev["parsed_dt"] is not None:
+                t0_dt = ev["parsed_dt"]
+                break
+
+    # 4. Compute elapsed seconds relative to T0 and consecutive time gaps
     normalized: List[Dict[str, Any]] = []
     prev_elapsed = 0.0
 
     for idx, ev in enumerate(sorted_events):
-        if t0 is not None and ev["parsed_dt"] is not None:
-            elapsed = max(0.0, (ev["parsed_dt"] - t0).total_seconds())
+        if has_precomputed_elapsed and ev["parsed_elapsed"] is not None and t0_el is not None:
+            elapsed = max(0.0, ev["parsed_elapsed"] - t0_el)
+        elif t0_dt is not None and ev["parsed_dt"] is not None:
+            elapsed = max(0.0, (ev["parsed_dt"] - t0_dt).total_seconds())
         else:
             elapsed = prev_elapsed + (0.5 if idx > 0 else 0.0)
+
+        # Ensure elapsed is strictly non-negative and finite
+        if not math.isfinite(elapsed) or elapsed < 0:
+            elapsed = prev_elapsed + 0.5
 
         gap = max(0.0, elapsed - prev_elapsed) if idx > 0 else 0.0
         prev_elapsed = elapsed

@@ -288,4 +288,7 @@ export const api = {
   },
 
   getMLStatus: () => request<MLStatusResponse>('/ml/status'),
+
+  // Comprehensive Model Evaluation & Metrics (Tables 1-3, Graphs 1-5, 5-Fold CV)
+  getModelEvaluationMetrics: () => request<any>('/evaluation/metrics'),
 };

@@ -1,0 +1,83 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DeepMisconceptionLabelSchema",
+  "description": "Schema for Session Labels, Provenance, Pedagogical Rubrics, and Evidence Status",
+  "type": "object",
+  "required": [
+    "session_id",
+    "original_label",
+    "synthetic_annotator_label",
+    "ground_truth_label",
+    "evidence_status",
+    "annotation_rubric",
+    "label_rationale",
+    "supporting_code_evidence",
+    "supporting_viva_evidence",
+    "supporting_process_evidence",
+    "annotation_confidence",
+    "label_provenance"
+  ],
+  "properties": {
+    "session_id": {
+      "type": "string",
+      "pattern": "^DM_[0-9]{4,6}$",
+      "description": "Identifier linking to parent programming session"
+    },
+    "original_label": {
+      "type": "string",
+      "enum": ["Understood", "Partial Understanding", "Possible Misconception"],
+      "description": "Preserved original label from baseline dataset without deletion or silent overwriting"
+    },
+    "synthetic_annotator_label": {
+      "type": "string",
+      "enum": ["Understood", "Partial Understanding", "Possible Misconception"],
+      "description": "Automatically generated label assigned via consistent pedagogical rubric"
+    },
+    "human_validated_label": {
+      "type": ["string", "null"],
+      "enum": ["Understood", "Partial Understanding", "Possible Misconception", null],
+      "description": "Reserved exclusively for verified human annotations; remains null until expert adjudication"
+    },
+    "ground_truth_label": {
+      "type": "string",
+      "enum": ["Understood", "Partial Understanding", "Possible Misconception"],
+      "description": "Target label used in training pipeline (explicitly documented as synthetic proxy label)"
+    },
+    "evidence_status": {
+      "type": "string",
+      "enum": ["Sufficient Evidence", "Insufficient Evidence"],
+      "description": "Orthogonal evidence status flag for borderline or cross-modal conflicting sessions"
+    },
+    "annotation_rubric": {
+      "type": "string",
+      "description": "Explicit pedagogical rubric and scoring criteria applied for this annotation"
+    },
+    "label_rationale": {
+      "type": "string",
+      "description": "Comprehensive qualitative justification synthesizing evidence across modalities"
+    },
+    "supporting_code_evidence": {
+      "type": "string",
+      "description": "Specific code implementation patterns or bugs supporting the annotation"
+    },
+    "supporting_viva_evidence": {
+      "type": "string",
+      "description": "Verbal conceptual reasoning and explanations supporting the annotation"
+    },
+    "supporting_process_evidence": {
+      "type": "string",
+      "description": "IDE behavioral trajectory, debugging dynamics, and test traces supporting the annotation"
+    },
+    "annotation_confidence": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "description": "Confidence score of the synthetic annotator assessment"
+    },
+    "label_provenance": {
+      "type": "string",
+      "enum": ["synthetic_pedagogical_rule", "human_expert_verified"],
+      "description": "Label provenance indicator ensuring transparency that labels are synthetic proxies"
+    }
+  }
+}

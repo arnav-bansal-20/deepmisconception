@@ -1,0 +1,29 @@
+{
+  "model_name": "DeepMisconception_Process_Transformer",
+  "version": "1.0.0",
+  "event_vocab_size": 13,
+  "max_seq_len": 32,
+  "event_embed_dim": 48,
+  "time_embed_dim": 16,
+  "event_input_dim": 64,
+  "num_transformer_layers": 2,
+  "num_attention_heads": 4,
+  "dim_feedforward": 256,
+  "transformer_hidden_dim": 64,
+  "transformer_dropout": 0.15,
+  "num_numerical_features": 24,
+  "numerical_mlp_hidden": 64,
+  "process_embedding_dim": 64,
+  "num_classes": 3,
+  "class_names": ["Understood", "Partial Understanding", "Possible Misconception"],
+  "training": {
+    "batch_size": 64,
+    "learning_rate": 0.001,
+    "weight_decay": 0.0001,
+    "max_epochs": 25,
+    "early_stopping_patience": 6,
+    "gradient_clip_norm": 1.0,
+    "class_weighted_loss": true,
+    "seed": 42
+  }
+}

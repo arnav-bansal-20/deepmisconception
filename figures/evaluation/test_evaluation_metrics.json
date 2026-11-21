@@ -1,0 +1,88 @@
+{
+  "status": "success",
+  "dataset_partition": "test",
+  "total_test_sessions": 693,
+  "evaluated_supervised_sessions": 627,
+  "excluded_insufficient_evidence_sessions": 66,
+  "metrics": {
+    "accuracy": 0.9074960127591707,
+    "classification_error_pct": 9.250398724082931,
+    "precision_macro": 0.8581763406525263,
+    "precision_weighted": 0.9205222137106135,
+    "recall_macro": 0.9227360968368162,
+    "recall_weighted": 0.9074960127591707,
+    "f1_macro": 0.8850287459795108,
+    "f1_weighted": 0.9095008175490594,
+    "sensitivity_macro": 0.9227360968368162,
+    "specificity_macro": 0.9562604286642937,
+    "roc_auc": 0.9887566721078196,
+    "pr_auc": 0.975657030440098
+  },
+  "per_class": {
+    "Understood": {
+      "precision": 0.983957219251337,
+      "recall": 0.882494004796163,
+      "f1": 0.9304677623261695,
+      "sensitivity": 0.882494004796163,
+      "specificity": 0.9714285714285714,
+      "support": 417
+    },
+    "Partial Understanding": {
+      "precision": 0.7931034482758621,
+      "recall": 0.9857142857142858,
+      "f1": 0.8789808917197452,
+      "sensitivity": 0.9857142857142858,
+      "specificity": 0.9260780287474333,
+      "support": 140
+    },
+    "Possible Misconception": {
+      "precision": 0.7974683544303798,
+      "recall": 0.9,
+      "f1": 0.8456375838926175,
+      "sensitivity": 0.9,
+      "specificity": 0.9712746858168761,
+      "support": 70
+    }
+  },
+  "confusion_matrix": {
+    "raw_counts": [
+      [
+        368,
+        34,
+        15
+      ],
+      [
+        1,
+        138,
+        1
+      ],
+      [
+        5,
+        2,
+        63
+      ]
+    ],
+    "normalized_percentages": [
+      [
+        88.25,
+        8.15,
+        3.6
+      ],
+      [
+        0.71,
+        98.57,
+        0.71
+      ],
+      [
+        7.14,
+        2.86,
+        90.0
+      ]
+    ],
+    "classes": [
+      "Understood",
+      "Partial Understanding",
+      "Possible Misconception"
+    ]
+  }
+}

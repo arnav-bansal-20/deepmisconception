@@ -1,0 +1,694 @@
+session_id,scenario_family_id,partition,concept_area,original_label,synthetic_annotator_label,human_validated_label,ground_truth_label,evidence_status,code_correctness_status,behavioral_archetype,num_viva_questions,n_process_events,duration_s,n_errors,n_tests,final_state_pass,annotation_confidence,annotation_rubric,label_provenance
+DM_0008,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,5,14,323.0,2,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0015,SF_15,test,Lists,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,correct,test_driven,4,13,195.0,0,4,1,0.84,RUBRIC_PARTIAL_ROTE_IMPLEMENTATION,synthetic_pedagogical_rule
+DM_0019,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,correct,exploratory,4,10,128.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0021,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,mixed,5,10,164.0,0,2,0,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_0029,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,3,8,114.0,1,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0039,SF_39,test,Classes and objects,Understood,Understood,,Understood,Sufficient Evidence,incorrect,exploratory,5,13,179.0,0,3,0,0.88,RUBRIC_MASTERY_DIAGNOSED_FAULT,synthetic_pedagogical_rule
+DM_0043,SF_43,test,Encapsulation,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,incorrect,planned,5,12,159.0,0,3,0,0.82,RUBRIC_PARTIAL_LOGIC_DEFICIT,synthetic_pedagogical_rule
+DM_0052,SF_52,test,Input validation,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,struggling,5,15,329.0,2,1,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_0058,SF_58,test,Time complexity,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,exploratory,5,11,151.0,0,1,1,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_0073,SF_08,test,Loops,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,mixed,5,10,171.0,0,3,1,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_0080,SF_15,test,Lists,Understood,Understood,,Understood,Insufficient Evidence,correct,test_driven,3,12,189.0,0,4,1,0.78,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0084,SF_19,test,Dictionaries,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,test_driven,5,11,164.0,0,3,1,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_0086,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,3,15,223.0,0,4,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0094,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,struggling,3,17,364.0,3,1,0,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_0104,SF_39,test,Classes and objects,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,mixed,4,12,236.0,0,3,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_0108,SF_43,test,Encapsulation,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,test_driven,4,11,155.0,0,3,1,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_0117,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,3,11,192.0,2,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0123,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,4,11,123.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0138,SF_08,test,Loops,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,correct,planned,4,11,142.0,0,3,1,0.85,RUBRIC_MISCONCEPTION_BRITTLE_PASS,synthetic_pedagogical_rule
+DM_0145,SF_15,test,Lists,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,mixed,3,9,155.0,0,2,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_0149,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,3,24,656.0,4,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0151,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,planned,3,12,171.0,0,4,0,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_0159,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,struggling,5,18,425.0,3,1,0,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_0169,SF_39,test,Classes and objects,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,correct,mixed,4,13,214.0,0,3,1,0.84,RUBRIC_PARTIAL_ROTE_IMPLEMENTATION,synthetic_pedagogical_rule
+DM_0173,SF_43,test,Encapsulation,Understood,Understood,,Understood,Insufficient Evidence,correct,mixed,4,9,130.0,0,1,1,0.78,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0182,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,correct,exploratory,4,12,168.0,0,2,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0188,SF_58,test,Time complexity,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,struggling,3,13,216.0,2,1,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_0203,SF_08,test,Loops,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,struggling,5,22,438.0,4,1,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_0210,SF_15,test,Lists,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,exploratory,5,14,215.0,0,2,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_0214,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,4,16,309.0,3,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0216,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,4,15,212.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0224,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,debugging_oriented,4,15,247.0,2,2,0,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_0234,SF_39,test,Classes and objects,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,5,14,244.0,2,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0238,SF_43,test,Encapsulation,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,mixed,5,7,140.0,0,1,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_0247,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,5,9,103.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0253,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,4,8,135.0,0,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0268,SF_08,test,Loops,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,partially_correct,test_driven,5,14,207.0,0,4,1,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_0275,SF_15,test,Lists,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,5,13,178.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0279,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,correct,exploratory,5,13,205.0,0,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0281,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,5,12,161.0,2,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0289,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,4,9,117.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0299,SF_39,test,Classes and objects,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,5,10,147.0,1,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0303,SF_43,test,Encapsulation,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,debugging_oriented,5,17,237.0,2,3,1,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_0312,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,3,11,158.0,1,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0318,SF_58,test,Time complexity,Understood,Understood,,Understood,Insufficient Evidence,partially_correct,exploratory,3,13,192.0,0,3,0,0.74,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_0333,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,4,12,234.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0340,SF_15,test,Lists,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,partially_correct,struggling,5,15,336.0,2,1,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_0344,SF_19,test,Dictionaries,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,mixed,5,13,230.0,0,3,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_0346,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,exploratory,5,12,211.0,0,2,0,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_0354,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,4,10,144.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0364,SF_39,test,Classes and objects,Understood,Understood,,Understood,Insufficient Evidence,correct,test_driven,4,9,126.0,0,3,1,0.74,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0368,SF_43,test,Encapsulation,Understood,Understood,,Understood,Sufficient Evidence,correct,exploratory,3,17,255.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0377,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,3,10,139.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0383,SF_58,test,Time complexity,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,debugging_oriented,5,16,242.0,2,3,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_0398,SF_08,test,Loops,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,mixed,4,12,252.0,0,3,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_0405,SF_15,test,Lists,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,planned,4,14,198.0,0,4,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_0409,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,3,13,210.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0411,SF_21,test,Sets,Possible Misconception,Possible Misconception,,Possible Misconception,Insufficient Evidence,incorrect,struggling,5,21,412.0,4,1,0,0.75,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_0419,SF_29,test,Sorting,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,struggling,4,12,257.0,2,1,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_0429,SF_39,test,Classes and objects,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,4,9,106.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0433,SF_43,test,Encapsulation,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,3,21,323.0,3,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0442,SF_52,test,Input validation,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,exploratory,4,16,253.0,0,3,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_0448,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,3,19,313.0,3,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0463,SF_08,test,Loops,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,correct,planned,3,8,117.0,0,2,1,0.85,RUBRIC_MISCONCEPTION_BRITTLE_PASS,synthetic_pedagogical_rule
+DM_0470,SF_15,test,Lists,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,incorrect,debugging_oriented,4,19,284.0,3,3,0,0.82,RUBRIC_PARTIAL_LOGIC_DEFICIT,synthetic_pedagogical_rule
+DM_0474,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,5,17,282.0,3,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0476,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,correct,exploratory,3,11,146.0,0,2,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0484,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,3,13,183.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0494,SF_39,test,Classes and objects,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,4,8,131.0,0,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0498,SF_43,test,Encapsulation,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,4,14,204.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0507,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,5,8,105.0,1,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0513,SF_58,test,Time complexity,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,exploratory,4,12,180.0,0,1,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_0528,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,correct,exploratory,5,15,232.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0535,SF_15,test,Lists,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,4,13,222.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0539,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,3,25,472.0,4,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0541,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,debugging_oriented,3,19,341.0,3,1,0,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_0549,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,5,16,271.0,3,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0559,SF_39,test,Classes and objects,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,5,9,121.0,1,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0563,SF_43,test,Encapsulation,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,5,17,282.0,3,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0572,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,5,12,166.0,2,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0578,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,3,18,300.0,3,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0593,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,4,19,278.0,3,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0600,SF_15,test,Lists,Understood,Understood,,Understood,Sufficient Evidence,correct,exploratory,3,11,140.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0604,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,4,8,128.0,0,2,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0606,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,5,19,547.0,3,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0614,SF_29,test,Sorting,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,mixed,4,9,161.0,0,2,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_0624,SF_39,test,Classes and objects,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,correct,debugging_oriented,3,20,334.0,3,2,1,0.84,RUBRIC_PARTIAL_ROTE_IMPLEMENTATION,synthetic_pedagogical_rule
+DM_0628,SF_43,test,Encapsulation,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,test_driven,5,9,143.0,0,3,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_0637,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,4,11,147.0,1,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0643,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,4,10,211.0,0,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0658,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,planned,3,10,154.0,0,3,0,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_0665,SF_15,test,Lists,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,4,11,144.0,0,3,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0669,SF_19,test,Dictionaries,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,incorrect,struggling,3,21,460.0,4,1,0,0.82,RUBRIC_PARTIAL_LOGIC_DEFICIT,synthetic_pedagogical_rule
+DM_0671,SF_21,test,Sets,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,struggling,5,18,334.0,3,1,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_0679,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,5,23,588.0,4,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0689,SF_39,test,Classes and objects,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,planned,5,14,197.0,0,4,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_0693,SF_43,test,Encapsulation,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,4,10,151.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0702,SF_52,test,Input validation,Understood,Understood,,Understood,Insufficient Evidence,partially_correct,planned,5,14,155.0,0,4,0,0.74,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_0708,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,test_driven,3,10,148.0,0,3,0,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_0723,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,correct,exploratory,3,13,208.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0730,SF_15,test,Lists,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,4,12,138.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0734,SF_19,test,Dictionaries,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,struggling,5,13,330.0,2,1,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_0736,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,3,12,229.0,2,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0744,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,3,9,127.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0754,SF_39,test,Classes and objects,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,3,9,116.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0758,SF_43,test,Encapsulation,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,test_driven,5,13,184.0,0,4,0,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_0767,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,5,10,141.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0773,SF_58,test,Time complexity,Understood,Understood,,Understood,Insufficient Evidence,correct,debugging_oriented,5,11,156.0,1,3,1,0.78,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0788,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,correct,exploratory,3,13,218.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0795,SF_15,test,Lists,Understood,Understood,,Understood,Insufficient Evidence,correct,mixed,4,11,190.0,0,3,1,0.78,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0799,SF_19,test,Dictionaries,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,exploratory,5,14,223.0,0,3,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_0801,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,3,8,139.0,0,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0809,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,4,10,167.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0819,SF_39,test,Classes and objects,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,struggling,3,13,433.0,2,1,0,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_0823,SF_43,test,Encapsulation,Understood,Understood,,Understood,Sufficient Evidence,correct,exploratory,4,14,230.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0832,SF_52,test,Input validation,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,planned,3,11,151.0,0,3,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_0838,SF_58,test,Time complexity,Possible Misconception,Possible Misconception,,Possible Misconception,Insufficient Evidence,incorrect,planned,4,16,210.0,0,4,0,0.75,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_0853,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,mixed,3,11,227.0,0,2,0,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_0860,SF_15,test,Lists,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,3,9,129.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0864,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,3,13,199.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0866,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,5,10,134.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0874,SF_29,test,Sorting,Understood,Understood,,Understood,Insufficient Evidence,correct,test_driven,3,12,187.0,0,3,1,0.74,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0884,SF_39,test,Classes and objects,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,correct,exploratory,5,10,149.0,0,2,1,0.85,RUBRIC_MISCONCEPTION_BRITTLE_PASS,synthetic_pedagogical_rule
+DM_0888,SF_43,test,Encapsulation,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,debugging_oriented,5,13,223.0,2,1,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_0897,SF_52,test,Input validation,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,debugging_oriented,5,14,206.0,2,2,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_0903,SF_58,test,Time complexity,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,test_driven,4,10,135.0,0,3,1,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_0918,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,4,9,115.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0925,SF_15,test,Lists,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,5,11,232.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0929,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,4,14,241.0,2,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0931,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,incorrect,exploratory,5,14,205.0,0,1,0,0.88,RUBRIC_MASTERY_DIAGNOSED_FAULT,synthetic_pedagogical_rule
+DM_0939,SF_29,test,Sorting,Understood,Understood,,Understood,Insufficient Evidence,correct,test_driven,4,10,158.0,0,3,0,0.78,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0949,SF_39,test,Classes and objects,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,struggling,4,11,172.0,2,1,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_0953,SF_43,test,Encapsulation,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,3,10,190.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0962,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,3,13,174.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0968,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,3,10,152.0,1,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0983,SF_08,test,Loops,Partial Understanding,Partial Understanding,,Partial Understanding,Insufficient Evidence,correct,mixed,5,7,124.0,0,1,1,0.69,RUBRIC_PARTIAL_ROTE_IMPLEMENTATION,synthetic_pedagogical_rule
+DM_0990,SF_15,test,Lists,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,3,10,150.0,1,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0994,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,5,11,156.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_0996,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,3,13,296.0,2,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1004,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,5,8,136.0,1,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1014,SF_39,test,Classes and objects,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,test_driven,5,13,161.0,0,4,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_1018,SF_43,test,Encapsulation,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,mixed,5,10,175.0,0,1,1,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_1027,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,struggling,3,20,601.0,3,1,0,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_1033,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,3,20,459.0,4,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1048,SF_08,test,Loops,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,planned,3,13,183.0,0,3,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_1055,SF_15,test,Lists,Understood,Understood,,Understood,Sufficient Evidence,correct,exploratory,4,8,107.0,0,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1059,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,3,22,434.0,4,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1061,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,3,13,164.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1069,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,struggling,5,21,427.0,4,1,0,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_1079,SF_39,test,Classes and objects,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,4,7,117.0,0,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1083,SF_43,test,Encapsulation,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,4,9,121.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1092,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,4,18,458.0,3,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1098,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,planned,3,12,170.0,0,4,1,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_1113,SF_08,test,Loops,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,debugging_oriented,4,19,340.0,3,3,1,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_1120,SF_15,test,Lists,Understood,Understood,,Understood,Sufficient Evidence,correct,exploratory,5,11,163.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1124,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,5,10,128.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1126,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,3,15,380.0,2,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1134,SF_29,test,Sorting,Possible Misconception,Possible Misconception,,Possible Misconception,Insufficient Evidence,partially_correct,struggling,5,14,294.0,3,1,0,0.72,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_1144,SF_39,test,Classes and objects,Understood,Understood,,Understood,Insufficient Evidence,correct,planned,3,14,173.0,0,3,1,0.78,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1148,SF_43,test,Encapsulation,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,5,11,208.0,0,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1157,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,incorrect,exploratory,4,12,165.0,0,3,0,0.88,RUBRIC_MASTERY_DIAGNOSED_FAULT,synthetic_pedagogical_rule
+DM_1163,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,5,14,199.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1178,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,4,13,195.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1185,SF_15,test,Lists,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,4,11,136.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1189,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,4,18,292.0,4,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1191,SF_21,test,Sets,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,planned,4,10,122.0,0,4,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_1199,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,3,9,122.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1209,SF_39,test,Classes and objects,Partial Understanding,Partial Understanding,,Partial Understanding,Insufficient Evidence,incorrect,exploratory,5,12,171.0,0,1,0,0.64,RUBRIC_PARTIAL_LOGIC_DEFICIT,synthetic_pedagogical_rule
+DM_1213,SF_43,test,Encapsulation,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,correct,struggling,5,16,290.0,3,1,0,0.85,RUBRIC_MISCONCEPTION_BRITTLE_PASS,synthetic_pedagogical_rule
+DM_1222,SF_52,test,Input validation,Understood,Understood,,Understood,Insufficient Evidence,correct,struggling,5,13,265.0,2,1,0,0.78,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1228,SF_58,test,Time complexity,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,partially_correct,debugging_oriented,3,14,241.0,2,3,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_1243,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,3,11,131.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1250,SF_15,test,Lists,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,5,11,186.0,1,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1254,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,3,11,142.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1256,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,4,18,294.0,3,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1264,SF_29,test,Sorting,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,mixed,5,10,179.0,0,3,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_1274,SF_39,test,Classes and objects,Understood,Understood,,Understood,Insufficient Evidence,correct,test_driven,5,12,159.0,0,3,0,0.78,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1278,SF_43,test,Encapsulation,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,struggling,5,24,562.0,4,1,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_1287,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,4,13,174.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1293,SF_58,test,Time complexity,Understood,Understood,,Understood,Insufficient Evidence,correct,struggling,3,23,608.0,4,1,0,0.78,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1308,SF_08,test,Loops,Partial Understanding,Partial Understanding,,Partial Understanding,Insufficient Evidence,correct,exploratory,5,11,154.0,0,1,1,0.69,RUBRIC_PARTIAL_ROTE_IMPLEMENTATION,synthetic_pedagogical_rule
+DM_1315,SF_15,test,Lists,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,3,20,321.0,3,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1319,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,correct,exploratory,4,12,172.0,0,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1321,SF_21,test,Sets,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,struggling,5,22,600.0,3,1,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_1329,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,5,12,194.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1339,SF_39,test,Classes and objects,Understood,Understood,,Understood,Insufficient Evidence,correct,struggling,3,24,550.0,4,1,0,0.78,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1343,SF_43,test,Encapsulation,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,3,16,249.0,3,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1352,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,5,23,454.0,4,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1358,SF_58,test,Time complexity,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,test_driven,4,9,113.0,0,3,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_1373,SF_08,test,Loops,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,incorrect,mixed,5,10,202.0,0,1,0,0.82,RUBRIC_PARTIAL_LOGIC_DEFICIT,synthetic_pedagogical_rule
+DM_1380,SF_15,test,Lists,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,5,15,255.0,2,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1384,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,exploratory,4,16,252.0,0,2,1,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_1386,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,3,10,125.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1394,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,test_driven,3,11,177.0,0,3,0,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_1404,SF_39,test,Classes and objects,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,5,12,161.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1408,SF_43,test,Encapsulation,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,4,12,156.0,2,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1417,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,5,20,356.0,3,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1423,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,3,13,210.0,2,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1438,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,4,9,117.0,1,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1445,SF_15,test,Lists,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,4,10,168.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1449,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,5,9,144.0,0,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1451,SF_21,test,Sets,Partial Understanding,Partial Understanding,,Partial Understanding,Insufficient Evidence,correct,debugging_oriented,5,19,299.0,3,3,1,0.69,RUBRIC_PARTIAL_ROTE_IMPLEMENTATION,synthetic_pedagogical_rule
+DM_1459,SF_29,test,Sorting,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,debugging_oriented,4,9,137.0,1,2,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_1469,SF_39,test,Classes and objects,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,5,14,251.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1473,SF_43,test,Encapsulation,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,4,10,136.0,1,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1482,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,5,10,106.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1488,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,4,18,312.0,3,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1503,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,correct,exploratory,3,11,155.0,0,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1510,SF_15,test,Lists,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,correct,mixed,5,16,258.0,0,3,1,0.84,RUBRIC_PARTIAL_ROTE_IMPLEMENTATION,synthetic_pedagogical_rule
+DM_1514,SF_19,test,Dictionaries,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,correct,exploratory,5,13,204.0,0,1,1,0.84,RUBRIC_PARTIAL_ROTE_IMPLEMENTATION,synthetic_pedagogical_rule
+DM_1516,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,4,11,204.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1524,SF_29,test,Sorting,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,exploratory,3,11,154.0,0,1,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_1534,SF_39,test,Classes and objects,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,3,8,84.0,1,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1538,SF_43,test,Encapsulation,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,exploratory,5,13,205.0,0,2,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_1547,SF_52,test,Input validation,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,test_driven,3,10,129.0,0,3,1,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_1553,SF_58,test,Time complexity,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,correct,exploratory,4,12,182.0,0,1,1,0.84,RUBRIC_PARTIAL_ROTE_IMPLEMENTATION,synthetic_pedagogical_rule
+DM_1568,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,5,11,144.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1575,SF_15,test,Lists,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,5,14,196.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1579,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,planned,5,16,196.0,0,3,0,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_1581,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,5,13,226.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1589,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,3,16,350.0,3,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1599,SF_39,test,Classes and objects,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,3,20,546.0,4,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1603,SF_43,test,Encapsulation,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,correct,mixed,4,9,164.0,0,1,1,0.84,RUBRIC_PARTIAL_ROTE_IMPLEMENTATION,synthetic_pedagogical_rule
+DM_1612,SF_52,test,Input validation,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,correct,exploratory,4,13,214.0,0,3,1,0.84,RUBRIC_PARTIAL_ROTE_IMPLEMENTATION,synthetic_pedagogical_rule
+DM_1618,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,3,20,344.0,3,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1633,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,3,14,198.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1640,SF_15,test,Lists,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,3,10,186.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1644,SF_19,test,Dictionaries,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,incorrect,struggling,5,12,307.0,2,1,0,0.82,RUBRIC_PARTIAL_LOGIC_DEFICIT,synthetic_pedagogical_rule
+DM_1646,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,correct,exploratory,4,12,170.0,0,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1654,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,5,11,154.0,1,2,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1664,SF_39,test,Classes and objects,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,correct,planned,3,13,154.0,0,4,1,0.85,RUBRIC_MISCONCEPTION_BRITTLE_PASS,synthetic_pedagogical_rule
+DM_1668,SF_43,test,Encapsulation,Possible Misconception,Possible Misconception,,Possible Misconception,Insufficient Evidence,incorrect,planned,4,10,151.0,0,2,0,0.75,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_1677,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,4,20,343.0,4,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1683,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,4,12,155.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1698,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,4,12,140.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1705,SF_15,test,Lists,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,debugging_oriented,3,12,168.0,2,1,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_1709,SF_19,test,Dictionaries,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,exploratory,4,12,186.0,0,1,1,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_1711,SF_21,test,Sets,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,partially_correct,test_driven,3,13,179.0,0,4,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_1719,SF_29,test,Sorting,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,mixed,4,8,149.0,0,1,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_1729,SF_39,test,Classes and objects,Partial Understanding,Partial Understanding,,Partial Understanding,Insufficient Evidence,partially_correct,struggling,5,21,490.0,4,1,0,0.71,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_1733,SF_43,test,Encapsulation,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,3,13,202.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1742,SF_52,test,Input validation,Understood,Understood,,Understood,Insufficient Evidence,correct,planned,4,11,134.0,0,3,1,0.78,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1748,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,correct,exploratory,5,13,193.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1763,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,3,18,542.0,3,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1770,SF_15,test,Lists,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,5,12,190.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1774,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,5,12,176.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1776,SF_21,test,Sets,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,debugging_oriented,4,17,247.0,3,1,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_1784,SF_29,test,Sorting,Possible Misconception,Possible Misconception,,Possible Misconception,Insufficient Evidence,correct,debugging_oriented,3,15,227.0,2,3,1,0.7,RUBRIC_MISCONCEPTION_BRITTLE_PASS,synthetic_pedagogical_rule
+DM_1794,SF_39,test,Classes and objects,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,5,12,143.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1798,SF_43,test,Encapsulation,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,debugging_oriented,4,13,205.0,2,1,0,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_1807,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,5,12,171.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1813,SF_58,test,Time complexity,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,debugging_oriented,4,9,116.0,1,1,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_1828,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,5,10,129.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1835,SF_15,test,Lists,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,struggling,4,12,241.0,2,1,0,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_1839,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,3,14,222.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1841,SF_21,test,Sets,Understood,Understood,,Understood,Insufficient Evidence,correct,planned,5,11,131.0,0,4,1,0.74,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1849,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,correct,exploratory,3,12,158.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1859,SF_39,test,Classes and objects,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,3,19,337.0,3,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1863,SF_43,test,Encapsulation,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,struggling,5,13,392.0,2,1,0,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_1872,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,4,14,177.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1878,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,correct,exploratory,3,13,211.0,0,3,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1893,SF_08,test,Loops,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,mixed,5,12,221.0,0,2,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_1900,SF_15,test,Lists,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,3,14,215.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1904,SF_19,test,Dictionaries,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,correct,exploratory,5,11,172.0,0,3,1,0.84,RUBRIC_PARTIAL_ROTE_IMPLEMENTATION,synthetic_pedagogical_rule
+DM_1906,SF_21,test,Sets,Partial Understanding,Partial Understanding,,Partial Understanding,Insufficient Evidence,partially_correct,struggling,4,17,396.0,3,1,0,0.71,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_1914,SF_29,test,Sorting,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,partially_correct,struggling,4,18,375.0,3,1,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_1924,SF_39,test,Classes and objects,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,struggling,5,16,275.0,3,1,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_1928,SF_43,test,Encapsulation,Understood,Understood,,Understood,Sufficient Evidence,correct,exploratory,4,15,221.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1937,SF_52,test,Input validation,Understood,Understood,,Understood,Insufficient Evidence,correct,struggling,4,22,497.0,4,1,0,0.78,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1943,SF_58,test,Time complexity,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,test_driven,3,14,182.0,0,4,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_1958,SF_08,test,Loops,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,correct,test_driven,4,10,117.0,0,3,1,0.84,RUBRIC_PARTIAL_ROTE_IMPLEMENTATION,synthetic_pedagogical_rule
+DM_1965,SF_15,test,Lists,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,correct,struggling,3,22,426.0,4,1,0,0.84,RUBRIC_PARTIAL_ROTE_IMPLEMENTATION,synthetic_pedagogical_rule
+DM_1969,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,5,10,137.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1971,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,4,10,147.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1979,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,correct,exploratory,3,11,167.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_1989,SF_39,test,Classes and objects,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,planned,4,10,158.0,0,2,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_1993,SF_43,test,Encapsulation,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,incorrect,debugging_oriented,5,17,286.0,3,1,0,0.82,RUBRIC_PARTIAL_LOGIC_DEFICIT,synthetic_pedagogical_rule
+DM_2002,SF_52,test,Input validation,Partial Understanding,Partial Understanding,,Partial Understanding,Insufficient Evidence,partially_correct,test_driven,3,12,185.0,0,4,0,0.71,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_2008,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,correct,exploratory,5,12,183.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2023,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,5,17,278.0,3,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2030,SF_15,test,Lists,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,debugging_oriented,4,14,197.0,2,2,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_2034,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,5,22,523.0,4,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2036,SF_21,test,Sets,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,incorrect,mixed,3,9,154.0,0,1,1,0.82,RUBRIC_PARTIAL_LOGIC_DEFICIT,synthetic_pedagogical_rule
+DM_2044,SF_29,test,Sorting,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,correct,struggling,4,16,412.0,2,1,0,0.84,RUBRIC_PARTIAL_ROTE_IMPLEMENTATION,synthetic_pedagogical_rule
+DM_2054,SF_39,test,Classes and objects,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,partially_correct,struggling,5,14,248.0,2,1,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_2058,SF_43,test,Encapsulation,Partial Understanding,Partial Understanding,,Partial Understanding,Insufficient Evidence,correct,planned,3,11,145.0,0,2,1,0.69,RUBRIC_PARTIAL_ROTE_IMPLEMENTATION,synthetic_pedagogical_rule
+DM_2067,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,3,13,206.0,2,2,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2073,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,correct,exploratory,5,15,240.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2088,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,5,12,281.0,2,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2095,SF_15,test,Lists,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,5,22,539.0,4,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2099,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,debugging_oriented,3,9,155.0,1,1,0,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_2101,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,5,11,131.0,1,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2109,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,3,15,437.0,2,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2119,SF_39,test,Classes and objects,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,planned,4,9,125.0,0,3,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_2123,SF_43,test,Encapsulation,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,mixed,3,13,239.0,0,3,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_2132,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,correct,exploratory,4,13,173.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2138,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,3,11,166.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2153,SF_08,test,Loops,Partial Understanding,Partial Understanding,,Partial Understanding,Insufficient Evidence,correct,debugging_oriented,4,9,147.0,1,2,1,0.69,RUBRIC_PARTIAL_ROTE_IMPLEMENTATION,synthetic_pedagogical_rule
+DM_2160,SF_15,test,Lists,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,test_driven,3,14,206.0,0,4,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_2164,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,3,13,339.0,2,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2166,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,5,10,158.0,0,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2174,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,3,14,184.0,2,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2184,SF_39,test,Classes and objects,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,3,10,155.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2188,SF_43,test,Encapsulation,Understood,Understood,,Understood,Insufficient Evidence,correct,mixed,5,12,200.0,0,2,1,0.78,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2197,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,3,12,152.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2203,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,5,14,156.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2218,SF_08,test,Loops,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,partially_correct,planned,3,11,152.0,0,2,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_2225,SF_15,test,Lists,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,partially_correct,struggling,3,22,526.0,4,1,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_2229,SF_19,test,Dictionaries,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,exploratory,4,9,141.0,0,1,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_2231,SF_21,test,Sets,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,correct,mixed,3,8,150.0,0,2,1,0.84,RUBRIC_PARTIAL_ROTE_IMPLEMENTATION,synthetic_pedagogical_rule
+DM_2239,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,4,10,161.0,0,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2249,SF_39,test,Classes and objects,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,5,10,219.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2253,SF_43,test,Encapsulation,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,correct,struggling,3,15,412.0,2,1,0,0.84,RUBRIC_PARTIAL_ROTE_IMPLEMENTATION,synthetic_pedagogical_rule
+DM_2262,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,5,11,281.0,2,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2268,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,3,19,312.0,3,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2283,SF_08,test,Loops,Partial Understanding,Partial Understanding,,Partial Understanding,Insufficient Evidence,partially_correct,mixed,5,11,206.0,0,3,0,0.67,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_2290,SF_15,test,Lists,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,planned,5,8,110.0,0,2,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_2294,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,correct,exploratory,4,11,157.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2296,SF_21,test,Sets,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,incorrect,debugging_oriented,5,10,141.0,1,3,0,0.82,RUBRIC_PARTIAL_LOGIC_DEFICIT,synthetic_pedagogical_rule
+DM_2304,SF_29,test,Sorting,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,correct,exploratory,5,13,197.0,0,1,1,0.85,RUBRIC_MISCONCEPTION_BRITTLE_PASS,synthetic_pedagogical_rule
+DM_2314,SF_39,test,Classes and objects,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,exploratory,3,13,202.0,0,1,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_2318,SF_43,test,Encapsulation,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,test_driven,5,13,203.0,0,4,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_2327,SF_52,test,Input validation,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,exploratory,3,15,210.0,0,2,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_2333,SF_58,test,Time complexity,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,exploratory,5,11,153.0,0,2,1,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_2348,SF_08,test,Loops,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,mixed,3,11,215.0,0,1,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_2355,SF_15,test,Lists,Understood,Understood,,Understood,Sufficient Evidence,correct,exploratory,3,10,155.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2359,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,5,16,275.0,2,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2361,SF_21,test,Sets,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,mixed,3,11,152.0,0,3,1,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_2369,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,4,10,164.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2379,SF_39,test,Classes and objects,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,5,12,200.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2383,SF_43,test,Encapsulation,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,3,11,135.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2392,SF_52,test,Input validation,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,correct,mixed,4,9,172.0,0,2,1,0.84,RUBRIC_PARTIAL_ROTE_IMPLEMENTATION,synthetic_pedagogical_rule
+DM_2398,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,test_driven,3,14,188.0,0,4,1,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_2413,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,5,13,161.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2420,SF_15,test,Lists,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,debugging_oriented,3,10,160.0,1,3,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_2424,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,4,10,143.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2426,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,4,10,122.0,0,3,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2434,SF_29,test,Sorting,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,exploratory,3,11,149.0,0,1,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_2444,SF_39,test,Classes and objects,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,3,10,132.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2448,SF_43,test,Encapsulation,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,3,13,217.0,2,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2457,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,5,9,128.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2463,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,5,21,410.0,4,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2478,SF_08,test,Loops,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,incorrect,mixed,4,8,127.0,0,1,0,0.82,RUBRIC_PARTIAL_LOGIC_DEFICIT,synthetic_pedagogical_rule
+DM_2485,SF_15,test,Lists,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,debugging_oriented,5,9,113.0,1,1,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_2489,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,exploratory,4,12,180.0,0,3,1,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_2491,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,incorrect,planned,3,13,186.0,0,4,0,0.88,RUBRIC_MASTERY_DIAGNOSED_FAULT,synthetic_pedagogical_rule
+DM_2499,SF_29,test,Sorting,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,planned,4,8,94.0,0,2,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_2509,SF_39,test,Classes and objects,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,exploratory,4,12,158.0,0,1,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_2513,SF_43,test,Encapsulation,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,exploratory,5,14,185.0,0,3,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_2522,SF_52,test,Input validation,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,incorrect,struggling,4,18,358.0,3,1,0,0.82,RUBRIC_PARTIAL_LOGIC_DEFICIT,synthetic_pedagogical_rule
+DM_2528,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,5,10,129.0,1,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2543,SF_08,test,Loops,Understood,Understood,,Understood,Insufficient Evidence,correct,planned,3,14,189.0,0,3,1,0.74,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2550,SF_15,test,Lists,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,5,10,135.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2554,SF_19,test,Dictionaries,Understood,Understood,,Understood,Insufficient Evidence,partially_correct,planned,4,10,138.0,0,4,0,0.74,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_2556,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,5,12,187.0,2,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2564,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,3,10,128.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2574,SF_39,test,Classes and objects,Partial Understanding,Partial Understanding,,Partial Understanding,Insufficient Evidence,partially_correct,debugging_oriented,3,17,286.0,3,1,0,0.71,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_2578,SF_43,test,Encapsulation,Understood,Understood,,Understood,Insufficient Evidence,correct,planned,3,13,152.0,0,3,1,0.78,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2587,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,mixed,4,10,182.0,0,2,0,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_2593,SF_58,test,Time complexity,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,struggling,4,24,734.0,4,1,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_2608,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,4,10,191.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2615,SF_15,test,Lists,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,exploratory,5,10,146.0,0,2,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_2619,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,5,14,217.0,2,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2621,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,4,11,154.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2629,SF_29,test,Sorting,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,incorrect,test_driven,5,11,151.0,0,3,1,0.82,RUBRIC_PARTIAL_LOGIC_DEFICIT,synthetic_pedagogical_rule
+DM_2639,SF_39,test,Classes and objects,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,struggling,5,14,354.0,2,1,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_2643,SF_43,test,Encapsulation,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,4,15,233.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2652,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,correct,exploratory,5,13,196.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2658,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,struggling,3,15,402.0,2,1,0,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_2673,SF_08,test,Loops,Understood,Understood,,Understood,Insufficient Evidence,partially_correct,test_driven,3,14,193.0,0,4,0,0.7,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_2680,SF_15,test,Lists,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,debugging_oriented,3,15,221.0,2,2,1,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_2684,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,5,20,515.0,4,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2686,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,5,10,174.0,0,3,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2694,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,5,14,185.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2704,SF_39,test,Classes and objects,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,3,13,234.0,2,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2708,SF_43,test,Encapsulation,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,5,9,127.0,0,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2717,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,correct,exploratory,4,15,220.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2723,SF_58,test,Time complexity,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,correct,test_driven,4,10,155.0,0,3,1,0.84,RUBRIC_PARTIAL_ROTE_IMPLEMENTATION,synthetic_pedagogical_rule
+DM_2738,SF_08,test,Loops,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,incorrect,planned,4,12,167.0,0,3,0,0.82,RUBRIC_PARTIAL_LOGIC_DEFICIT,synthetic_pedagogical_rule
+DM_2745,SF_15,test,Lists,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,3,11,174.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2749,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,struggling,5,24,540.0,4,1,0,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_2751,SF_21,test,Sets,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,struggling,4,13,223.0,2,1,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_2759,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,debugging_oriented,5,11,163.0,1,3,1,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_2769,SF_39,test,Classes and objects,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,3,11,158.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2773,SF_43,test,Encapsulation,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,3,11,148.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2782,SF_52,test,Input validation,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,exploratory,3,15,228.0,0,3,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_2788,SF_58,test,Time complexity,Understood,Understood,,Understood,Insufficient Evidence,correct,debugging_oriented,3,11,147.0,1,3,1,0.78,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2803,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,correct,exploratory,5,13,185.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2810,SF_15,test,Lists,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,incorrect,struggling,5,13,239.0,2,1,0,0.82,RUBRIC_PARTIAL_LOGIC_DEFICIT,synthetic_pedagogical_rule
+DM_2814,SF_19,test,Dictionaries,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,correct,debugging_oriented,3,9,116.0,1,1,1,0.84,RUBRIC_PARTIAL_ROTE_IMPLEMENTATION,synthetic_pedagogical_rule
+DM_2816,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,4,15,202.0,0,4,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2824,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,4,19,420.0,4,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2834,SF_39,test,Classes and objects,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,4,14,217.0,2,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2838,SF_43,test,Encapsulation,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,exploratory,5,11,151.0,0,3,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_2847,SF_52,test,Input validation,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,exploratory,3,13,188.0,0,2,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_2853,SF_58,test,Time complexity,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,incorrect,mixed,5,12,243.0,0,3,0,0.82,RUBRIC_PARTIAL_LOGIC_DEFICIT,synthetic_pedagogical_rule
+DM_2868,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,5,11,131.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2875,SF_15,test,Lists,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,test_driven,3,9,107.0,0,3,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_2879,SF_19,test,Dictionaries,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,correct,struggling,4,19,485.0,4,1,0,0.84,RUBRIC_PARTIAL_ROTE_IMPLEMENTATION,synthetic_pedagogical_rule
+DM_2881,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,4,14,297.0,2,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2889,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,3,9,100.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2899,SF_39,test,Classes and objects,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,test_driven,3,12,158.0,0,4,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_2903,SF_43,test,Encapsulation,Possible Misconception,Possible Misconception,,Possible Misconception,Insufficient Evidence,correct,test_driven,4,10,137.0,0,3,1,0.7,RUBRIC_MISCONCEPTION_BRITTLE_PASS,synthetic_pedagogical_rule
+DM_2912,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,3,10,181.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2918,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,correct,exploratory,3,11,153.0,0,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2933,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,5,15,263.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2940,SF_15,test,Lists,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,3,11,221.0,0,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2944,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,5,8,169.0,0,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2946,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,3,10,140.0,1,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2954,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,5,14,219.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2964,SF_39,test,Classes and objects,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,3,9,128.0,1,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2968,SF_43,test,Encapsulation,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,debugging_oriented,5,9,129.0,1,1,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_2977,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,4,17,329.0,3,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2983,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,4,13,199.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_2998,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,4,9,137.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3005,SF_15,test,Lists,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,correct,test_driven,3,10,135.0,0,3,1,0.85,RUBRIC_MISCONCEPTION_BRITTLE_PASS,synthetic_pedagogical_rule
+DM_3009,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,3,17,378.0,3,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3011,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,3,13,192.0,2,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3019,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,3,10,145.0,1,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3029,SF_39,test,Classes and objects,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,struggling,5,14,206.0,3,1,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_3033,SF_43,test,Encapsulation,Understood,Understood,,Understood,Insufficient Evidence,correct,planned,5,12,151.0,0,4,1,0.78,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3042,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,3,15,215.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3048,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,debugging_oriented,4,16,281.0,2,3,0,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_3063,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,incorrect,exploratory,4,11,150.0,0,2,0,0.88,RUBRIC_MASTERY_DIAGNOSED_FAULT,synthetic_pedagogical_rule
+DM_3070,SF_15,test,Lists,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,partially_correct,mixed,3,7,138.0,0,1,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_3074,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,4,15,294.0,2,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3076,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,5,13,199.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3084,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,correct,exploratory,5,13,193.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3094,SF_39,test,Classes and objects,Understood,Understood,,Understood,Sufficient Evidence,correct,exploratory,3,12,175.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3098,SF_43,test,Encapsulation,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,5,10,126.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3107,SF_52,test,Input validation,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,correct,exploratory,3,12,182.0,0,2,1,0.84,RUBRIC_PARTIAL_ROTE_IMPLEMENTATION,synthetic_pedagogical_rule
+DM_3113,SF_58,test,Time complexity,Partial Understanding,Partial Understanding,,Partial Understanding,Insufficient Evidence,partially_correct,debugging_oriented,5,15,218.0,2,2,1,0.71,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_3128,SF_08,test,Loops,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,correct,test_driven,3,10,134.0,0,3,1,0.84,RUBRIC_PARTIAL_ROTE_IMPLEMENTATION,synthetic_pedagogical_rule
+DM_3135,SF_15,test,Lists,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,3,10,148.0,1,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3139,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,3,14,173.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3141,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,correct,exploratory,3,12,156.0,0,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3149,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,3,11,149.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3159,SF_39,test,Classes and objects,Understood,Understood,,Understood,Sufficient Evidence,correct,exploratory,3,13,185.0,0,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3163,SF_43,test,Encapsulation,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,planned,3,10,120.0,0,2,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_3172,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,3,12,197.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3178,SF_58,test,Time complexity,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,correct,planned,5,9,121.0,0,2,0,0.85,RUBRIC_MISCONCEPTION_BRITTLE_PASS,synthetic_pedagogical_rule
+DM_3193,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,3,15,220.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3200,SF_15,test,Lists,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,incorrect,planned,5,10,134.0,0,3,0,0.82,RUBRIC_PARTIAL_LOGIC_DEFICIT,synthetic_pedagogical_rule
+DM_3204,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,5,8,96.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3206,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,correct,exploratory,5,15,221.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3214,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,4,13,205.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3224,SF_39,test,Classes and objects,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,correct,planned,4,17,235.0,0,4,1,0.84,RUBRIC_PARTIAL_ROTE_IMPLEMENTATION,synthetic_pedagogical_rule
+DM_3228,SF_43,test,Encapsulation,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,3,12,153.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3237,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,3,9,135.0,0,2,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3243,SF_58,test,Time complexity,Understood,Understood,,Understood,Insufficient Evidence,correct,exploratory,3,10,147.0,0,3,0,0.78,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3258,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,4,24,606.0,4,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3265,SF_15,test,Lists,Understood,Understood,,Understood,Insufficient Evidence,correct,test_driven,3,11,153.0,0,3,1,0.74,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3269,SF_19,test,Dictionaries,Understood,Understood,,Understood,Insufficient Evidence,correct,debugging_oriented,4,12,171.0,1,3,1,0.78,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3271,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,4,15,216.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3279,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,4,12,163.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3289,SF_39,test,Classes and objects,Understood,Understood,,Understood,Sufficient Evidence,correct,exploratory,3,11,182.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3293,SF_43,test,Encapsulation,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,debugging_oriented,4,10,178.0,1,2,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_3302,SF_52,test,Input validation,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,planned,5,13,155.0,0,4,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_3308,SF_58,test,Time complexity,Partial Understanding,Partial Understanding,,Partial Understanding,Insufficient Evidence,incorrect,test_driven,4,14,226.0,0,4,0,0.67,RUBRIC_PARTIAL_LOGIC_DEFICIT,synthetic_pedagogical_rule
+DM_3323,SF_08,test,Loops,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,debugging_oriented,4,15,245.0,2,3,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_3330,SF_15,test,Lists,Understood,Understood,,Understood,Insufficient Evidence,partially_correct,test_driven,5,10,153.0,0,3,0,0.74,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_3334,SF_19,test,Dictionaries,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,correct,debugging_oriented,5,19,304.0,3,2,1,0.85,RUBRIC_MISCONCEPTION_BRITTLE_PASS,synthetic_pedagogical_rule
+DM_3336,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,4,22,643.0,4,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3344,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,4,10,195.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3354,SF_39,test,Classes and objects,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,correct,planned,5,10,133.0,0,2,1,0.85,RUBRIC_MISCONCEPTION_BRITTLE_PASS,synthetic_pedagogical_rule
+DM_3358,SF_43,test,Encapsulation,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,3,13,180.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3367,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,4,14,298.0,2,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3373,SF_58,test,Time complexity,Partial Understanding,Partial Understanding,,Partial Understanding,Insufficient Evidence,partially_correct,debugging_oriented,3,14,226.0,2,2,0,0.71,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_3388,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,4,14,197.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3395,SF_15,test,Lists,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,test_driven,3,13,174.0,0,4,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_3399,SF_19,test,Dictionaries,Partial Understanding,Partial Understanding,,Partial Understanding,Insufficient Evidence,partially_correct,debugging_oriented,4,19,317.0,3,1,1,0.67,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_3401,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,test_driven,3,10,138.0,0,3,0,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_3409,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,5,12,215.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3419,SF_39,test,Classes and objects,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,debugging_oriented,5,18,284.0,3,1,0,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_3423,SF_43,test,Encapsulation,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,4,14,239.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3432,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,3,13,213.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3438,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,4,9,171.0,0,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3453,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,4,10,174.0,0,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3460,SF_15,test,Lists,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,struggling,4,11,290.0,2,1,0,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_3464,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,5,14,220.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3466,SF_21,test,Sets,Understood,Understood,,Understood,Insufficient Evidence,correct,exploratory,3,12,151.0,0,2,1,0.78,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3474,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,mixed,5,9,142.0,0,2,0,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_3484,SF_39,test,Classes and objects,Understood,Understood,,Understood,Sufficient Evidence,correct,exploratory,5,11,154.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3488,SF_43,test,Encapsulation,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,correct,debugging_oriented,5,18,268.0,3,2,1,0.85,RUBRIC_MISCONCEPTION_BRITTLE_PASS,synthetic_pedagogical_rule
+DM_3497,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,mixed,5,9,165.0,0,1,0,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_3503,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,3,15,208.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3518,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,exploratory,4,12,188.0,0,1,0,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_3525,SF_15,test,Lists,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,4,7,152.0,0,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3529,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,4,25,861.0,4,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3531,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,4,13,151.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3539,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,5,8,157.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3549,SF_39,test,Classes and objects,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,mixed,3,9,173.0,0,1,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_3553,SF_43,test,Encapsulation,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,5,14,205.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3562,SF_52,test,Input validation,Partial Understanding,Partial Understanding,,Partial Understanding,Insufficient Evidence,partially_correct,planned,4,15,183.0,0,4,0,0.71,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_3568,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,5,11,218.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3583,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,3,19,325.0,3,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3590,SF_15,test,Lists,Understood,Understood,,Understood,Insufficient Evidence,correct,planned,3,12,166.0,0,3,0,0.78,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3594,SF_19,test,Dictionaries,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,exploratory,4,10,113.0,0,1,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_3596,SF_21,test,Sets,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,planned,3,12,155.0,0,2,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_3604,SF_29,test,Sorting,Understood,Understood,,Understood,Insufficient Evidence,correct,planned,4,12,132.0,0,2,1,0.74,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3614,SF_39,test,Classes and objects,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,4,10,139.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3618,SF_43,test,Encapsulation,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,4,13,173.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3627,SF_52,test,Input validation,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,exploratory,4,14,239.0,0,3,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_3633,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,5,10,128.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3648,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,mixed,4,9,169.0,0,3,0,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_3655,SF_15,test,Lists,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,struggling,3,13,254.0,2,1,0,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_3659,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,struggling,4,12,204.0,2,1,0,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_3661,SF_21,test,Sets,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,incorrect,debugging_oriented,5,15,240.0,2,3,0,0.82,RUBRIC_PARTIAL_LOGIC_DEFICIT,synthetic_pedagogical_rule
+DM_3669,SF_29,test,Sorting,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,correct,test_driven,4,9,120.0,0,3,1,0.84,RUBRIC_PARTIAL_ROTE_IMPLEMENTATION,synthetic_pedagogical_rule
+DM_3679,SF_39,test,Classes and objects,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,debugging_oriented,3,20,338.0,3,2,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_3683,SF_43,test,Encapsulation,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,3,12,187.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3692,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,5,10,190.0,0,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3698,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,5,10,184.0,0,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3713,SF_08,test,Loops,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,incorrect,test_driven,4,12,190.0,0,3,0,0.82,RUBRIC_PARTIAL_LOGIC_DEFICIT,synthetic_pedagogical_rule
+DM_3720,SF_15,test,Lists,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,4,13,351.0,2,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3724,SF_19,test,Dictionaries,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,test_driven,4,14,192.0,0,4,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_3726,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,3,10,159.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3734,SF_29,test,Sorting,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,incorrect,struggling,5,19,459.0,3,1,0,0.82,RUBRIC_PARTIAL_LOGIC_DEFICIT,synthetic_pedagogical_rule
+DM_3744,SF_39,test,Classes and objects,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,4,15,484.0,2,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3748,SF_43,test,Encapsulation,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,4,10,135.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3757,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,4,14,271.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3763,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,3,14,198.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3778,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,debugging_oriented,5,10,127.0,1,3,1,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_3785,SF_15,test,Lists,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,5,10,195.0,0,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3789,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,4,10,142.0,0,3,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3791,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,3,16,447.0,3,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3799,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,4,12,191.0,2,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3809,SF_39,test,Classes and objects,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,exploratory,5,16,242.0,0,3,0,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_3813,SF_43,test,Encapsulation,Understood,Understood,,Understood,Sufficient Evidence,incorrect,mixed,3,13,215.0,0,2,0,0.88,RUBRIC_MASTERY_DIAGNOSED_FAULT,synthetic_pedagogical_rule
+DM_3822,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,debugging_oriented,5,19,282.0,3,2,0,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_3828,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,5,16,402.0,3,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3843,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,mixed,5,9,199.0,0,1,1,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_3850,SF_15,test,Lists,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,4,12,208.0,0,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3854,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,4,8,103.0,1,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3856,SF_21,test,Sets,Understood,Understood,,Understood,Insufficient Evidence,correct,struggling,3,12,197.0,2,1,0,0.78,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3864,SF_29,test,Sorting,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,correct,test_driven,3,14,190.0,0,4,1,0.84,RUBRIC_PARTIAL_ROTE_IMPLEMENTATION,synthetic_pedagogical_rule
+DM_3874,SF_39,test,Classes and objects,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,5,12,192.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3878,SF_43,test,Encapsulation,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,correct,debugging_oriented,4,10,138.0,1,3,1,0.84,RUBRIC_PARTIAL_ROTE_IMPLEMENTATION,synthetic_pedagogical_rule
+DM_3887,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,3,9,141.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3893,SF_58,test,Time complexity,Possible Misconception,Possible Misconception,,Possible Misconception,Insufficient Evidence,correct,test_driven,4,13,175.0,0,4,1,0.66,RUBRIC_MISCONCEPTION_BRITTLE_PASS,synthetic_pedagogical_rule
+DM_3908,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,5,21,423.0,4,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3915,SF_15,test,Lists,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,planned,4,13,196.0,0,3,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_3919,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,4,13,184.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3921,SF_21,test,Sets,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,test_driven,4,14,223.0,0,4,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_3929,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,5,9,164.0,0,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3939,SF_39,test,Classes and objects,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,5,14,206.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3943,SF_43,test,Encapsulation,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,correct,debugging_oriented,4,9,137.0,1,1,0,0.85,RUBRIC_MISCONCEPTION_BRITTLE_PASS,synthetic_pedagogical_rule
+DM_3952,SF_52,test,Input validation,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,struggling,5,15,308.0,3,1,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_3958,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,correct,exploratory,3,13,194.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3973,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,3,9,124.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3980,SF_15,test,Lists,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,3,11,210.0,0,2,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3984,SF_19,test,Dictionaries,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,correct,test_driven,4,14,218.0,0,4,1,0.84,RUBRIC_PARTIAL_ROTE_IMPLEMENTATION,synthetic_pedagogical_rule
+DM_3986,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,4,14,216.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_3994,SF_29,test,Sorting,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,test_driven,3,15,199.0,0,4,1,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_4004,SF_39,test,Classes and objects,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,4,11,193.0,0,2,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4008,SF_43,test,Encapsulation,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,5,10,164.0,1,2,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4017,SF_52,test,Input validation,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,exploratory,3,11,147.0,0,3,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_4023,SF_58,test,Time complexity,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,debugging_oriented,3,12,159.0,1,3,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_4038,SF_08,test,Loops,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,mixed,3,11,195.0,0,2,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_4045,SF_15,test,Lists,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,5,11,182.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4049,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,4,22,486.0,4,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4051,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,3,11,168.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4059,SF_29,test,Sorting,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,incorrect,debugging_oriented,4,21,358.0,3,3,0,0.82,RUBRIC_PARTIAL_LOGIC_DEFICIT,synthetic_pedagogical_rule
+DM_4069,SF_39,test,Classes and objects,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,4,15,268.0,2,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4073,SF_43,test,Encapsulation,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,struggling,3,13,229.0,2,1,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_4082,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,3,9,120.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4088,SF_58,test,Time complexity,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,mixed,4,9,163.0,0,1,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_4103,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,3,11,156.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4110,SF_15,test,Lists,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,4,15,238.0,2,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4114,SF_19,test,Dictionaries,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,mixed,3,10,143.0,0,1,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_4116,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,5,10,146.0,1,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4124,SF_29,test,Sorting,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,correct,debugging_oriented,3,11,131.0,1,3,1,0.84,RUBRIC_PARTIAL_ROTE_IMPLEMENTATION,synthetic_pedagogical_rule
+DM_4134,SF_39,test,Classes and objects,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,planned,4,13,174.0,0,2,1,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_4138,SF_43,test,Encapsulation,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,3,9,119.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4147,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,4,10,133.0,1,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4153,SF_58,test,Time complexity,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,mixed,3,9,144.0,0,1,1,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_4168,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,4,10,124.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4175,SF_15,test,Lists,Understood,Understood,,Understood,Insufficient Evidence,correct,test_driven,5,10,155.0,0,3,1,0.78,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4179,SF_19,test,Dictionaries,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,incorrect,exploratory,5,12,169.0,0,3,0,0.82,RUBRIC_PARTIAL_LOGIC_DEFICIT,synthetic_pedagogical_rule
+DM_4181,SF_21,test,Sets,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,correct,debugging_oriented,5,12,172.0,2,1,1,0.85,RUBRIC_MISCONCEPTION_BRITTLE_PASS,synthetic_pedagogical_rule
+DM_4189,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,5,15,307.0,3,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4199,SF_39,test,Classes and objects,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,exploratory,5,10,148.0,0,1,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_4203,SF_43,test,Encapsulation,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,3,16,217.0,3,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4212,SF_52,test,Input validation,Possible Misconception,Possible Misconception,,Possible Misconception,Insufficient Evidence,incorrect,struggling,5,16,303.0,3,1,0,0.75,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_4218,SF_58,test,Time complexity,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,correct,struggling,4,16,409.0,3,1,0,0.85,RUBRIC_MISCONCEPTION_BRITTLE_PASS,synthetic_pedagogical_rule
+DM_4233,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,3,10,134.0,1,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4240,SF_15,test,Lists,Possible Misconception,Possible Misconception,,Possible Misconception,Insufficient Evidence,incorrect,planned,4,12,138.0,0,2,0,0.75,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_4244,SF_19,test,Dictionaries,Understood,Understood,,Understood,Insufficient Evidence,correct,exploratory,3,12,206.0,0,3,1,0.74,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4246,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,3,12,275.0,2,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4254,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,5,13,179.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4264,SF_39,test,Classes and objects,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,planned,3,9,103.0,0,2,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_4268,SF_43,test,Encapsulation,Understood,Understood,,Understood,Sufficient Evidence,incorrect,exploratory,5,11,160.0,0,3,0,0.88,RUBRIC_MASTERY_DIAGNOSED_FAULT,synthetic_pedagogical_rule
+DM_4277,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,4,11,158.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4283,SF_58,test,Time complexity,Understood,Understood,,Understood,Insufficient Evidence,correct,debugging_oriented,5,11,155.0,1,3,1,0.78,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4298,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,test_driven,4,10,136.0,0,3,0,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_4305,SF_15,test,Lists,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,5,10,123.0,0,4,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4309,SF_19,test,Dictionaries,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,mixed,4,8,133.0,0,1,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_4311,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,correct,exploratory,4,15,245.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4319,SF_29,test,Sorting,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,exploratory,4,12,186.0,0,2,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_4329,SF_39,test,Classes and objects,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,4,10,200.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4333,SF_43,test,Encapsulation,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,5,12,201.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4342,SF_52,test,Input validation,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,test_driven,5,14,209.0,0,4,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_4348,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,4,17,378.0,3,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4363,SF_08,test,Loops,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,exploratory,4,14,232.0,0,1,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_4370,SF_15,test,Lists,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,incorrect,debugging_oriented,3,9,115.0,1,1,0,0.82,RUBRIC_PARTIAL_LOGIC_DEFICIT,synthetic_pedagogical_rule
+DM_4374,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,mixed,3,13,196.0,0,3,1,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_4376,SF_21,test,Sets,Understood,Understood,,Understood,Insufficient Evidence,partially_correct,test_driven,5,13,170.0,0,4,0,0.74,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_4384,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,correct,exploratory,3,15,224.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4394,SF_39,test,Classes and objects,Understood,Understood,,Understood,Insufficient Evidence,correct,test_driven,4,13,196.0,0,4,1,0.78,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4398,SF_43,test,Encapsulation,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,4,9,101.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4407,SF_52,test,Input validation,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,correct,test_driven,4,10,114.0,0,3,1,0.84,RUBRIC_PARTIAL_ROTE_IMPLEMENTATION,synthetic_pedagogical_rule
+DM_4413,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,planned,5,17,245.0,0,3,1,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_4428,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,correct,exploratory,5,12,194.0,0,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4435,SF_15,test,Lists,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,5,14,217.0,2,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4439,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,3,18,287.0,3,2,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4441,SF_21,test,Sets,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,correct,planned,3,11,152.0,0,2,1,0.84,RUBRIC_PARTIAL_ROTE_IMPLEMENTATION,synthetic_pedagogical_rule
+DM_4449,SF_29,test,Sorting,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,debugging_oriented,4,21,309.0,3,3,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_4459,SF_39,test,Classes and objects,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,3,19,324.0,3,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4463,SF_43,test,Encapsulation,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,3,13,164.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4472,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,correct,exploratory,5,13,181.0,0,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4478,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,4,10,200.0,0,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4493,SF_08,test,Loops,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,struggling,3,14,334.0,2,1,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_4500,SF_15,test,Lists,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,incorrect,mixed,3,9,184.0,0,2,0,0.82,RUBRIC_PARTIAL_LOGIC_DEFICIT,synthetic_pedagogical_rule
+DM_4504,SF_19,test,Dictionaries,Understood,Understood,,Understood,Insufficient Evidence,correct,mixed,3,10,214.0,0,3,1,0.78,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4506,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,struggling,5,19,597.0,3,1,0,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_4514,SF_29,test,Sorting,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,correct,mixed,3,10,197.0,0,3,0,0.84,RUBRIC_PARTIAL_ROTE_IMPLEMENTATION,synthetic_pedagogical_rule
+DM_4524,SF_39,test,Classes and objects,Understood,Understood,,Understood,Sufficient Evidence,correct,exploratory,3,9,108.0,0,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4528,SF_43,test,Encapsulation,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,4,8,120.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4537,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,3,20,363.0,3,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4543,SF_58,test,Time complexity,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,debugging_oriented,4,10,144.0,1,2,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_4558,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,5,14,201.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4565,SF_15,test,Lists,Understood,Understood,,Understood,Sufficient Evidence,incorrect,struggling,3,13,317.0,2,1,0,0.88,RUBRIC_MASTERY_DIAGNOSED_FAULT,synthetic_pedagogical_rule
+DM_4569,SF_19,test,Dictionaries,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,incorrect,test_driven,5,11,148.0,0,3,0,0.82,RUBRIC_PARTIAL_LOGIC_DEFICIT,synthetic_pedagogical_rule
+DM_4571,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,incorrect,test_driven,3,12,170.0,0,4,1,0.88,RUBRIC_MASTERY_DIAGNOSED_FAULT,synthetic_pedagogical_rule
+DM_4579,SF_29,test,Sorting,Partial Understanding,Partial Understanding,,Partial Understanding,Insufficient Evidence,correct,mixed,3,10,146.0,0,1,1,0.66,RUBRIC_PARTIAL_ROTE_IMPLEMENTATION,synthetic_pedagogical_rule
+DM_4589,SF_39,test,Classes and objects,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,4,12,164.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4593,SF_43,test,Encapsulation,Understood,Understood,,Understood,Sufficient Evidence,incorrect,exploratory,3,14,229.0,0,3,0,0.88,RUBRIC_MASTERY_DIAGNOSED_FAULT,synthetic_pedagogical_rule
+DM_4602,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,4,12,196.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4608,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,mixed,4,9,138.0,0,1,0,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_4623,SF_08,test,Loops,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,test_driven,4,11,162.0,0,3,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_4630,SF_15,test,Lists,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,struggling,4,13,245.0,2,1,0,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_4634,SF_19,test,Dictionaries,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,incorrect,struggling,3,13,221.0,2,1,0,0.82,RUBRIC_PARTIAL_LOGIC_DEFICIT,synthetic_pedagogical_rule
+DM_4636,SF_21,test,Sets,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,test_driven,4,15,212.0,0,4,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_4644,SF_29,test,Sorting,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,exploratory,3,11,142.0,0,1,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_4654,SF_39,test,Classes and objects,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,test_driven,5,13,170.0,0,4,0,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_4658,SF_43,test,Encapsulation,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,3,13,232.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4667,SF_52,test,Input validation,Possible Misconception,Possible Misconception,,Possible Misconception,Insufficient Evidence,incorrect,planned,4,9,118.0,0,2,0,0.75,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_4673,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,4,9,134.0,0,3,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4688,SF_08,test,Loops,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,debugging_oriented,4,13,208.0,2,1,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_4695,SF_15,test,Lists,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,correct,mixed,3,12,236.0,0,2,1,0.84,RUBRIC_PARTIAL_ROTE_IMPLEMENTATION,synthetic_pedagogical_rule
+DM_4699,SF_19,test,Dictionaries,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,exploratory,5,8,118.0,0,1,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_4701,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,5,10,191.0,0,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4709,SF_29,test,Sorting,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,mixed,4,10,151.0,0,3,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_4719,SF_39,test,Classes and objects,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,5,9,130.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4723,SF_43,test,Encapsulation,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,mixed,5,12,169.0,0,3,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_4732,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,correct,test_driven,4,14,207.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4738,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,5,16,279.0,2,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4753,SF_08,test,Loops,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,debugging_oriented,3,15,228.0,2,3,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_4760,SF_15,test,Lists,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,4,12,159.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4764,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,3,9,162.0,0,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4766,SF_21,test,Sets,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,debugging_oriented,5,8,116.0,1,1,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_4774,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,5,18,303.0,3,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4784,SF_39,test,Classes and objects,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,debugging_oriented,5,18,297.0,3,3,0,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_4788,SF_43,test,Encapsulation,Understood,Understood,,Understood,Sufficient Evidence,correct,exploratory,3,13,186.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4797,SF_52,test,Input validation,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,struggling,5,13,396.0,2,1,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_4803,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,4,14,162.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4818,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,3,17,283.0,3,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4825,SF_15,test,Lists,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,4,23,564.0,4,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4829,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,3,14,245.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4831,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,5,11,209.0,0,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4839,SF_29,test,Sorting,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,debugging_oriented,5,16,232.0,2,3,0,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_4849,SF_39,test,Classes and objects,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,3,25,713.0,4,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4853,SF_43,test,Encapsulation,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,incorrect,struggling,5,11,162.0,2,1,0,0.82,RUBRIC_PARTIAL_LOGIC_DEFICIT,synthetic_pedagogical_rule
+DM_4862,SF_52,test,Input validation,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,correct,mixed,3,10,159.0,0,3,1,0.84,RUBRIC_PARTIAL_ROTE_IMPLEMENTATION,synthetic_pedagogical_rule
+DM_4868,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,3,9,132.0,1,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4883,SF_08,test,Loops,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,5,15,213.0,2,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4890,SF_15,test,Lists,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,test_driven,5,13,176.0,0,4,1,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_4894,SF_19,test,Dictionaries,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,4,15,212.0,2,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4896,SF_21,test,Sets,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,planned,4,9,109.0,0,2,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_4904,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,correct,struggling,4,17,477.0,3,1,0,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4914,SF_39,test,Classes and objects,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,5,13,187.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4918,SF_43,test,Encapsulation,Understood,Understood,,Understood,Sufficient Evidence,correct,mixed,3,13,248.0,0,3,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4927,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,correct,debugging_oriented,3,10,155.0,1,1,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4933,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,partially_correct,planned,3,12,159.0,0,4,0,0.9,RUBRIC_MASTERY_MINOR_EDGE_SLIP,synthetic_pedagogical_rule
+DM_4948,SF_08,test,Loops,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,debugging_oriented,4,17,280.0,3,2,1,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_4955,SF_15,test,Lists,Partial Understanding,Partial Understanding,,Partial Understanding,Insufficient Evidence,incorrect,planned,5,11,128.0,0,3,0,0.67,RUBRIC_PARTIAL_LOGIC_DEFICIT,synthetic_pedagogical_rule
+DM_4959,SF_19,test,Dictionaries,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,mixed,4,11,196.0,0,1,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_4961,SF_21,test,Sets,Understood,Understood,,Understood,Sufficient Evidence,correct,exploratory,3,12,174.0,0,2,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4969,SF_29,test,Sorting,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,3,13,162.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule
+DM_4979,SF_39,test,Classes and objects,Partial Understanding,Partial Understanding,,Partial Understanding,Sufficient Evidence,partially_correct,debugging_oriented,5,15,217.0,2,3,1,0.86,RUBRIC_PARTIAL_WORKING_PROTOTYPE,synthetic_pedagogical_rule
+DM_4983,SF_43,test,Encapsulation,Possible Misconception,Possible Misconception,,Possible Misconception,Sufficient Evidence,incorrect,debugging_oriented,3,11,141.0,1,3,0,0.92,RUBRIC_MISCONCEPTION_SYSTEMATIC_FLAW,synthetic_pedagogical_rule
+DM_4992,SF_52,test,Input validation,Understood,Understood,,Understood,Sufficient Evidence,incorrect,mixed,5,8,121.0,0,1,0,0.88,RUBRIC_MASTERY_DIAGNOSED_FAULT,synthetic_pedagogical_rule
+DM_4998,SF_58,test,Time complexity,Understood,Understood,,Understood,Sufficient Evidence,correct,planned,4,12,164.0,0,4,1,0.95,RUBRIC_MASTERY_OPTIMAL,synthetic_pedagogical_rule

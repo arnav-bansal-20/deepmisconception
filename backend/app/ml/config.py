@@ -42,15 +42,20 @@ STATUS_READY: str = "READY"
 # ------------------------------------------------------------------------------
 # 3. Canonical Numerical Feature Names & Order (24 Dimensions)
 # ------------------------------------------------------------------------------
-# NOTE: Index 0 (s_overall) is masked to 0.0 by default in the Transformer input vector
-# to prevent target leakage and redundant composite score feedback, while remaining
-# available in supporting dictionaries for reporting and baseline analysis.
+# CRITICAL LEAKAGE PREVENTION CONTRACT:
+# - Index 0 (s_overall) is strictly masked to 0.0 in the Transformer input vector
+#   to prevent direct composite formula target leakage.
+# - Index 3 (s_viva) is strictly masked to 0.0 in the primary model input vector
+#   because it is derived from evaluator answer-quality annotations. Viva text is
+#   already encoded via Sentence-Transformer; evaluator rubric assessments must
+#   not enter the primary model.
+# Both scores remain available in feature dictionaries for baseline reporting.
 NUMERICAL_FEATURE_NAMES: List[str] = [
     # 0–4: High-Level Composite & Modality Formula Scores
-    "s_overall",                    # Index 0: masked to 0.0 in model input
+    "s_overall",                    # Index 0: MASKED to 0.0 in primary model input
     "s_ast",                        # Index 1: AST Structural Score
     "s_exec",                       # Index 2: Sandbox Execution Fidelity Score
-    "s_viva",                       # Index 3: Viva Reasoning Score
+    "s_viva",                       # Index 3: MASKED to 0.0 in primary model input
     "s_process",                    # Index 4: Process Telemetry Behavioral Score
     # 5–8: Process Sub-dimension Component Scores
     "s_inc",                        # Index 5: Incremental Development Score

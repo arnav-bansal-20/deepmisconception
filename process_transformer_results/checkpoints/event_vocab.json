@@ -1,0 +1,15 @@
+{
+  "<PAD>": 0,
+  "debug": 1,
+  "delete": 2,
+  "edit": 3,
+  "idle": 4,
+  "insert": 5,
+  "paste": 6,
+  "revision": 7,
+  "run": 8,
+  "runtime_error": 9,
+  "save": 10,
+  "syntax_error": 11,
+  "test": 12
+}

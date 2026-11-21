@@ -52,6 +52,21 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Navigation Tabs */}
         <nav className="flex items-center gap-1">
+          {/* Teacher / Administrator Tabs */}
+          {isTeacher && (
+            <button
+              onClick={() => setActiveTab('instructor')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                activeTab === 'instructor'
+                  ? 'bg-indigo-50 text-indigo-700 font-bold border border-indigo-200'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              }`}
+            >
+              <GraduationCap className="w-4 h-4" />
+              <span>Instructor Dashboard</span>
+            </button>
+          )}
+
           {/* Student Tabs: ONLY shown for students */}
           {!isTeacher && (
             <>

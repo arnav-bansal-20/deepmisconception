@@ -1,0 +1,18 @@
+{
+  "class_to_idx": {
+    "Understood": 0,
+    "Partial Understanding": 1,
+    "Possible Misconception": 2
+  },
+  "idx_to_class": {
+    "0": "Understood",
+    "1": "Partial Understanding",
+    "2": "Possible Misconception"
+  },
+  "classes": [
+    "Understood",
+    "Partial Understanding",
+    "Possible Misconception"
+  ],
+  "num_classes": 3
+}

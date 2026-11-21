@@ -266,11 +266,13 @@ class MultimodalTrainer:
         weight_decay: float = 1e-4,
         class_weights: Optional[List[float]] = None,
         device: Optional[str] = None,
+        mask_formula_leakage: bool = False,
     ):
         self.device = device or ("cuda" if torch.cuda.is_available() else ("mps" if torch.backends.mps.is_available() else "cpu"))
         self.model = model.to(self.device)
         self.alignment_module = alignment_module.to(self.device) if alignment_module else None
         self.process_transformer = process_transformer.to(self.device) if process_transformer else None
+        self.mask_formula_leakage = mask_formula_leakage
 
         # Trainable parameters across all active trainable components
         self.trainable_params = list(self.model.parameters())
@@ -303,6 +305,12 @@ class MultimodalTrainer:
             labels = batch["labels"].to(self.device)
             masks = batch["modality_masks"].to(self.device)
 
+            # Target leakage elimination: mask s_overall (index 0) and s_viva (index 3) if formula scores are present
+            if self.mask_formula_leakage:
+                num_feat = num_feat.clone()
+                num_feat[:, 0] = 0.0
+                num_feat[:, 3] = 0.0
+
             # End-to-end Process Transformer forward pass
             if self.process_transformer is not None and batch.get("has_process_seq") and "proc_event_types" in batch:
                 proc_types = batch["proc_event_types"].to(self.device)
@@ -321,9 +329,19 @@ class MultimodalTrainer:
                 proc_emb = batch["proc_emb"].to(self.device)
 
             # Compute cross-modal alignment representation if active
+            # Strictly masked if either Code (index 1) or Explanation (index 2) is missing
             if self.alignment_module:
                 ast_feat = num_feat[:, 15:20] if num_feat.size(1) >= 20 else None
-                align_rep, _, _ = self.alignment_module(code_emb, exp_emb, ast_feat)
+                align_rep, _, _ = self.alignment_module(
+                    code_emb, exp_emb, ast_feat,
+                    code_mask=masks[:, 1], exp_mask=masks[:, 2]
+                )
+                either_missing = masks[:, 1] | masks[:, 2]
+                if either_missing.any():
+                    masks = masks.clone()
+                    masks[:, 3] = masks[:, 3] | either_missing
+                    align_rep = align_rep.clone()
+                    align_rep[either_missing] = 0.0
             else:
                 align_rep = batch["align_rep"].to(self.device)
 
@@ -364,7 +382,12 @@ class MultimodalTrainer:
             for batch in dataloader:
                 code_emb = batch["code_emb"].to(self.device)
                 exp_emb = batch["exp_emb"].to(self.device)
-                num_feat = batch["num_features"].to(self.device)
+                num_feat = batch["num_features"].to(self.device).clone()
+                # Target leakage elimination in validation: mask s_overall and s_viva if formula scores are present
+                if self.mask_formula_leakage:
+                    num_feat = num_feat.clone()
+                    num_feat[:, 0] = 0.0
+                    num_feat[:, 3] = 0.0
                 labels = batch["labels"].to(self.device)
                 masks = batch["modality_masks"].to(self.device)
 
@@ -384,7 +407,17 @@ class MultimodalTrainer:
                     proc_emb = batch["proc_emb"].to(self.device)
 
                 if self.alignment_module:
-                    align_rep, _, _ = self.alignment_module(code_emb, exp_emb)
+                    ast_feat = num_feat[:, 15:20] if num_feat.size(1) >= 20 else None
+                    align_rep, _, _ = self.alignment_module(
+                        code_emb, exp_emb, ast_feat,
+                        code_mask=masks[:, 1], exp_mask=masks[:, 2]
+                    )
+                    either_missing = masks[:, 1] | masks[:, 2]
+                    if either_missing.any():
+                        masks = masks.clone()
+                        masks[:, 3] = masks[:, 3] | either_missing
+                        align_rep = align_rep.clone()
+                        align_rep[either_missing] = 0.0
                 else:
                     align_rep = batch["align_rep"].to(self.device)
 
@@ -461,6 +494,13 @@ class MultimodalTrainer:
                         "num_classes": self.model.num_classes,
                         "num_heads": self.model.nhead,
                         "num_encoder_layers": self.model.num_encoder_layers,
+                    },
+                    "class_mapping": dict(LABEL_MAP),
+                    "classes": list(LABELS),
+                    "preprocessing_config": {
+                        "mask_s_overall": True,
+                        "mask_s_viva": True,
+                        "num_features_dim": self.model.num_features_dim,
                     },
                     "val_loss": val_loss,
                     "val_accuracy": val_acc,

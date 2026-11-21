@@ -1,0 +1,90 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DeepMisconceptionProcessEventSchema",
+  "description": "Schema for Modality 3: Chronological Coding-Process Events",
+  "type": "object",
+  "required": [
+    "session_id",
+    "event_id",
+    "timestamp",
+    "event_type",
+    "event_description",
+    "characters_inserted",
+    "characters_deleted",
+    "code_snapshot_reference",
+    "execution_result",
+    "error_type",
+    "debug_action",
+    "test_result"
+  ],
+  "properties": {
+    "session_id": {
+      "type": "string",
+      "pattern": "^DM_[0-9]{4,6}$",
+      "description": "Identifier linking to the parent session"
+    },
+    "event_id": {
+      "type": "string",
+      "pattern": "^EVT_DM_[0-9]{4,6}_[0-9]+$",
+      "description": "Unique identifier for this chronological event"
+    },
+    "timestamp": {
+      "type": "string",
+      "description": "Monotonically increasing chronological timestamp in ISO-8601 format"
+    },
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "insert",
+        "edit",
+        "delete",
+        "paste",
+        "run",
+        "syntax_error",
+        "runtime_error",
+        "debug",
+        "test",
+        "revision",
+        "idle",
+        "save"
+      ],
+      "description": "Category of process event"
+    },
+    "event_description": {
+      "type": "string",
+      "description": "Human-readable description of the developer action"
+    },
+    "characters_inserted": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Count of characters inserted in this event"
+    },
+    "characters_deleted": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Count of characters removed in this event"
+    },
+    "code_snapshot_reference": {
+      "type": "string",
+      "description": "Hash or version reference of code state at this event"
+    },
+    "execution_result": {
+      "type": "string",
+      "enum": ["success", "syntax_error", "runtime_error", "test_pass", "test_fail", "none"],
+      "description": "Outcome of an execution or test run"
+    },
+    "error_type": {
+      "type": "string",
+      "description": "Python exception type or 'none' if no error occurred"
+    },
+    "debug_action": {
+      "type": "string",
+      "description": "Action taken to diagnose or resolve an error or 'none'"
+    },
+    "test_result": {
+      "type": "string",
+      "enum": ["pass", "fail", "none"],
+      "description": "Result of automated or manual test case evaluation"
+    }
+  }
+}

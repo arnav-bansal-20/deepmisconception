@@ -1,0 +1,142 @@
+{
+  "dataset_partition": "test",
+  "total_test_sessions": 693,
+  "evaluated_supervised_sessions": 627,
+  "excluded_insufficient_evidence_sessions": 66,
+  "class_support": {
+    "Understood": 417,
+    "Partial Understanding": 140,
+    "Possible Misconception": 70
+  },
+  "experiments": {
+    "Experiment_A_Event_Only": {
+      "accuracy": 0.6044657097288676,
+      "macro_precision": 0.30333882611424984,
+      "macro_recall": 0.33933424688820374,
+      "macro_f1": 0.31532336885265444,
+      "weighted_f1": 0.5430271276091576,
+      "roc_auc": 0.5373415914401539,
+      "pr_auc": 0.35751401265951377,
+      "per_class": {
+        "Understood": {
+          "precision": 0.6704331450094162,
+          "recall": 0.8537170263788969,
+          "f1": 0.7510548523206751
+        },
+        "Partial Understanding": {
+          "precision": 0.23958333333333334,
+          "recall": 0.16428571428571428,
+          "f1": 0.19491525423728814
+        },
+        "Possible Misconception": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        }
+      },
+      "confusion_matrix": [
+        [
+          356,
+          61,
+          0
+        ],
+        [
+          117,
+          23,
+          0
+        ],
+        [
+          58,
+          12,
+          0
+        ]
+      ]
+    },
+    "Experiment_B_Numerical_Only": {
+      "accuracy": 0.6331738437001595,
+      "macro_precision": 0.5030485204225412,
+      "macro_recall": 0.5247744661413726,
+      "macro_f1": 0.5065570083745172,
+      "weighted_f1": 0.6501890719582367,
+      "roc_auc": 0.7223309486874857,
+      "pr_auc": 0.49023303095590515,
+      "per_class": {
+        "Understood": {
+          "precision": 0.8257372654155496,
+          "recall": 0.7386091127098321,
+          "f1": 0.779746835443038
+        },
+        "Partial Understanding": {
+          "precision": 0.4420289855072464,
+          "recall": 0.4357142857142857,
+          "f1": 0.43884892086330934
+        },
+        "Possible Misconception": {
+          "precision": 0.2413793103448276,
+          "recall": 0.4,
+          "f1": 0.3010752688172043
+        }
+      },
+      "confusion_matrix": [
+        [
+          308,
+          58,
+          51
+        ],
+        [
+          42,
+          61,
+          37
+        ],
+        [
+          23,
+          19,
+          28
+        ]
+      ]
+    },
+    "Experiment_C_Combined_Process_Transformer": {
+      "accuracy": 0.5980861244019139,
+      "macro_precision": 0.4906482288062766,
+      "macro_recall": 0.5056069430170149,
+      "macro_f1": 0.4830592703756548,
+      "weighted_f1": 0.6273854406374753,
+      "roc_auc": 0.716595664324398,
+      "pr_auc": 0.4842879429441144,
+      "per_class": {
+        "Understood": {
+          "precision": 0.8294797687861272,
+          "recall": 0.6882494004796164,
+          "f1": 0.7522935779816514
+        },
+        "Partial Understanding": {
+          "precision": 0.45454545454545453,
+          "recall": 0.42857142857142855,
+          "f1": 0.4411764705882353
+        },
+        "Possible Misconception": {
+          "precision": 0.18791946308724833,
+          "recall": 0.4,
+          "f1": 0.2557077625570776
+        }
+      },
+      "confusion_matrix": [
+        [
+          287,
+          51,
+          79
+        ],
+        [
+          38,
+          60,
+          42
+        ],
+        [
+          21,
+          21,
+          28
+        ]
+      ]
+    }
+  }
+}

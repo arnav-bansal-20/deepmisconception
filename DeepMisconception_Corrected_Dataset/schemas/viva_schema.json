@@ -1,0 +1,67 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DeepMisconceptionVivaQASchema",
+  "description": "Schema for Modality 2: Viva Questions and Answers",
+  "type": "object",
+  "required": [
+    "session_id",
+    "viva_id",
+    "question",
+    "student_answer",
+    "target_concept",
+    "answer_correctness",
+    "answer_completeness",
+    "reasoning_quality",
+    "identified_misconception",
+    "annotation_confidence"
+  ],
+  "properties": {
+    "session_id": {
+      "type": "string",
+      "pattern": "^DM_[0-9]{4,6}$",
+      "description": "Identifier linking to the parent programming session"
+    },
+    "viva_id": {
+      "type": "string",
+      "pattern": "^VIVA_DM_[0-9]{4,6}_[0-9]+$",
+      "description": "Unique identifier for this viva Q&A turn"
+    },
+    "question": {
+      "type": "string",
+      "description": "Viva question grounded in the submitted Python code"
+    },
+    "student_answer": {
+      "type": "string",
+      "description": "Student's verbal explanation and conceptual reasoning"
+    },
+    "target_concept": {
+      "type": "string",
+      "description": "Core computer science concept evaluated by this question"
+    },
+    "answer_correctness": {
+      "type": "string",
+      "enum": ["correct", "partially_correct", "incorrect"],
+      "description": "Factual and conceptual correctness of the student answer"
+    },
+    "answer_completeness": {
+      "type": "string",
+      "enum": ["complete", "partially_complete", "incomplete"],
+      "description": "Completeness of the conceptual coverage in the answer"
+    },
+    "reasoning_quality": {
+      "type": "string",
+      "enum": ["sound", "flawed", "absent", "superficial"],
+      "description": "Quality and depth of logical reasoning exhibited"
+    },
+    "identified_misconception": {
+      "type": "string",
+      "description": "Specific conceptual flaw or 'None' if understanding is demonstrated"
+    },
+    "annotation_confidence": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "description": "Confidence score of the annotation assessment"
+    }
+  }
+}

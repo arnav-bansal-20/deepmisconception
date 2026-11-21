@@ -1,0 +1,628 @@
+session_id,true_class,pred_class,prob_Understood,prob_Partial,prob_Misconception
+DM_0008,Understood,Understood,0.36474022,0.27127007,0.36398968
+DM_0015,Partial Understanding,Understood,0.5810202,0.25277326,0.16620658
+DM_0019,Understood,Understood,0.5975793,0.21627955,0.18614112
+DM_0021,Understood,Partial Understanding,0.13602789,0.43242788,0.4315442
+DM_0029,Understood,Understood,0.43780467,0.3009847,0.26121065
+DM_0039,Understood,Partial Understanding,0.09477302,0.46055385,0.44467318
+DM_0043,Partial Understanding,Partial Understanding,0.13170685,0.47851083,0.38978234
+DM_0052,Partial Understanding,Possible Misconception,0.30770788,0.3184359,0.37385625
+DM_0058,Possible Misconception,Understood,0.52685905,0.24035013,0.23279077
+DM_0073,Possible Misconception,Understood,0.60931987,0.22682847,0.16385165
+DM_0084,Possible Misconception,Understood,0.6243859,0.19990635,0.17570779
+DM_0086,Understood,Possible Misconception,0.14149982,0.40342847,0.45507172
+DM_0094,Understood,Possible Misconception,0.28699297,0.30692577,0.4060813
+DM_0104,Partial Understanding,Possible Misconception,0.1560402,0.3923342,0.45162562
+DM_0108,Partial Understanding,Understood,0.582629,0.22478512,0.1925858
+DM_0117,Understood,Possible Misconception,0.1602059,0.41758847,0.4222056
+DM_0123,Understood,Understood,0.44897532,0.3120077,0.23901697
+DM_0138,Possible Misconception,Understood,0.5674395,0.24060164,0.1919588
+DM_0145,Possible Misconception,Partial Understanding,0.12720338,0.46175435,0.41104233
+DM_0149,Understood,Possible Misconception,0.3479082,0.2933609,0.3587309
+DM_0151,Understood,Partial Understanding,0.1758717,0.41539627,0.40873203
+DM_0159,Understood,Understood,0.41580713,0.2528997,0.33129317
+DM_0169,Partial Understanding,Understood,0.5743361,0.24130234,0.18436153
+DM_0182,Understood,Possible Misconception,0.14262152,0.41265512,0.44472334
+DM_0188,Partial Understanding,Partial Understanding,0.20819277,0.4048722,0.38693503
+DM_0203,Partial Understanding,Understood,0.3962602,0.26148728,0.34225252
+DM_0210,Possible Misconception,Possible Misconception,0.103843644,0.3868951,0.5092613
+DM_0214,Understood,Possible Misconception,0.27597842,0.32400522,0.4000164
+DM_0216,Understood,Understood,0.57122827,0.218922,0.20984969
+DM_0224,Understood,Partial Understanding,0.16398026,0.42350012,0.41251963
+DM_0234,Understood,Possible Misconception,0.22905503,0.3719756,0.3989694
+DM_0238,Partial Understanding,Partial Understanding,0.10906069,0.5048643,0.386075
+DM_0247,Understood,Understood,0.36863005,0.33587417,0.2954958
+DM_0253,Understood,Partial Understanding,0.30106786,0.3608743,0.33805785
+DM_0268,Possible Misconception,Understood,0.5895931,0.23500052,0.17540646
+DM_0275,Understood,Understood,0.59169364,0.233395,0.17491129
+DM_0279,Understood,Understood,0.54511154,0.2362112,0.21867728
+DM_0281,Understood,Understood,0.4700833,0.24731182,0.28260493
+DM_0289,Understood,Understood,0.5680577,0.26086473,0.17107755
+DM_0299,Understood,Understood,0.5669141,0.25183374,0.18125215
+DM_0303,Partial Understanding,Understood,0.42361197,0.34395814,0.23242986
+DM_0312,Understood,Understood,0.6054595,0.21985039,0.17469013
+DM_0333,Understood,Understood,0.5518623,0.24346207,0.20467566
+DM_0340,Possible Misconception,Possible Misconception,0.28293005,0.3405945,0.37647545
+DM_0344,Possible Misconception,Partial Understanding,0.21163532,0.4307233,0.35764134
+DM_0346,Understood,Possible Misconception,0.07746184,0.44156465,0.48097357
+DM_0354,Understood,Understood,0.578085,0.25115833,0.17075665
+DM_0368,Understood,Understood,0.51206654,0.24030659,0.24762678
+DM_0377,Understood,Partial Understanding,0.33141539,0.35923675,0.30934787
+DM_0383,Possible Misconception,Partial Understanding,0.13820069,0.45586762,0.40593162
+DM_0398,Partial Understanding,Partial Understanding,0.15777723,0.47006348,0.37215924
+DM_0405,Partial Understanding,Possible Misconception,0.22046138,0.36736634,0.41217226
+DM_0409,Understood,Understood,0.6042493,0.22025795,0.17549278
+DM_0419,Partial Understanding,Possible Misconception,0.24365203,0.3177663,0.43858165
+DM_0429,Understood,Understood,0.4805068,0.3040932,0.21539994
+DM_0433,Understood,Understood,0.49284348,0.2489858,0.25817072
+DM_0442,Possible Misconception,Possible Misconception,0.11664061,0.41766685,0.46569258
+DM_0448,Understood,Understood,0.42056078,0.30366477,0.27577436
+DM_0463,Possible Misconception,Understood,0.53811467,0.2655104,0.19637497
+DM_0470,Partial Understanding,Possible Misconception,0.19320269,0.3486515,0.45814583
+DM_0474,Understood,Understood,0.41993877,0.2928757,0.28718552
+DM_0476,Understood,Possible Misconception,0.071159445,0.40770856,0.521132
+DM_0484,Understood,Understood,0.5561615,0.22490482,0.21893366
+DM_0494,Understood,Understood,0.50101423,0.28025,0.21873572
+DM_0498,Understood,Understood,0.63183796,0.19216764,0.17599444
+DM_0507,Understood,Partial Understanding,0.106144086,0.5260927,0.36776316
+DM_0513,Possible Misconception,Possible Misconception,0.11488928,0.40665182,0.47845894
+DM_0528,Understood,Understood,0.45392174,0.27354577,0.2725325
+DM_0535,Understood,Understood,0.61547166,0.22216256,0.16236575
+DM_0539,Understood,Possible Misconception,0.3117779,0.30868748,0.37953463
+DM_0541,Understood,Partial Understanding,0.23086436,0.40718213,0.3619536
+DM_0549,Understood,Possible Misconception,0.24535555,0.37486508,0.37977937
+DM_0559,Understood,Understood,0.52581364,0.25156978,0.22261651
+DM_0563,Understood,Understood,0.42358446,0.28568888,0.29072666
+DM_0572,Understood,Possible Misconception,0.23694022,0.32388353,0.43917626
+DM_0578,Understood,Understood,0.5389593,0.22104561,0.23999502
+DM_0593,Understood,Understood,0.5191701,0.2291712,0.25165874
+DM_0600,Understood,Understood,0.6204844,0.22275719,0.15675837
+DM_0604,Understood,Partial Understanding,0.11152234,0.5070446,0.3814331
+DM_0606,Understood,Possible Misconception,0.34138516,0.28660226,0.37201256
+DM_0614,Partial Understanding,Partial Understanding,0.115148984,0.49329212,0.39155895
+DM_0624,Partial Understanding,Understood,0.41054964,0.30393198,0.28551835
+DM_0628,Partial Understanding,Partial Understanding,0.07351741,0.5305192,0.3959634
+DM_0637,Understood,Understood,0.45708042,0.3388136,0.20410594
+DM_0643,Understood,Partial Understanding,0.13927,0.43732998,0.4234
+DM_0658,Understood,Partial Understanding,0.11192876,0.47041997,0.41765133
+DM_0665,Understood,Possible Misconception,0.07163485,0.4469355,0.48142958
+DM_0669,Partial Understanding,Possible Misconception,0.33345446,0.29824772,0.36829785
+DM_0671,Possible Misconception,Possible Misconception,0.35377643,0.270898,0.3753256
+DM_0679,Understood,Understood,0.41864756,0.25003648,0.331316
+DM_0689,Partial Understanding,Partial Understanding,0.1853141,0.40869457,0.40599132
+DM_0693,Understood,Understood,0.636556,0.20775399,0.15568995
+DM_0708,Understood,Partial Understanding,0.08408821,0.54006964,0.37584224
+DM_0723,Understood,Understood,0.6301473,0.21508344,0.15476933
+DM_0730,Understood,Understood,0.37767908,0.33007395,0.292247
+DM_0734,Partial Understanding,Understood,0.42121324,0.25971535,0.31907147
+DM_0736,Understood,Possible Misconception,0.18886553,0.37841797,0.43271643
+DM_0744,Understood,Understood,0.35453704,0.34268564,0.30277732
+DM_0754,Understood,Understood,0.5281998,0.29488906,0.17691119
+DM_0758,Understood,Partial Understanding,0.16860422,0.48475367,0.34664205
+DM_0767,Understood,Understood,0.610621,0.22386892,0.16551013
+DM_0788,Understood,Understood,0.61642814,0.20517687,0.17839491
+DM_0799,Partial Understanding,Possible Misconception,0.11656355,0.42531574,0.4581207
+DM_0801,Understood,Understood,0.35324007,0.33013815,0.31662184
+DM_0809,Understood,Understood,0.36612916,0.34361288,0.29025787
+DM_0819,Understood,Possible Misconception,0.29677266,0.33214593,0.3710814
+DM_0823,Understood,Understood,0.42982477,0.28662997,0.2835453
+DM_0832,Possible Misconception,Possible Misconception,0.10009069,0.4268608,0.47304857
+DM_0853,Understood,Partial Understanding,0.13983487,0.5140206,0.3461446
+DM_0860,Understood,Understood,0.57224256,0.26230004,0.16545737
+DM_0864,Understood,Understood,0.6450566,0.19862477,0.15631859
+DM_0866,Understood,Understood,0.60071707,0.22086976,0.17841314
+DM_0884,Possible Misconception,Understood,0.6018164,0.21262333,0.18556035
+DM_0888,Possible Misconception,Partial Understanding,0.15230653,0.46581748,0.38187602
+DM_0897,Partial Understanding,Partial Understanding,0.11680148,0.48008832,0.4031103
+DM_0903,Possible Misconception,Understood,0.58264625,0.24269806,0.17465569
+DM_0918,Understood,Understood,0.5879603,0.22146541,0.1905743
+DM_0925,Understood,Understood,0.6240465,0.22677268,0.14918078
+DM_0929,Understood,Understood,0.46353388,0.2912189,0.24524713
+DM_0931,Understood,Partial Understanding,0.14672212,0.42727706,0.4260009
+DM_0949,Possible Misconception,Partial Understanding,0.11938416,0.46515524,0.41546056
+DM_0953,Understood,Understood,0.67041177,0.20397997,0.12560827
+DM_0962,Understood,Understood,0.58010685,0.23759426,0.18229887
+DM_0968,Understood,Understood,0.51067865,0.28099245,0.20832893
+DM_0990,Understood,Understood,0.5796859,0.23250106,0.18781306
+DM_0994,Understood,Understood,0.6246889,0.1862481,0.18906306
+DM_0996,Understood,Possible Misconception,0.3082982,0.30883253,0.3828693
+DM_1004,Understood,Understood,0.4570965,0.30415416,0.23874937
+DM_1014,Partial Understanding,Partial Understanding,0.12423861,0.47517896,0.40058243
+DM_1018,Partial Understanding,Partial Understanding,0.2972585,0.3792131,0.32352832
+DM_1027,Understood,Possible Misconception,0.34811583,0.2888426,0.36304155
+DM_1033,Understood,Possible Misconception,0.3575048,0.26191568,0.3805795
+DM_1048,Partial Understanding,Partial Understanding,0.20333995,0.41910425,0.37755576
+DM_1055,Understood,Understood,0.46850556,0.28560704,0.24588738
+DM_1059,Understood,Possible Misconception,0.33933833,0.27184033,0.38882133
+DM_1061,Understood,Understood,0.60067177,0.21891345,0.1804148
+DM_1069,Understood,Understood,0.3745877,0.2635678,0.3618445
+DM_1079,Understood,Partial Understanding,0.108384766,0.48738006,0.4042352
+DM_1083,Understood,Understood,0.5631207,0.23815398,0.1987253
+DM_1092,Understood,Possible Misconception,0.35473,0.27861854,0.36665145
+DM_1098,Understood,Understood,0.62451774,0.19541347,0.18006879
+DM_1113,Possible Misconception,Understood,0.49215928,0.23827563,0.26956505
+DM_1120,Understood,Understood,0.3428805,0.3410926,0.31602693
+DM_1124,Understood,Understood,0.5404074,0.24084878,0.21874379
+DM_1126,Understood,Possible Misconception,0.27499273,0.32403243,0.4009748
+DM_1148,Understood,Understood,0.42533034,0.2941008,0.28056887
+DM_1157,Understood,Partial Understanding,0.12717144,0.45278725,0.4200414
+DM_1163,Understood,Understood,0.62848717,0.19306375,0.1784491
+DM_1178,Understood,Understood,0.6526708,0.1977456,0.14958364
+DM_1185,Understood,Understood,0.41574594,0.31138086,0.2728732
+DM_1189,Understood,Possible Misconception,0.27382073,0.320549,0.40563026
+DM_1191,Partial Understanding,Partial Understanding,0.14720437,0.45412374,0.39867193
+DM_1199,Understood,Understood,0.5499378,0.26309663,0.18696555
+DM_1213,Possible Misconception,Possible Misconception,0.25243747,0.35079095,0.39677158
+DM_1228,Possible Misconception,Partial Understanding,0.11991235,0.47253075,0.40755692
+DM_1243,Understood,Understood,0.5668632,0.2439732,0.18916363
+DM_1250,Understood,Understood,0.6528686,0.19140127,0.1557301
+DM_1254,Understood,Understood,0.37199464,0.3261392,0.30186614
+DM_1256,Understood,Understood,0.43802628,0.28814757,0.27382618
+DM_1264,Possible Misconception,Partial Understanding,0.15015528,0.50855064,0.34129417
+DM_1278,Possible Misconception,Possible Misconception,0.35972577,0.28027973,0.35999447
+DM_1287,Understood,Understood,0.5273648,0.24716118,0.225474
+DM_1315,Understood,Understood,0.53467983,0.2138745,0.2514457
+DM_1319,Understood,Understood,0.5589119,0.23715298,0.2039351
+DM_1321,Partial Understanding,Possible Misconception,0.3539672,0.28422508,0.36180767
+DM_1329,Understood,Understood,0.44131535,0.33249128,0.22619331
+DM_1343,Understood,Understood,0.45526168,0.2309217,0.31381667
+DM_1352,Understood,Possible Misconception,0.31582448,0.2978181,0.38635752
+DM_1358,Partial Understanding,Partial Understanding,0.0724326,0.51735955,0.41020784
+DM_1373,Partial Understanding,Partial Understanding,0.12757803,0.44383714,0.4285848
+DM_1380,Understood,Understood,0.47054088,0.2956757,0.23378342
+DM_1384,Understood,Understood,0.5808686,0.21743046,0.20170097
+DM_1386,Understood,Understood,0.49936762,0.2890121,0.21162032
+DM_1394,Understood,Partial Understanding,0.104088925,0.4855729,0.4103382
+DM_1404,Understood,Understood,0.6391226,0.20890243,0.15197499
+DM_1408,Understood,Possible Misconception,0.24479865,0.35659245,0.39860895
+DM_1417,Understood,Understood,0.43284398,0.29620776,0.2709483
+DM_1423,Understood,Understood,0.5345958,0.24436724,0.22103693
+DM_1438,Understood,Understood,0.5035793,0.26385227,0.23256847
+DM_1445,Understood,Understood,0.6370841,0.21778849,0.14512736
+DM_1449,Understood,Understood,0.3617774,0.321592,0.31663054
+DM_1459,Partial Understanding,Partial Understanding,0.10389203,0.48781085,0.40829712
+DM_1469,Understood,Understood,0.460854,0.31075588,0.2283901
+DM_1473,Understood,Understood,0.4904507,0.30290696,0.20664236
+DM_1482,Understood,Understood,0.49759784,0.25798702,0.24441512
+DM_1488,Understood,Understood,0.41062975,0.2994255,0.2899448
+DM_1503,Understood,Possible Misconception,0.3225518,0.3319265,0.34552175
+DM_1510,Partial Understanding,Understood,0.49862915,0.28509927,0.21627155
+DM_1514,Partial Understanding,Understood,0.54981047,0.2471099,0.20307969
+DM_1516,Understood,Understood,0.6435847,0.23049566,0.12591968
+DM_1524,Possible Misconception,Possible Misconception,0.09987989,0.412983,0.48713717
+DM_1534,Understood,Understood,0.3667259,0.36672243,0.26655176
+DM_1538,Partial Understanding,Possible Misconception,0.09481155,0.42149886,0.48368958
+DM_1547,Partial Understanding,Understood,0.5344333,0.26316023,0.20240645
+DM_1553,Partial Understanding,Understood,0.5369376,0.2483123,0.2147501
+DM_1568,Understood,Understood,0.53247386,0.22794472,0.23958133
+DM_1575,Understood,Understood,0.605633,0.18339711,0.21096985
+DM_1579,Understood,Possible Misconception,0.18116488,0.38495418,0.4338809
+DM_1581,Understood,Understood,0.6139877,0.21855748,0.16745481
+DM_1589,Understood,Understood,0.39784637,0.2627129,0.33944082
+DM_1599,Understood,Possible Misconception,0.35200974,0.27449942,0.37349087
+DM_1603,Partial Understanding,Partial Understanding,0.32614574,0.36093608,0.3129182
+DM_1612,Partial Understanding,Understood,0.6262291,0.22043452,0.15333644
+DM_1618,Understood,Understood,0.413253,0.3007756,0.28597143
+DM_1633,Understood,Understood,0.55937827,0.23675084,0.20387094
+DM_1640,Understood,Understood,0.62174183,0.22217382,0.15608436
+DM_1644,Partial Understanding,Possible Misconception,0.2463561,0.3611809,0.39246297
+DM_1646,Understood,Understood,0.3541037,0.31231079,0.33358547
+DM_1654,Understood,Partial Understanding,0.08845167,0.55458814,0.35696024
+DM_1664,Possible Misconception,Understood,0.46123,0.26946467,0.2693053
+DM_1677,Understood,Possible Misconception,0.3339833,0.27475622,0.39126047
+DM_1683,Understood,Understood,0.41346043,0.3181792,0.26836038
+DM_1698,Understood,Understood,0.5692584,0.19901006,0.23173147
+DM_1705,Possible Misconception,Possible Misconception,0.16081356,0.3943358,0.44485068
+DM_1709,Possible Misconception,Understood,0.5430815,0.24553642,0.21138205
+DM_1711,Possible Misconception,Partial Understanding,0.14233737,0.4873797,0.37028286
+DM_1719,Partial Understanding,Partial Understanding,0.107898936,0.47998476,0.41211635
+DM_1733,Understood,Understood,0.4864071,0.2727672,0.24082574
+DM_1748,Understood,Understood,0.5926566,0.22460793,0.18273546
+DM_1763,Understood,Possible Misconception,0.3478228,0.27329195,0.37888533
+DM_1770,Understood,Understood,0.5189571,0.27835253,0.20269036
+DM_1774,Understood,Understood,0.5805908,0.22497393,0.19443521
+DM_1776,Partial Understanding,Possible Misconception,0.20317522,0.3747166,0.42210826
+DM_1794,Understood,Understood,0.5944634,0.21394204,0.19159463
+DM_1798,Understood,Partial Understanding,0.15578382,0.44558924,0.3986269
+DM_1807,Understood,Understood,0.63896215,0.21519066,0.14584728
+DM_1813,Partial Understanding,Partial Understanding,0.109541416,0.52219594,0.3682627
+DM_1828,Understood,Understood,0.59682304,0.2230061,0.18017086
+DM_1835,Understood,Possible Misconception,0.27372465,0.2917808,0.4344945
+DM_1839,Understood,Understood,0.41927415,0.3125195,0.26820642
+DM_1849,Understood,Understood,0.56362164,0.23460746,0.20177093
+DM_1859,Understood,Understood,0.52749956,0.21213566,0.2603648
+DM_1863,Understood,Possible Misconception,0.23617631,0.3545789,0.40924475
+DM_1872,Understood,Understood,0.5197763,0.25705263,0.22317104
+DM_1878,Understood,Possible Misconception,0.07661196,0.3896885,0.5336995
+DM_1893,Possible Misconception,Partial Understanding,0.15104872,0.45954812,0.38940307
+DM_1900,Understood,Understood,0.61411905,0.21542662,0.1704543
+DM_1904,Partial Understanding,Understood,0.6461319,0.19812027,0.15574785
+DM_1914,Possible Misconception,Possible Misconception,0.29389092,0.30376843,0.40234065
+DM_1924,Partial Understanding,Possible Misconception,0.2709517,0.32092357,0.40812477
+DM_1928,Understood,Understood,0.45612788,0.2728452,0.27102694
+DM_1943,Partial Understanding,Partial Understanding,0.12511188,0.44295606,0.431932
+DM_1958,Partial Understanding,Understood,0.49300185,0.28757071,0.21942735
+DM_1965,Partial Understanding,Possible Misconception,0.3165222,0.30502582,0.378452
+DM_1969,Understood,Understood,0.37722266,0.3311919,0.29158542
+DM_1971,Understood,Understood,0.6313325,0.21791884,0.15074861
+DM_1979,Understood,Understood,0.6187192,0.21210419,0.1691766
+DM_1989,Possible Misconception,Partial Understanding,0.12699889,0.46091643,0.4120847
+DM_1993,Partial Understanding,Possible Misconception,0.22230063,0.37878418,0.39891523
+DM_2008,Understood,Understood,0.6403806,0.18348537,0.17613402
+DM_2023,Understood,Understood,0.4063357,0.29593632,0.29772797
+DM_2030,Possible Misconception,Possible Misconception,0.14462224,0.3847449,0.47063285
+DM_2034,Understood,Possible Misconception,0.35338095,0.28017798,0.36644104
+DM_2036,Partial Understanding,Understood,0.37439433,0.32136425,0.30424145
+DM_2044,Partial Understanding,Possible Misconception,0.3003972,0.3134029,0.38619998
+DM_2054,Possible Misconception,Possible Misconception,0.22778809,0.37794614,0.3942658
+DM_2067,Understood,Partial Understanding,0.12347244,0.47955248,0.39697516
+DM_2073,Understood,Understood,0.607737,0.21441105,0.1778519
+DM_2088,Understood,Possible Misconception,0.3464076,0.28170443,0.37188795
+DM_2095,Understood,Understood,0.37995625,0.26114324,0.3589005
+DM_2099,Understood,Partial Understanding,0.11561748,0.510178,0.37420452
+DM_2101,Understood,Understood,0.53139967,0.2603993,0.20820105
+DM_2109,Understood,Possible Misconception,0.2976077,0.32139388,0.3809984
+DM_2119,Partial Understanding,Partial Understanding,0.10066654,0.46904123,0.4302923
+DM_2123,Partial Understanding,Partial Understanding,0.19013633,0.45908317,0.35078055
+DM_2132,Understood,Understood,0.47527584,0.27561888,0.2491053
+DM_2138,Understood,Understood,0.630496,0.2138517,0.15565231
+DM_2160,Partial Understanding,Partial Understanding,0.14222583,0.43357036,0.4242038
+DM_2164,Understood,Possible Misconception,0.27164638,0.34168664,0.38666698
+DM_2166,Understood,Understood,0.5815006,0.23257396,0.18592541
+DM_2174,Understood,Understood,0.57879287,0.21273173,0.20847535
+DM_2184,Understood,Understood,0.6080903,0.2326453,0.15926436
+DM_2197,Understood,Understood,0.5310444,0.22178176,0.2471738
+DM_2203,Understood,Understood,0.5265492,0.24394818,0.22950266
+DM_2218,Possible Misconception,Partial Understanding,0.108012766,0.44673073,0.44525653
+DM_2225,Possible Misconception,Possible Misconception,0.33661464,0.2786187,0.38476667
+DM_2229,Partial Understanding,Partial Understanding,0.09836117,0.45796365,0.44367525
+DM_2231,Partial Understanding,Understood,0.5701689,0.24690007,0.18293111
+DM_2239,Understood,Partial Understanding,0.32662728,0.37159425,0.30177847
+DM_2249,Understood,Understood,0.587681,0.24725781,0.1650612
+DM_2253,Partial Understanding,Possible Misconception,0.28043923,0.32917857,0.39038214
+DM_2262,Understood,Possible Misconception,0.23839386,0.35698393,0.4046223
+DM_2268,Understood,Understood,0.5218573,0.216076,0.26206666
+DM_2290,Partial Understanding,Partial Understanding,0.12530446,0.46812814,0.40656736
+DM_2294,Understood,Understood,0.5483556,0.27032155,0.18132293
+DM_2296,Partial Understanding,Partial Understanding,0.063313864,0.525234,0.41145208
+DM_2304,Possible Misconception,Understood,0.39612064,0.2861123,0.31776708
+DM_2314,Partial Understanding,Possible Misconception,0.15919568,0.41207,0.42873436
+DM_2318,Possible Misconception,Partial Understanding,0.14026272,0.47908366,0.38065368
+DM_2327,Partial Understanding,Partial Understanding,0.113488965,0.44850597,0.43800512
+DM_2333,Possible Misconception,Understood,0.34979224,0.3347001,0.31550765
+DM_2348,Partial Understanding,Partial Understanding,0.120456785,0.5053842,0.374159
+DM_2355,Understood,Understood,0.61623865,0.20764847,0.1761128
+DM_2359,Understood,Understood,0.3891012,0.35547572,0.2554231
+DM_2361,Possible Misconception,Understood,0.39696008,0.34116662,0.26187325
+DM_2369,Understood,Understood,0.5527747,0.28051254,0.16671272
+DM_2379,Understood,Understood,0.6026304,0.24384312,0.15352638
+DM_2383,Understood,Understood,0.5760169,0.22684261,0.19714047
+DM_2392,Partial Understanding,Understood,0.5488396,0.27214092,0.17901942
+DM_2398,Understood,Understood,0.5875773,0.23900919,0.17341343
+DM_2413,Understood,Understood,0.48491928,0.2653275,0.24975316
+DM_2420,Possible Misconception,Partial Understanding,0.09613824,0.4661901,0.43767163
+DM_2424,Understood,Understood,0.41106197,0.31844562,0.27049243
+DM_2426,Understood,Partial Understanding,0.07142982,0.46543193,0.46313822
+DM_2434,Partial Understanding,Possible Misconception,0.10018318,0.41532195,0.48449498
+DM_2444,Understood,Understood,0.37267622,0.33618262,0.2911411
+DM_2448,Understood,Understood,0.49298754,0.27114564,0.23586676
+DM_2457,Understood,Understood,0.59632903,0.2402321,0.16343884
+DM_2463,Understood,Possible Misconception,0.2906872,0.32018402,0.38912883
+DM_2478,Partial Understanding,Partial Understanding,0.10241647,0.4931484,0.40443513
+DM_2485,Partial Understanding,Partial Understanding,0.11712978,0.50708747,0.37578273
+DM_2489,Understood,Understood,0.58933586,0.2540545,0.15660962
+DM_2491,Understood,Possible Misconception,0.18325053,0.39622504,0.42052445
+DM_2499,Partial Understanding,Partial Understanding,0.111296006,0.4592662,0.42943788
+DM_2509,Partial Understanding,Partial Understanding,0.13388598,0.4468087,0.4193053
+DM_2513,Possible Misconception,Partial Understanding,0.12922022,0.444525,0.42625475
+DM_2522,Partial Understanding,Possible Misconception,0.2979411,0.29267433,0.40938458
+DM_2528,Understood,Understood,0.5203954,0.28299707,0.19660756
+DM_2550,Understood,Understood,0.52950174,0.246719,0.22377929
+DM_2556,Understood,Partial Understanding,0.14041246,0.45870847,0.40087909
+DM_2564,Understood,Understood,0.51291686,0.26864514,0.21843792
+DM_2587,Understood,Partial Understanding,0.09398487,0.49037036,0.41564476
+DM_2593,Partial Understanding,Possible Misconception,0.3539135,0.28001148,0.36607507
+DM_2608,Understood,Understood,0.6119224,0.22884539,0.15923227
+DM_2615,Partial Understanding,Partial Understanding,0.10785191,0.4627675,0.42938063
+DM_2619,Understood,Partial Understanding,0.17361017,0.47652274,0.34986708
+DM_2621,Understood,Understood,0.4298949,0.3007947,0.2693104
+DM_2629,Partial Understanding,Understood,0.56779,0.26362133,0.16858868
+DM_2639,Partial Understanding,Understood,0.38024142,0.28109273,0.33866587
+DM_2643,Understood,Understood,0.572333,0.24914318,0.1785239
+DM_2652,Understood,Understood,0.4102697,0.28326645,0.3064638
+DM_2658,Understood,Possible Misconception,0.28266114,0.34289414,0.3744447
+DM_2680,Partial Understanding,Understood,0.45587388,0.31237,0.23175615
+DM_2684,Understood,Possible Misconception,0.33074856,0.29655814,0.37269327
+DM_2686,Understood,Partial Understanding,0.08126997,0.49365532,0.4250747
+DM_2694,Understood,Understood,0.5236898,0.23948507,0.2368251
+DM_2704,Understood,Understood,0.39265585,0.3084775,0.2988666
+DM_2708,Understood,Partial Understanding,0.07563506,0.47343564,0.4509293
+DM_2717,Understood,Understood,0.4433622,0.270202,0.28643584
+DM_2723,Partial Understanding,Understood,0.64855254,0.20020574,0.15124175
+DM_2738,Partial Understanding,Partial Understanding,0.14974074,0.43382528,0.41643393
+DM_2745,Understood,Understood,0.6632012,0.18200563,0.15479316
+DM_2749,Understood,Understood,0.37961695,0.2701004,0.3502827
+DM_2751,Partial Understanding,Possible Misconception,0.22415689,0.34949672,0.42634633
+DM_2759,Understood,Understood,0.60891896,0.23073672,0.1603443
+DM_2769,Understood,Understood,0.6015925,0.24527305,0.15313451
+DM_2773,Understood,Understood,0.5544422,0.23201478,0.21354298
+DM_2782,Partial Understanding,Possible Misconception,0.11127852,0.43282884,0.4558927
+DM_2803,Understood,Understood,0.63747,0.19036546,0.17216456
+DM_2810,Partial Understanding,Possible Misconception,0.21626537,0.3527606,0.43097395
+DM_2814,Partial Understanding,Understood,0.4574991,0.29716375,0.24533719
+DM_2816,Understood,Partial Understanding,0.16532072,0.45051175,0.38416752
+DM_2824,Understood,Possible Misconception,0.3649562,0.26503816,0.37000567
+DM_2834,Understood,Understood,0.5968567,0.20802951,0.1951138
+DM_2838,Possible Misconception,Possible Misconception,0.10907203,0.37100226,0.5199258
+DM_2847,Partial Understanding,Possible Misconception,0.079516254,0.4084786,0.5120052
+DM_2853,Partial Understanding,Partial Understanding,0.17623582,0.48392928,0.3398349
+DM_2868,Understood,Understood,0.48262396,0.24370643,0.2736696
+DM_2875,Partial Understanding,Partial Understanding,0.07610859,0.48774368,0.43614772
+DM_2879,Partial Understanding,Possible Misconception,0.32208115,0.2907589,0.3871599
+DM_2881,Understood,Possible Misconception,0.35272706,0.27822828,0.36904466
+DM_2889,Understood,Understood,0.46737656,0.320684,0.21193948
+DM_2899,Partial Understanding,Partial Understanding,0.11618302,0.49254772,0.3912692
+DM_2912,Understood,Understood,0.39026055,0.33411053,0.27562892
+DM_2918,Understood,Partial Understanding,0.32714844,0.35586432,0.31698722
+DM_2933,Understood,Understood,0.583361,0.24840845,0.16823047
+DM_2940,Understood,Partial Understanding,0.10587281,0.47153604,0.42259115
+DM_2944,Understood,Understood,0.51935965,0.2743207,0.20631967
+DM_2946,Understood,Understood,0.5837927,0.23917831,0.17702897
+DM_2954,Understood,Understood,0.6520545,0.18329236,0.16465314
+DM_2964,Understood,Understood,0.5073901,0.2622493,0.23036067
+DM_2968,Partial Understanding,Partial Understanding,0.10870552,0.50583845,0.38545603
+DM_2977,Understood,Possible Misconception,0.27030602,0.32757553,0.40211838
+DM_2983,Understood,Understood,0.66440034,0.18926871,0.14633091
+DM_2998,Understood,Partial Understanding,0.33089212,0.3644083,0.30469954
+DM_3005,Possible Misconception,Understood,0.5521429,0.2647511,0.18310596
+DM_3009,Understood,Possible Misconception,0.29375336,0.29072812,0.41551855
+DM_3011,Understood,Understood,0.4763205,0.26405877,0.25962073
+DM_3019,Understood,Understood,0.5620735,0.23932517,0.19860125
+DM_3029,Possible Misconception,Possible Misconception,0.23747751,0.29827505,0.46424735
+DM_3042,Understood,Understood,0.56581885,0.24547714,0.18870406
+DM_3048,Understood,Possible Misconception,0.17151894,0.3837111,0.44477
+DM_3063,Understood,Possible Misconception,0.14929876,0.41940925,0.43129197
+DM_3070,Possible Misconception,Partial Understanding,0.10895219,0.5168685,0.3741793
+DM_3074,Understood,Possible Misconception,0.24838044,0.35209396,0.39952555
+DM_3076,Understood,Understood,0.65945274,0.19885066,0.14169659
+DM_3084,Understood,Understood,0.57477653,0.23417443,0.19104907
+DM_3094,Understood,Understood,0.60999244,0.20764032,0.18236724
+DM_3098,Understood,Understood,0.5229532,0.29666924,0.1803775
+DM_3107,Partial Understanding,Understood,0.59723574,0.21533868,0.18742552
+DM_3128,Partial Understanding,Understood,0.6112574,0.21808046,0.17066216
+DM_3135,Understood,Understood,0.44776472,0.34322664,0.20900865
+DM_3139,Understood,Understood,0.47862962,0.24164873,0.27972168
+DM_3141,Understood,Understood,0.34042174,0.32029444,0.33928376
+DM_3149,Understood,Understood,0.59419304,0.21750256,0.1883045
+DM_3159,Understood,Understood,0.54377216,0.25444183,0.201786
+DM_3163,Partial Understanding,Partial Understanding,0.10586091,0.45155734,0.4425818
+DM_3172,Understood,Understood,0.38449037,0.3548527,0.26065686
+DM_3178,Possible Misconception,Possible Misconception,0.113958694,0.41783488,0.4682064
+DM_3193,Understood,Understood,0.56951267,0.2434092,0.18707807
+DM_3200,Partial Understanding,Partial Understanding,0.092896186,0.47020543,0.43689844
+DM_3204,Understood,Understood,0.5148343,0.26110542,0.22406025
+DM_3206,Understood,Understood,0.46119502,0.26073453,0.27807045
+DM_3214,Understood,Understood,0.66176194,0.19411975,0.14411832
+DM_3224,Partial Understanding,Understood,0.49969453,0.2336585,0.26664695
+DM_3228,Understood,Understood,0.585152,0.20724714,0.20760079
+DM_3237,Understood,Partial Understanding,0.11073573,0.5208568,0.36840752
+DM_3258,Understood,Understood,0.37054992,0.27067918,0.35877094
+DM_3271,Understood,Understood,0.5815148,0.20292093,0.21556434
+DM_3279,Understood,Understood,0.44347537,0.2998625,0.2566621
+DM_3289,Understood,Understood,0.63785917,0.19949402,0.16264679
+DM_3293,Possible Misconception,Possible Misconception,0.1412364,0.42555568,0.43320787
+DM_3302,Possible Misconception,Possible Misconception,0.15129572,0.41760314,0.43110117
+DM_3323,Possible Misconception,Possible Misconception,0.15890522,0.390091,0.4510038
+DM_3334,Possible Misconception,Understood,0.46832907,0.2540717,0.27759922
+DM_3336,Understood,Possible Misconception,0.36552206,0.2575032,0.37697467
+DM_3344,Understood,Understood,0.6150004,0.22936442,0.15563513
+DM_3354,Possible Misconception,Understood,0.39321214,0.32542333,0.28136453
+DM_3358,Understood,Understood,0.6047019,0.19154502,0.20375307
+DM_3367,Understood,Possible Misconception,0.24771945,0.33834112,0.41393942
+DM_3388,Understood,Understood,0.5821072,0.23997794,0.17791487
+DM_3395,Partial Understanding,Partial Understanding,0.1397409,0.49555948,0.36469957
+DM_3401,Understood,Partial Understanding,0.06668228,0.49178874,0.44152904
+DM_3409,Understood,Understood,0.651789,0.21032421,0.13788673
+DM_3419,Understood,Possible Misconception,0.21617049,0.3779677,0.40586182
+DM_3423,Understood,Understood,0.5670008,0.259375,0.17362416
+DM_3432,Understood,Understood,0.597627,0.249888,0.15248497
+DM_3438,Understood,Understood,0.5002188,0.2828553,0.216926
+DM_3453,Understood,Understood,0.49293813,0.28722602,0.21983594
+DM_3460,Understood,Possible Misconception,0.2846897,0.32656235,0.38874796
+DM_3464,Understood,Understood,0.62136894,0.20884325,0.16978787
+DM_3474,Understood,Partial Understanding,0.12710378,0.47428346,0.39861274
+DM_3484,Understood,Understood,0.59877884,0.22684284,0.17437835
+DM_3488,Possible Misconception,Understood,0.44982633,0.2568585,0.29331523
+DM_3497,Understood,Partial Understanding,0.09198287,0.462084,0.4459331
+DM_3503,Understood,Understood,0.5456031,0.22659722,0.22779965
+DM_3518,Understood,Possible Misconception,0.101716146,0.37305707,0.52522683
+DM_3525,Understood,Understood,0.4154583,0.33509305,0.24944867
+DM_3529,Understood,Understood,0.37534073,0.26896977,0.35568947
+DM_3531,Understood,Understood,0.4148829,0.3107767,0.27434036
+DM_3539,Understood,Understood,0.53495336,0.28801742,0.17702925
+DM_3549,Partial Understanding,Partial Understanding,0.119470604,0.49243832,0.38809106
+DM_3553,Understood,Understood,0.59766275,0.24146211,0.16087511
+DM_3568,Understood,Understood,0.55574536,0.27706438,0.16719028
+DM_3583,Understood,Understood,0.47049153,0.2516567,0.27785176
+DM_3594,Possible Misconception,Possible Misconception,0.14655928,0.42356503,0.4298757
+DM_3596,Partial Understanding,Partial Understanding,0.15765417,0.43321192,0.40913388
+DM_3614,Understood,Understood,0.5864093,0.218716,0.19487478
+DM_3618,Understood,Understood,0.60580695,0.2197998,0.17439322
+DM_3627,Possible Misconception,Possible Misconception,0.117484316,0.43968642,0.44282928
+DM_3633,Understood,Understood,0.59317464,0.21984138,0.18698394
+DM_3648,Understood,Partial Understanding,0.1401675,0.5491586,0.31067398
+DM_3655,Understood,Possible Misconception,0.2308427,0.34561506,0.42354232
+DM_3659,Understood,Possible Misconception,0.20714758,0.35691226,0.43594015
+DM_3661,Partial Understanding,Possible Misconception,0.13777544,0.42300326,0.43922135
+DM_3669,Partial Understanding,Understood,0.57073313,0.25276062,0.17650622
+DM_3679,Partial Understanding,Partial Understanding,0.22597109,0.4167118,0.35731712
+DM_3683,Understood,Understood,0.66009766,0.20678625,0.13311608
+DM_3692,Understood,Understood,0.41806576,0.30355176,0.2783825
+DM_3698,Understood,Understood,0.3688092,0.32865697,0.30253386
+DM_3713,Partial Understanding,Possible Misconception,0.08181177,0.4458079,0.47238025
+DM_3720,Understood,Possible Misconception,0.29164422,0.33187994,0.3764759
+DM_3724,Partial Understanding,Partial Understanding,0.1569147,0.46639696,0.37668842
+DM_3726,Understood,Understood,0.57963264,0.26433527,0.15603209
+DM_3734,Partial Understanding,Possible Misconception,0.32798558,0.29753587,0.37447852
+DM_3744,Understood,Possible Misconception,0.34020704,0.30388606,0.35590693
+DM_3748,Understood,Understood,0.55620515,0.24966432,0.1941306
+DM_3757,Understood,Understood,0.48442715,0.27647433,0.23909855
+DM_3763,Understood,Understood,0.48809212,0.263023,0.24888483
+DM_3778,Understood,Understood,0.54447156,0.24855857,0.20696987
+DM_3785,Understood,Understood,0.5546834,0.25499234,0.19032417
+DM_3789,Understood,Partial Understanding,0.087367885,0.5353959,0.37723625
+DM_3791,Understood,Possible Misconception,0.28093216,0.32596388,0.39310396
+DM_3799,Understood,Possible Misconception,0.26776555,0.32559234,0.40664217
+DM_3809,Understood,Possible Misconception,0.104939446,0.3638788,0.53118175
+DM_3813,Understood,Partial Understanding,0.15142134,0.44847733,0.4001013
+DM_3822,Understood,Possible Misconception,0.21179599,0.38942543,0.3987786
+DM_3828,Understood,Possible Misconception,0.3102674,0.31692824,0.3728044
+DM_3843,Understood,Understood,0.5245888,0.2652637,0.21014744
+DM_3850,Understood,Understood,0.55122936,0.2560107,0.19275998
+DM_3854,Understood,Understood,0.43733376,0.3016345,0.2610318
+DM_3864,Partial Understanding,Understood,0.58512866,0.21471779,0.20015356
+DM_3874,Understood,Understood,0.66077286,0.20732716,0.13190004
+DM_3878,Partial Understanding,Understood,0.52804613,0.27918097,0.192773
+DM_3887,Understood,Understood,0.5838945,0.23792084,0.1781846
+DM_3908,Understood,Possible Misconception,0.34880722,0.26759288,0.38359994
+DM_3915,Partial Understanding,Partial Understanding,0.14370628,0.43086854,0.4254252
+DM_3919,Understood,Understood,0.5490184,0.22232957,0.22865207
+DM_3921,Possible Misconception,Partial Understanding,0.16778502,0.45766243,0.37455252
+DM_3929,Understood,Understood,0.5758159,0.25430554,0.16987857
+DM_3939,Understood,Understood,0.58661425,0.22153457,0.19185112
+DM_3943,Possible Misconception,Partial Understanding,0.11914388,0.51501054,0.36584562
+DM_3952,Partial Understanding,Possible Misconception,0.2975578,0.29278287,0.40965933
+DM_3958,Understood,Understood,0.3853162,0.3049414,0.30974245
+DM_3973,Understood,Understood,0.5709986,0.26442042,0.16458097
+DM_3980,Understood,Partial Understanding,0.0988203,0.48086283,0.4203168
+DM_3984,Partial Understanding,Understood,0.666316,0.17650273,0.15718138
+DM_3986,Understood,Understood,0.61958915,0.18142904,0.19898184
+DM_3994,Possible Misconception,Understood,0.53907335,0.25838414,0.20254244
+DM_4004,Understood,Possible Misconception,0.14716351,0.42495012,0.42788628
+DM_4008,Understood,Partial Understanding,0.09792097,0.5553674,0.34671164
+DM_4017,Partial Understanding,Partial Understanding,0.1013318,0.45618436,0.4424838
+DM_4023,Partial Understanding,Partial Understanding,0.081116766,0.5730115,0.34587172
+DM_4038,Partial Understanding,Possible Misconception,0.10509427,0.43339437,0.4615113
+DM_4045,Understood,Understood,0.62190604,0.20671168,0.17138226
+DM_4049,Understood,Possible Misconception,0.34925142,0.28055242,0.37019616
+DM_4051,Understood,Understood,0.5266615,0.25788715,0.21545127
+DM_4059,Partial Understanding,Partial Understanding,0.21703559,0.40446863,0.37849575
+DM_4069,Understood,Partial Understanding,0.3557324,0.36328158,0.280986
+DM_4073,Partial Understanding,Possible Misconception,0.1987073,0.38913247,0.41216022
+DM_4082,Understood,Understood,0.5439318,0.2761132,0.17995512
+DM_4088,Partial Understanding,Partial Understanding,0.106271386,0.48881632,0.40491232
+DM_4103,Understood,Understood,0.56552905,0.23580132,0.19866969
+DM_4110,Understood,Understood,0.6235781,0.192078,0.18434387
+DM_4114,Partial Understanding,Possible Misconception,0.0881789,0.4507825,0.4610386
+DM_4116,Understood,Understood,0.4875259,0.2913628,0.22111124
+DM_4124,Partial Understanding,Understood,0.5225732,0.28487387,0.19255292
+DM_4134,Partial Understanding,Understood,0.41693157,0.30575842,0.27731
+DM_4138,Understood,Understood,0.5463836,0.27620783,0.17740855
+DM_4147,Understood,Understood,0.52858627,0.26407123,0.2073425
+DM_4153,Partial Understanding,Understood,0.36047518,0.34970915,0.28981566
+DM_4168,Understood,Understood,0.59193105,0.20128907,0.20677985
+DM_4179,Partial Understanding,Partial Understanding,0.12796149,0.44672474,0.42531377
+DM_4181,Possible Misconception,Understood,0.42244387,0.31018245,0.26737365
+DM_4189,Understood,Possible Misconception,0.22915632,0.32884318,0.44200054
+DM_4199,Partial Understanding,Possible Misconception,0.085378066,0.4505583,0.46406358
+DM_4203,Understood,Understood,0.4369226,0.24041778,0.32265964
+DM_4218,Possible Misconception,Possible Misconception,0.30001846,0.30472523,0.39525637
+DM_4233,Understood,Understood,0.5293045,0.2613736,0.20932192
+DM_4246,Understood,Possible Misconception,0.26478127,0.35397008,0.38124865
+DM_4254,Understood,Understood,0.5736161,0.2556538,0.1707301
+DM_4264,Partial Understanding,Possible Misconception,0.104643464,0.43240243,0.4629541
+DM_4268,Understood,Partial Understanding,0.12133921,0.44032982,0.43833092
+DM_4277,Understood,Understood,0.38799405,0.34366608,0.26833996
+DM_4298,Understood,Partial Understanding,0.07138895,0.4821355,0.4464756
+DM_4305,Understood,Possible Misconception,0.21595414,0.36384428,0.4202016
+DM_4309,Possible Misconception,Partial Understanding,0.11910534,0.47321755,0.40767708
+DM_4311,Understood,Understood,0.4294334,0.2941741,0.27639246
+DM_4319,Partial Understanding,Possible Misconception,0.10093903,0.4435352,0.45552582
+DM_4329,Understood,Understood,0.5657258,0.26279473,0.17147942
+DM_4333,Understood,Understood,0.39475608,0.30411795,0.3011259
+DM_4342,Partial Understanding,Partial Understanding,0.16252531,0.45869297,0.37878168
+DM_4348,Understood,Possible Misconception,0.36417487,0.2675816,0.3682435
+DM_4363,Partial Understanding,Possible Misconception,0.10050022,0.37225676,0.527243
+DM_4370,Partial Understanding,Partial Understanding,0.10269238,0.5271096,0.37019798
+DM_4374,Understood,Understood,0.58306503,0.23162779,0.1853071
+DM_4384,Understood,Understood,0.5996225,0.23418336,0.16619417
+DM_4398,Understood,Understood,0.3479621,0.34034544,0.31169242
+DM_4407,Partial Understanding,Understood,0.56634617,0.23144774,0.2022061
+DM_4413,Understood,Understood,0.47643942,0.23640524,0.2871553
+DM_4428,Understood,Understood,0.34043032,0.3319078,0.3276619
+DM_4435,Understood,Understood,0.48358402,0.2900822,0.22633374
+DM_4439,Understood,Partial Understanding,0.19767125,0.42851913,0.37380967
+DM_4441,Partial Understanding,Understood,0.51442826,0.22502375,0.260548
+DM_4449,Partial Understanding,Partial Understanding,0.18575397,0.4286709,0.38557512
+DM_4459,Understood,Understood,0.4428005,0.2751329,0.2820666
+DM_4463,Understood,Understood,0.57975864,0.23726194,0.18297939
+DM_4472,Understood,Understood,0.36689624,0.31562668,0.31747702
+DM_4478,Understood,Understood,0.55738443,0.24515,0.19746554
+DM_4493,Partial Understanding,Possible Misconception,0.3351152,0.29779854,0.36708626
+DM_4500,Partial Understanding,Possible Misconception,0.12441972,0.39992505,0.47565523
+DM_4506,Understood,Understood,0.3840126,0.26117325,0.35481414
+DM_4514,Partial Understanding,Partial Understanding,0.1055089,0.4999136,0.39457753
+DM_4524,Understood,Possible Misconception,0.3106956,0.34411278,0.3451917
+DM_4528,Understood,Partial Understanding,0.32810548,0.36812454,0.30377
+DM_4537,Understood,Understood,0.5294223,0.21779816,0.25277948
+DM_4543,Partial Understanding,Partial Understanding,0.10307573,0.50482297,0.39210135
+DM_4558,Understood,Understood,0.62056476,0.1997981,0.17963715
+DM_4565,Understood,Possible Misconception,0.34462225,0.28296697,0.37241077
+DM_4569,Partial Understanding,Possible Misconception,0.07520921,0.44299617,0.48179457
+DM_4571,Understood,Understood,0.6178475,0.23023017,0.15192226
+DM_4589,Understood,Understood,0.5403173,0.22653075,0.23315193
+DM_4593,Understood,Possible Misconception,0.10378969,0.42432615,0.47188413
+DM_4602,Understood,Understood,0.6655305,0.2055294,0.12894006
+DM_4608,Understood,Partial Understanding,0.09777695,0.4650653,0.4371578
+DM_4623,Possible Misconception,Possible Misconception,0.07034949,0.45045555,0.4791949
+DM_4630,Understood,Possible Misconception,0.2632149,0.34110236,0.39568278
+DM_4634,Partial Understanding,Possible Misconception,0.22289498,0.3624054,0.41469964
+DM_4636,Possible Misconception,Possible Misconception,0.13664947,0.4149067,0.44844383
+DM_4644,Possible Misconception,Possible Misconception,0.1474462,0.42331672,0.429237
+DM_4654,Understood,Partial Understanding,0.119881734,0.46977758,0.41034067
+DM_4658,Understood,Understood,0.61876214,0.22283803,0.15839985
+DM_4673,Understood,Partial Understanding,0.13002619,0.4669852,0.40298867
+DM_4688,Possible Misconception,Partial Understanding,0.14804491,0.4773294,0.3746257
+DM_4695,Partial Understanding,Understood,0.47422582,0.2897232,0.23605104
+DM_4699,Partial Understanding,Partial Understanding,0.1074721,0.45087868,0.44164917
+DM_4701,Understood,Understood,0.51961654,0.27471274,0.20567067
+DM_4709,Partial Understanding,Partial Understanding,0.19157606,0.5059611,0.30246276
+DM_4719,Understood,Understood,0.5318468,0.27013287,0.19802038
+DM_4723,Partial Understanding,Partial Understanding,0.17538396,0.44685,0.37776598
+DM_4732,Understood,Understood,0.63023895,0.19773997,0.17202105
+DM_4738,Understood,Understood,0.47616357,0.2803253,0.24351114
+DM_4753,Partial Understanding,Possible Misconception,0.13269585,0.431376,0.4359282
+DM_4760,Understood,Understood,0.5660824,0.22212586,0.21179172
+DM_4764,Understood,Understood,0.48600653,0.29036212,0.22363131
+DM_4766,Partial Understanding,Partial Understanding,0.12600435,0.46789873,0.4060969
+DM_4774,Understood,Possible Misconception,0.24166,0.35656062,0.40177935
+DM_4784,Understood,Possible Misconception,0.18907811,0.40467042,0.40625152
+DM_4788,Understood,Understood,0.3588825,0.323984,0.31713355
+DM_4797,Possible Misconception,Possible Misconception,0.24503465,0.35110074,0.40386456
+DM_4803,Understood,Understood,0.5083887,0.2416929,0.24991843
+DM_4818,Understood,Understood,0.4552339,0.25110093,0.29366514
+DM_4825,Understood,Possible Misconception,0.34038052,0.28826433,0.37135515
+DM_4829,Understood,Understood,0.57754785,0.25906646,0.1633857
+DM_4831,Understood,Understood,0.540923,0.26076052,0.19831651
+DM_4839,Partial Understanding,Partial Understanding,0.134175,0.46503845,0.40078658
+DM_4849,Understood,Understood,0.37821192,0.2714002,0.35038784
+DM_4853,Partial Understanding,Possible Misconception,0.15542977,0.39153656,0.4530337
+DM_4862,Partial Understanding,Understood,0.6033407,0.24574645,0.1509129
+DM_4868,Understood,Understood,0.46697327,0.3126265,0.22040023
+DM_4883,Understood,Understood,0.58990854,0.21778405,0.1923074
+DM_4890,Partial Understanding,Understood,0.59108377,0.23270305,0.17621313
+DM_4894,Understood,Understood,0.4860262,0.29262617,0.22134767
+DM_4896,Possible Misconception,Possible Misconception,0.094326824,0.45065203,0.45502105
+DM_4904,Understood,Possible Misconception,0.32039803,0.29370564,0.38589624
+DM_4914,Understood,Understood,0.6314178,0.18921398,0.17936824
+DM_4918,Understood,Understood,0.50630367,0.25683665,0.23685962
+DM_4927,Understood,Understood,0.45224595,0.33042765,0.21732634
+DM_4933,Understood,Possible Misconception,0.18835431,0.3607004,0.4509453
+DM_4948,Possible Misconception,Understood,0.49002898,0.23433127,0.2756398
+DM_4959,Possible Misconception,Partial Understanding,0.1617338,0.4248293,0.41343695
+DM_4961,Understood,Understood,0.6126942,0.207019,0.18028678
+DM_4969,Understood,Understood,0.59647924,0.22141585,0.18210493
+DM_4979,Partial Understanding,Understood,0.5729132,0.20537308,0.22171375
+DM_4983,Possible Misconception,Partial Understanding,0.12058816,0.44174698,0.4376649
+DM_4992,Understood,Partial Understanding,0.17280564,0.4341671,0.39302725
+DM_4998,Understood,Understood,0.62079555,0.20294249,0.17626195

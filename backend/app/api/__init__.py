@@ -11,6 +11,7 @@ from app.api.assignments import router as assignments_router
 from app.api.classrooms import router as classrooms_router
 from app.api.ml import router as ml_router
 from app.api.users import router as users_router
+from app.api.evaluation import router as evaluation_router
 
 api_router = APIRouter(prefix="/api")
 api_router.include_router(users_router)
@@ -24,5 +25,6 @@ api_router.include_router(instructor_router)
 api_router.include_router(code_router)
 api_router.include_router(assignments_router)
 api_router.include_router(ml_router)
+api_router.include_router(evaluation_router)
 
 __all__ = ["api_router"]

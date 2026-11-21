@@ -217,11 +217,16 @@ if TORCH_AVAILABLE:
             if exp_emb.size(-1) != self.exp_dim:
                 raise ValueError(f"Expected exp_dim={self.exp_dim}, got {exp_emb.size(-1)}")
 
-            # Handle optional inputs gracefully with zero-padding
+            # Handle optional inputs gracefully with dimension verification
             if align_rep is None:
                 align_rep = torch.zeros(batch_size, self.align_dim, device=device)
+            elif align_rep.size(-1) != self.align_dim:
+                raise ValueError(f"Expected align_dim={self.align_dim}, got {align_rep.size(-1)}")
+
             if num_features is None:
                 num_features = torch.zeros(batch_size, self.num_features_dim, device=device)
+            elif num_features.size(-1) != self.num_features_dim:
+                raise ValueError(f"Expected num_features_dim={self.num_features_dim}, got {num_features.size(-1)}")
 
             # --------------------------------------------------------------
             # Step 1: Project modalities to common latent space d_model
@@ -462,12 +467,12 @@ class MultimodalCrossAttentionFusion:
                 t = arr.float()
             if t.dim() == 1:
                 t = t.unsqueeze(0)
-            # Adaptive zero-padding or linear pad if legacy dimension is passed
-            if t.size(-1) < expected_dim:
-                pad = torch.zeros(t.size(0), expected_dim - t.size(-1), device=t.device)
-                t = torch.cat([t, pad], dim=-1)
-            elif t.size(-1) > expected_dim:
-                t = t[:, :expected_dim]
+            # Strict representation dimension validation (no silent padding or truncation)
+            if t.size(-1) != expected_dim:
+                raise ValueError(
+                    f"Representation dimension mismatch: expected {expected_dim}, got {t.size(-1)}. "
+                    "Silent padding or truncation is strictly prohibited in the primary research pipeline."
+                )
             return t.to(self.device)
 
         t_code = to_tensor(x_code, self.code_dim)
@@ -649,6 +654,13 @@ class MultimodalCrossAttentionFusion:
                     "num_heads": self.model.nhead,
                     "num_encoder_layers": self.model.num_encoder_layers,
                 },
+                "class_mapping": dict(LABEL_MAP),
+                "classes": list(LABELS),
+                "preprocessing_config": {
+                    "mask_s_overall": True,
+                    "mask_s_viva": True,
+                    "num_features_dim": self.num_features_dim,
+                },
                 "is_trained": self.is_trained,
             }, path)
 
@@ -752,6 +764,7 @@ class MultimodalCrossAttentionFusion:
             viva_assessments=bundle.explanation.answers if bundle.explanation else None,
             telemetry_features=bundle.process.numerical_features if bundle.process else None,
             include_s_overall=False,
+            include_s_viva=False,
         )
         supporting_scores = {
             "S_AST": fdict.get("s_ast"),
@@ -799,7 +812,7 @@ class MultimodalCrossAttentionFusion:
         else:
             proc_t = torch.zeros(1, self.proc_dim, device=self.device)
 
-        # Numerical feature tensor with S_OVERALL masked to prevent redundant leakage
+        # Numerical feature tensor with S_OVERALL and S_VIVA strictly masked to prevent target leakage
         num_vec, _ = NumericalFeaturePreprocessor.transform(
             ast_summary=bundle.code.ast_summary if bundle.code else None,
             exec_output=bundle.code.execution_output if bundle.code else None,
@@ -809,20 +822,25 @@ class MultimodalCrossAttentionFusion:
             viva_assessments=bundle.explanation.answers if bundle.explanation else None,
             telemetry_features=bundle.process.numerical_features if bundle.process else None,
             include_s_overall=False,
+            include_s_viva=False,
         )
         num_t = torch.from_numpy(num_vec).unsqueeze(0).float().to(self.device)
 
-        # Cross-modal alignment
+        # Cross-modal alignment: strictly computed only when both Code and Explanation are active
+        has_align = bool(has_code and has_exp)
         align_t = None
-        if self.alignment_module:
+        if has_align and self.alignment_module:
             align_t, _, _ = self.alignment_module(code_t, exp_t)
+        else:
+            align_t = torch.zeros(1, self.align_dim, device=self.device)
 
         # Modality key padding mask: (1, 5) with True for padded/missing modalities
+        # Modality order: 0=Process, 1=Code, 2=Explanation, 3=Alignment, 4=Numerical
         key_mask = torch.tensor([[
             not has_proc,               # Index 0: Process
-            False,                      # Index 1: Code (available)
-            False,                      # Index 2: Explanation (available)
-            False,                      # Index 3: Alignment (computed from code + exp)
+            not has_code,               # Index 1: Code
+            not has_exp,                # Index 2: Explanation
+            not has_align,              # Index 3: Alignment (masked if code or viva missing)
             False,                      # Index 4: Numerical features (computed)
         ]], dtype=torch.bool, device=self.device)
 

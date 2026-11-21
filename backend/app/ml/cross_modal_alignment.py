@@ -1,9 +1,11 @@
 """Cross-Modal Semantic Alignment Module for DeepMisconception.
 
-Learns semantic consistency, entailment, and contradiction between submitted
-source code (CodeBERT), student explanations (Sentence-Transformer), and
-execution evidence using vector-level bidirectional cross-attention, contradiction
-difference tensors (|c - e|), bilinear product interactions (c * e), and bilinear similarity.
+Architecture Notice:
+This module performs vector-level cross-modal interaction between pooled contextual
+code representations (CodeBERT 768-D) and pooled student explanation representations
+(Sentence-Transformer 384-D). It computes bidirectional cross-attention, contradiction
+difference vectors (|c - e|), element-wise product interactions (c * e), and bilinear
+similarity over projected pooled vectors. It does NOT operate on token-level sequence grids.
 """
 from typing import Dict, Any, Tuple, Optional
 import math
@@ -16,10 +18,9 @@ from app.ml.config import CODE_DIM, EXP_DIM, ALIGN_DIM, FEATURE_CONTRACT
 class CrossModalSemanticAlignment(nn.Module):
     """Dedicated Neural Alignment Module evaluating Code-Explanation consistency.
     
-    Novelty Component 4 of DeepMisconception:
     Evaluates consistency between pooled contextual code representations and
-    student explanations using bidirectional cross-attention, contradiction-sensitive
-    difference and product interactions, and execution ground-truth signals.
+    student explanations using vector-level bidirectional cross-attention,
+    contradiction-sensitive difference and product interactions, and execution signals.
     """
 
     def __init__(
@@ -109,6 +110,8 @@ class CrossModalSemanticAlignment(nn.Module):
         exp_emb: torch.Tensor,                 # (B, exp_dim) e.g. 384-D
         ast_features: Optional[torch.Tensor] = None,   # (B, ast_dim) e.g. 16-D
         exec_features: Optional[torch.Tensor] = None,  # (B, exec_dim) e.g. 4-D
+        code_mask: Optional[torch.Tensor] = None,      # (B,) BoolTensor (True if code is missing/masked)
+        exp_mask: Optional[torch.Tensor] = None,       # (B,) BoolTensor (True if viva is missing/masked)
     ) -> Tuple[torch.Tensor, torch.Tensor, Dict[str, torch.Tensor]]:
         """Compute cross-modal semantic alignment.
         
@@ -117,6 +120,8 @@ class CrossModalSemanticAlignment(nn.Module):
             exp_emb: Sentence-Transformer representation (B, 384)
             ast_features: Structural AST features (B, 16) or None
             exec_features: Execution trace features (B, 4) or None
+            code_mask: Optional boolean mask where True indicates missing code
+            exp_mask: Optional boolean mask where True indicates missing viva
             
         Returns:
             alignment_rep: (B, alignment_dim) representation for Multimodal Fusion Transformer
@@ -143,11 +148,23 @@ class CrossModalSemanticAlignment(nn.Module):
             ast_features = torch.zeros(batch_size, self.ast_dim, device=device)
         elif ast_features.dim() == 1:
             ast_features = ast_features.unsqueeze(0)
+        if ast_features.size(-1) != self.ast_dim:
+            if ast_features.size(-1) < self.ast_dim:
+                pad = torch.zeros(batch_size, self.ast_dim - ast_features.size(-1), device=device)
+                ast_features = torch.cat([ast_features, pad], dim=-1)
+            else:
+                ast_features = ast_features[:, :self.ast_dim]
 
         if exec_features is None:
             exec_features = torch.zeros(batch_size, self.exec_dim, device=device)
         elif exec_features.dim() == 1:
             exec_features = exec_features.unsqueeze(0)
+        if exec_features.size(-1) != self.exec_dim:
+            if exec_features.size(-1) < self.exec_dim:
+                pad = torch.zeros(batch_size, self.exec_dim - exec_features.size(-1), device=device)
+                exec_features = torch.cat([exec_features, pad], dim=-1)
+            else:
+                exec_features = exec_features[:, :self.exec_dim]
 
         # 1. Project to shared alignment space: (B, d_align)
         h_code = self.proj_code(code_emb)
@@ -181,6 +198,17 @@ class CrossModalSemanticAlignment(nn.Module):
         )
         alignment_rep = self.alignment_mlp(interaction_vector)  # (B, alignment_dim)
         consistency_score = self.consistency_head(alignment_rep) # (B, 1)
+
+        # 5. Gating: Mask alignment representation if code or viva is missing
+        if code_mask is not None or exp_mask is not None:
+            c_m = code_mask if code_mask is not None else torch.zeros(batch_size, dtype=torch.bool, device=device)
+            e_m = exp_mask if exp_mask is not None else torch.zeros(batch_size, dtype=torch.bool, device=device)
+            missing = (c_m | e_m)
+            if missing.any():
+                alignment_rep = alignment_rep.clone()
+                alignment_rep[missing] = 0.0
+                consistency_score = consistency_score.clone()
+                consistency_score[missing] = 0.0
 
         attention_maps = {
             "code_to_exp_weights": weights_c2e,

@@ -1,6 +1,6 @@
 # III. RESEARCH METHOD
 
-In this section, the proposed methodology for predicting student conceptual understanding and detecting programming misconceptions is presented. The approach comprises: i) data collection, ii) data pre-processing and feature extraction, iii) cross-modal latent alignment, iv) model training and multimodal fusion, v) testing data partitioning, and vi) model validation.
+In this section, the proposed methodology for predicting student conceptual understanding and detecting programming misconceptions is presented. The approach comprises: i) synthetic data generation and dataset description, ii) data pre-processing and feature extraction, iii) cross-modal latent alignment, iv) model training and multimodal fusion, v) testing data partitioning, and vi) model validation.
 
 ---
 
@@ -8,22 +8,24 @@ In this section, the proposed methodology for predicting student conceptual unde
 +---------------------------------------------------------------------------------------------------------+
 |                                        FIGURE 1. FLOW DIAGRAM                                           |
 |                                                                                                         |
-|  [First Step: Data Collection]                                                                          |
+|  [First Step: Synthetic Multimodal Data Generation]                                                     |
 |        │                                                                                                |
-|        ├── Code Submissions (Python Source Code)                                                        |
-|        ├── Oral Viva Voce (Conceptual Questions & Student Answers)                                      |
-|        └── Chronological Process Telemetry (IDE Event Streams & 24 Metrics)                             |
+|        ├── 1) Split-First Scenario Partitioning (46 Scenario Families split before generation)          |
+|        ├── 2) Source Code Synthesis (AST Variations, Boundary Bugs, Copy-Paste Patterns)                |
+|        ├── 3) Code-Grounded Viva Voce Dialogue (10 Cognitive Archetypes: Accurate to Contradictory)     |
+|        ├── 4) Chronological Telemetry Simulation (6 Behavioral Trajectories + 24 Normalized Metrics)    |
+|        └── 5) Rule-Based Proxy Pedagogical Annotation (Understood, Partial, Misconception, Pending)     |
 |        │                                                                                                |
 |  [Second Step: Data Pre-Processing & Feature Extraction]                                                |
 |        │                                                                                                |
-|        ├── 1) Data Cleaning & Evidence Verification (Filter Incomplete Viva Sessions)                   |
-|        ├── 2) AST Parsing (16 Structural Metrics) & CodeBERT Embedding (768-D)                          |
-|        ├── 3) Sentence-BERT Embedding of Viva Voce Dialogue (384-D)                                     |
+|        ├── 1) Evidence Filtering: Gating Incomplete Viva Sessions to 'Pending / Insufficient Evidence'   |
+|        ├── 2) AST Parsing (16 Structural Metrics) & Falcon-Adapted CodeBERT (768-D)                     |
+|        ├── 3) Pretrained Frozen Sentence-BERT Embedding of Viva Dialogue (384-D)                        |
 |        └── 4) Sequence Formatting & Z-Score Normalization of 24 Process Features (64-D)                 |
 |        │                                                                                                |
 |  [Third Step: Cross-Modal Latent Alignment (Stage A)]                                                   |
 |        │                                                                                                |
-|        └── Contrastive InfoNCE Loss & Cosine Regularization (Unified 128-D Space)                       |
+|        └── Contrastive InfoNCE Loss & Cosine Regularization (Unified 128-D Latent Space)                |
 |        │                                                                                                |
 |  [Fourth Step: Multimodal Fusion & Classification (Stage B & C)]                                        |
 |        │                                                                                                |
@@ -31,9 +33,9 @@ In this section, the proposed methodology for predicting student conceptual unde
 |        ├── Bidirectional 4-Layer Transformer Encoder (8 Heads, d=128)                                   |
 |        └── Linear-GELU Classification Head (3 Classes)                                                  |
 |        │                                                                                                |
-|  [Fifth Step: Testing Data]                                                                             |
+|  [Fifth Step: Testing Data Protocol]                                                                    |
 |        │                                                                                                |
-|        ├── Held-Out Test Set Evaluation (N = 627)                                                       |
+|        ├── Held-Out Test Set Evaluation (N = 627 Supervised Sessions)                                   |
 |        └── 5-Fold Stratified Group-Aware Cross-Validation (N = 3,137 across 46 Scenario Families)       |
 |        │                                                                                                |
 |  [Sixth Step: Model Validation]                                                                         |
@@ -47,10 +49,44 @@ In this section, the proposed methodology for predicting student conceptual unde
 
 ---
 
-## A. DATA COLLECTION
-The data analyzed in this study were collected from undergraduate students enrolled in introductory programming fundamentals courses across 46 distinct problem scenario families from the `DeepMisconception_Corrected_Dataset`. We obtained a total of 3,764 programming sessions encapsulating complete interaction trajectories across Python algorithmic challenges (iteration, recursion invariants, list mutation, and dictionary accumulation). 
+## A. SYNTHETIC DATA GENERATION AND DATASET DESCRIPTION
+To evaluate the proposed Multimodal Fusion Transformer architecture under rigorously controlled, leak-free conditions, the dataset analyzed in this research (`DeepMisconception_Corrected_Dataset`, $N=3,764$ sessions) was **synthetically generated**. Real student data was not collected from university cohorts due to human subject privacy restrictions, institutional review constraints, and the necessity to eliminate confounding noise before establishing baseline multimodal cross-attention mechanics.
 
-Table 1 presents the multimodal attribute categories comprising the student session representation.
+The synthetic data generation framework was executed through a five-stage pipeline designed to model authentic computing education dynamics:
+
+### 1) SPLIT-FIRST SCENARIO FAMILY DEFINITION
+To guarantee zero cross-partition leakage, 46 distinct programming scenario families across 36 core computer science concepts (e.g., nested iteration, recursion termination, sequence slicing, dictionary accumulators, and mutable parameter aliasing) were partitioned into Training, Validation, and Testing sets *prior* to generating dependent samples. No scenario family appears in more than one partition.
+
+### 2) SOURCE CODE SYNTHESIS AND BUG INJECTION
+For each scenario family, diverse functional and erroneous Python code submissions were generated. These included:
+- Canonical algorithmic solutions with optimal complexity.
+- Boundary-value bugs (off-by-one loop indices, faulty base conditions).
+- Inefficient implementations (nested redundant scans, unintentional state mutations).
+- Superficial copy-paste patterns (variable renamings with unaltered logic).
+Each script was parsed into an Abstract Syntax Tree (AST) to compute 16 structural metrics, including McCabe's Cyclomatic Complexity ($M = E - N + 2P$) and maximum AST nesting depth.
+
+### 3) CODE-GROUNDED VIVA VOCE DIALOGUE SYNTHESIS
+For every code submission, code-grounded conceptual oral exam questions were generated targeting the specific AST constructs and execution states of the student's program (e.g., variable lifetimes, loop termination criteria). Student answers were synthesized using **10 distinct cognitive archetypes**:
+- *Thorough Conceptual Understanding:* Precise explanation of program state and operational invariants.
+- *Fragile / Boundary Comprehension:* Accurate description of normal execution, but hesitation or errors on edge cases.
+- *Contradictory / Misconception:* Confident explanations that directly contradict actual runtime execution behavior.
+- *Evasive / Incomplete:* Empty, one-word, or unrelated responses.
+
+### 4) CHRONOLOGICAL PROCESS TELEMETRY SIMULATION
+IDE interaction dynamics were simulated across **6 authentic behavioral trajectories** (e.g., incremental developer, trial-and-error guesser, large-block copy-paster, hesitant debugger). Each event stream was modeled as a chronological sequence of keystrokes, character deletions, paste bursts, and execution runs, standardized to 128 steps. In parallel, 24 continuous behavioral features (typing speed, paste-to-type ratio, edit velocity, test frequency, error recovery latency) were recorded.
+
+### 5) RULE-BASED PROXY PEDAGOGICAL ANNOTATION
+Target labels were assigned via deterministic pedagogical rubrics evaluating the concordance between code execution reality and oral verbal claims:
+- **`Understood` (Class 0):** Correct execution, sound conceptual reasoning, zero verified contradictions with runtime reality.
+- **`Partial Understanding` (Class 1):** Functional code with incomplete boundary knowledge or fragile conceptual grasp in oral defense.
+- **`Possible Misconception` (Class 2):** Direct contradictions between student verbal claims and actual program execution traces.
+
+### 6) LABEL PROVENANCE AND EVIDENCE STATUS GATING
+In accordance with scientific integrity standards:
+- All labels represent synthetic proxy annotations (`synthetic_annotator_label`). The `human_validated_label` field remains unpopulated ($null$) pending future classroom adjudication.
+- **Evidence Status Gating:** Sessions where simulated viva defense was missing or evasive ($N=66$ in the test set) were explicitly assigned `Pending / Insufficient Evidence` and excluded from model classification, ensuring that the model never guesses without evidence.
+
+Table 1 summarizes the multimodal attributes comprising each session.
 
 ### TABLE 1. Dataset attribute list.
 
@@ -66,7 +102,7 @@ Table 1 presents the multimodal attribute categories comprising the student sess
 | **Target Label** | Pedagogical Class | Nominal | 3 Classes | `Understood`, `Partial Understanding`, `Possible Misconception` |
 
 ## B. DATA PRE-PROCESSING
-We carried out data cleaning, feature discretization/normalization, and feature encoding to obtain a unified, error-free dataset for model training.
+We carried out data cleaning, feature normalization, and target encoding to obtain a unified, error-free dataset for model training.
 
 ### 1) DATA CLEANING AND EVIDENCE FILTERING
 The data cleaning process verified session integrity across all three modalities. Sessions missing mandatory code submissions or corrupted event logs were eliminated. In addition, an evidence status filter was established for oral viva defense: sessions with empty, missing, or evasive viva responses ($N=66$ in the test partition) were identified and assigned to an explicit status gate (`Pending / Insufficient Evidence`). Rather than forcing an ungrounded model prediction, these cases were routed to instructor audit.
@@ -176,9 +212,9 @@ Given parameters: W_c, b_c, W_v, b_v, W_p, b_p, e_c, e_v, e_p, Transformer weigh
 ========================================================================================================
 ```
 
-## E. TESTING DATA
+## E. TESTING DATA PROTOCOL
 To verify model generalization across diverse programming problems, two rigorous testing protocols were applied:
-1. **Held-Out Test Split ($N=627$):** Completely unseen test split evaluated independently after training.
+1. **Held-Out Test Split ($N=627$):** Completely unseen test split evaluated independently after training ($66$ incomplete viva sessions excluded via evidence gating).
 2. **K-Fold Stratified Group-Aware Cross-Validation ($K=5$):** Executed exclusively on the training partition ($N=3,137$). Submissions were grouped by `scenario_family_id` such that no problem scenario family appears in both training and validation folds.
 
 ## F. MODEL VALIDATION

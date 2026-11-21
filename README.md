@@ -60,7 +60,7 @@ In modern programming education, automated assessment tools (unit test auto-grad
 flowchart TD
     subgraph S1["Modality 1: Python Code"]
         CODE["Student Submission"] --> AST["Static AST Analyzer (16-D Features)"]
-        CODE --> CODEBERT["Falcon-Adapted CodeBERT (768-D Embeddings)"]
+        CODE --> CODEBERT["Pretrained CodeBERT (768-D Embeddings)"]
     end
 
     subgraph S2["Modality 2: Oral Viva Voce"]
@@ -90,7 +90,7 @@ flowchart TD
 ```
 
 ### 1. Multimodal Feature Pipelines
-- **Code Modality (`768-D`)**: Tokenized and embedded via `microsoft/codebert-base` adapted on the Falcon Code corpus. Accompanied by a 16-dimensional AST structural feature extractor (cyclomatic complexity, nesting depth, loop structures, function contracts).
+- **Code Modality (`768-D`)**: Tokenized and embedded via `microsoft/codebert-base`. Accompanied by a 16-dimensional AST structural feature extractor (cyclomatic complexity, nesting depth, loop structures, function contracts).
 - **Viva Modality (`384-D`)**: Oral questions and student answers are paired and embedded using pretrained frozen `sentence-transformers/all-MiniLM-L6-v2`, preserving semantic nuances with zero parameter drift.
 - **Process Modality (`64-D`)**: Continuous IDE event streams (character insertions, deletions, paste bursts, test runs) coupled with 24 z-score normalized process metrics, encoded through a dedicated Process Transformer.
 
@@ -188,7 +188,7 @@ Student code execution is strictly isolated in `backend/app/services/safe_execut
 deepmisconception/
 ├── DeepMisconception/
 │   ├── models/                       # Trained PyTorch model checkpoints
-│   │   ├── codebert_falcon_adapted/  # Falcon-adapted CodeBERT (768-D)
+│   │   ├── cross_modal_alignment/    # Stage A Cross-Modal Alignment checkpoint (128-D)
 │   │   ├── complete_multimodal_model/# Stage A Alignment + Stage B Fusion Transformer
 │   │   └── multimodal_fusion_best.pt # Authoritative best checkpoint
 │   ├── reports/                      # Full evaluation reports and 5-fold CV JSON results

@@ -19,7 +19,7 @@ In this section, the proposed methodology for predicting student conceptual unde
 |  [Second Step: Data Pre-Processing & Feature Extraction]                                                |
 |        │                                                                                                |
 |        ├── 1) Evidence Filtering: Gating Incomplete Viva Sessions to 'Pending / Insufficient Evidence'   |
-|        ├── 2) AST Parsing (16 Structural Metrics) & Falcon-Adapted CodeBERT (768-D)                     |
+|        ├── 2) AST Parsing (16 Structural Metrics) & Pretrained CodeBERT (768-D)                         |
 |        ├── 3) Pretrained Frozen Sentence-BERT Embedding of Viva Dialogue (384-D)                        |
 |        └── 4) Sequence Formatting & Z-Score Normalization of 24 Process Features (64-D)                 |
 |        │                                                                                                |
@@ -93,7 +93,7 @@ Table 1 summarizes the multimodal attributes comprising each session.
 | Modality Stream | Attribute Name | Type | Dimensionality / Values | Description |
 |:---|:---|:---|:---:|:---|
 | **Code Modality** | Python Source AST | Numeric | 16-D | McCabe cyclomatic complexity, AST depth, loop counts, recursion flags |
-| | CodeBERT Contextual Vector | Numeric | 768-D | Contextual semantic token embeddings from Falcon Code-adapted CodeBERT |
+| | CodeBERT Contextual Vector | Numeric | 768-D | Contextual semantic token embeddings from pretrained CodeBERT (microsoft/codebert-base) |
 | **Viva Modality** | Oral Viva Dialogue | Text / Vector | 384-D | Question-answer explanation pairs encoded via frozen Sentence-BERT |
 | **Process Modality** | Event Sequence Stream | Discrete Sequence | $128 \times 1$ | Chronological IDE actions (keystrokes, pastes, runs, deletions) |
 | | Numerical Process Metrics | Numeric | 24-D | Normalized metrics (edit velocity, paste ratio, debugging interval, test count) |

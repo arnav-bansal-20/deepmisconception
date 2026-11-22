@@ -596,11 +596,13 @@ def seed_real_data(db: Session = None, clean: bool = True):
                     "concept": "Loop Invariants & State Accumulation",
                     "question": "Explain how the accumulator variable 'total' maintains mathematical state.",
                     "answer": "It stores the sum of squares and adds each number except multiples of 3.",
-                    "label": "Correct",
-                    "explanation": "Correct basic explanation.",
-                    "concepts_correct": ["accumulation", "skipping multiples"],
+                    "label": "Partially Correct",
+                    "explanation": "Described loop filtering outcome, but omitted state-maintenance mechanics: total=0 initialization and stepwise inductive accumulation.",
+                    "concepts_correct": ["skipping multiples of 3", "square summation"],
+                    "concepts_missed": ["state initialization (total=0)", "stepwise loop accumulation invariant"],
                 },
             ],
+            instructor_notes="Demonstrated procedural recall of filtering requirements, but incomplete explanation of accumulator state maintenance.",
         )
 
         # Priya Patel (1RV24CS089) - Diagnosed Misconception case

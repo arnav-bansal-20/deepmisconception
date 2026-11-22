@@ -554,29 +554,9 @@ class ComprehensionEngine:
                 "interpretation": "Context only: Significant block paste observed. Note that pasted code alone does not prove unauthorized source usage or a conceptual flaw; oral viva explanations verify comprehension."
             })
 
-        # 4. Concepts Not Assessed (Requirement 4)
-        asgn = db.query(Assignment).filter(Assignment.title == session.title).first()
-        if asgn and asgn.concept_tags:
-            assessed_text = " ".join(
-                [q.concept.lower().replace("-", " ") for q in questions if q.concept] 
-                + [q.question_text.lower().replace("-", " ") for q in questions]
-            )
-            unassessed = [
-                tag for tag in asgn.concept_tags 
-                if tag.lower().replace("-", " ") not in assessed_text and tag.lower() not in ("loops", "strings", "invariants")
-            ]
-            if (overall_label == "Partial Understanding" and not has_demonstrated_flaw) and unassessed:
-                u_tag = unassessed[0]
-                misconceptions_table.append({
-                    "concept": f"{u_tag.replace('-', ' ').title()} (Concept not assessed)",
-                    "evidence": f"Assignment requires '{u_tag}', but viva questions covered only evaluated topics ({', '.join([q.concept for q in questions if q.concept][:2])}).",
-                    "pattern": "Concept not assessed",
-                    "interpretation": f"Concept not assessed: Comprehension of '{u_tag}' was not directly probed in this viva session. Follow-up is recommended to verify this area."
-                })
-
-        # 5. Assessment Output Uncertainty / Prediction Discrepancy (Requirements 5 & 7)
+        # 4. Assessment Output Uncertainty / Prediction Discrepancy (Requirements 5 & 7)
         # If the Transformer predicted Partial Understanding or Possible Misconception,
-        # but recorded evidence (code + vivas + tests) shows no demonstrated misunderstanding or incomplete explanation:
+        # but recorded evidence across all modalities (code + viva + process) shows no demonstrated misunderstanding or incomplete explanation:
         if (overall_label in ("Partial Understanding", "Possible Misconception") 
             and not has_demonstrated_flaw 
             and not has_incomplete_explanation 
@@ -585,9 +565,9 @@ class ComprehensionEngine:
             diag_pct = int(round(composite_score * 100))
             misconceptions_table.append({
                 "concept": "Assessment Output Uncertainty",
-                "evidence": f"Diagnostic score is {diag_pct}%: Code passed all tests with clean exit code; all {len(assessments)} evaluated viva response(s) were assessed as correct for the questions asked.",
+                "evidence": f"Diagnostic score is {diag_pct}%: Code passed all test assertions with clean exit code; all {len(assessments)} evaluated viva response(s) were assessed as correct for the questions asked; process telemetry reflects normal iterative development.",
                 "pattern": "Unexplained prediction variance",
-                "interpretation": f"The model's {overall_label} prediction cannot be adequately explained by the available observations. Recorded code and viva responses satisfy the evaluated criteria without demonstrated errors. Follow-up recommended: {targeted_question}"
+                "interpretation": f"The model's {overall_label} prediction cannot be adequately explained by the available observations. Recorded code, viva explanations, and process features satisfy evaluated criteria without demonstrated errors. Follow-up recommended: {targeted_question}"
             })
 
         # Code & Execution Evidence (Template Section 6)

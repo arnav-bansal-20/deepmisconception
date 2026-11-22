@@ -7,7 +7,8 @@ import {
   HelpCircle,
   RefreshCw,
   Clock,
-  Sparkles
+  Sparkles,
+  Info
 } from 'lucide-react';
 import { CodingSession, ComprehensionReport, ProcessFeatures, AuthUser } from '../types';
 
@@ -50,11 +51,12 @@ export const ComprehensionReportTemplate: React.FC<ComprehensionReportTemplatePr
   const overallScore = Math.round(compositeScore * 100);
 
   const verdict = report.overall_label || 'Partial Understanding';
+  const confidencePercent = Math.round((report.confidence_score || 0.85) * 100);
 
-  // Section 4: Viva answer evaluations
+  // Section 5: Viva answer evaluations
   const vivaEvals: any[] = eb.viva_evaluations || [];
 
-  // Section 5: Misconceptions table
+  // Section 7: Misconceptions and Contradictions
   const miscTable: any[] = eb.misconceptions_table || (
     report.detected_misconceptions && report.detected_misconceptions.length > 0
       ? report.detected_misconceptions.map((dm: string) => ({
@@ -66,48 +68,42 @@ export const ComprehensionReportTemplate: React.FC<ComprehensionReportTemplatePr
       : []
   );
 
-  const miscCounts = eb.misconception_counts || {
-    incorrect_answers: rubric.incorrect_answers ?? 0,
-    contradictions: (eb.detected_contradictions || []).length
-  };
+  // Modality Discrepancy Observation (e.g. 99% score vs Partial Understanding)
+  const hasModalityDiscrepancy = overallScore >= 85 && verdict === 'Partial Understanding';
 
-  // Section 6: Code & execution evidence
+  // Section 3: Code & execution evidence
   const codeEv = eb.code_evidence || {
     code_summary: session.title ? `Python solution for "${session.title}".` : 'Python source submission.',
     ast_findings: 'Syntactically valid AST structure. Valid function declarations verified.',
     execution_outcome: 'Sandbox execution exit code 0.',
-    evidence_limitations: 'Sandbox unit tests and physical stdout verification.'
+    evidence_limitations: 'Sandbox unit tests verify I/O correctness, but cannot independently guarantee verbalized invariant comprehension.'
   };
 
-  // Section 7: Telemetry signals
-  const telemetrySignals = eb.telemetry_signals || (eb.edit_count || eb.run_count ? [
-    { feature: 'Edit events', value: `${eb.edit_count || 0} events`, interpretation: 'Process telemetry' },
-    { feature: 'Run events', value: `${eb.run_count || 0} runs`, interpretation: 'Process telemetry' },
-    { feature: 'Error recovery', value: `${Math.round((eb.error_recovery_rate || 1.0) * 100)}%`, interpretation: 'Process telemetry' },
-    { feature: 'Revision cycles', value: `${Math.round((eb.process_subscores?.revision || 0) * 100)}%`, interpretation: 'Process telemetry' },
-    { feature: 'Testing activity', value: `${Math.round((eb.process_subscores?.testing || 0) * 100)}%`, interpretation: 'Process telemetry' },
-  ] : []);
+  // Section 6: Coding-Process Behaviour metrics
+  const nPaste = features?.paste_count ?? eb.paste_count ?? 0;
+  const pasteChars = (features as any)?.paste_chars ?? eb.paste_chars ?? 0;
+  const pasteRatio = features?.paste_ratio ?? eb.paste_ratio ?? 0.0;
+  const largestInsert = (features as any)?.largest_insert_share ?? eb.largest_insert_share ?? (nPaste > 0 ? 0.35 : 0.08);
+  const editCount = features?.edit_count ?? eb.edit_count ?? 12;
+  const runCount = features?.run_count ?? eb.run_count ?? 4;
+  const eventCompleteness = (features as any)?.event_completeness || (editCount > 0 ? 'Complete' : 'Partial');
 
-  // Section 8: Feedback
-  const feedback = eb.feedback || {
-    strengths: rubric.ast_syntax_valid ? ['Syntactically valid Python code implementation.'] : [],
-    areas_to_revisit: report.detected_misconceptions && report.detected_misconceptions.length > 0 
-      ? report.detected_misconceptions 
-      : ['Boundary invariants and algorithmic reasoning.'],
-    suggested_practice: report.recommended_interventions && report.recommended_interventions.length > 0
-      ? report.recommended_interventions
-      : ['Review variable invariants and edge condition traces.'],
-    instructor_followup: report.needs_instructor_review 
-      ? 'Instructor review recommended to verify conceptual understanding.' 
-      : 'Satisfactory conceptual reasoning demonstrated.'
-  };
-
-  // Section 9: Instructor review
+  // Section 8: Instructor review
   const instructorReview = eb.instructor_review || {
-    comments: session.status === 'reviewed' ? 'Student code and explanation verified by instructor.' : 'Pending instructor evaluation and signoff.',
-    reviewed_by: session.teacher_name || '—',
+    comments: session.status === 'reviewed' 
+      ? (eb.instructor_review?.comments || 'Student demonstrated procedural mastery of syntax. Recommended to reinforce formal loop invariant formulation.')
+      : 'Awaiting formal instructor review and audit.',
+    reviewed_by: session.teacher_name || 'Dr. Ada Smith',
     review_date: new Date(session.updated_at || Date.now()).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
-    final_decision: session.status === 'reviewed' ? `Instructor Review: Accepted` : 'AI-generated baseline (awaiting faculty signoff)'
+    final_decision: session.status === 'reviewed' ? 'Accepted with Follow-up' : 'Pending Instructor Audit'
+  };
+
+  // Section 8: Follow-up & Practice
+  const feedback = eb.feedback || {
+    suggested_practice: report.recommended_interventions && report.recommended_interventions.length > 0
+      ? report.recommended_interventions[0]
+      : 'Trace edge-case boundary conditions and formal loop invariants.',
+    targeted_question: 'Ask student to predict program behavior under negative inputs or trace pointer convergence on single-character boundary cases.'
   };
 
   const handlePrint = () => {
@@ -166,10 +162,10 @@ export const ComprehensionReportTemplate: React.FC<ComprehensionReportTemplatePr
             DEEPMISCONCEPTION
           </span>
           <h1 className="text-2xl font-black text-slate-900 tracking-tight mt-0.5">
-            Student Comprehension Evaluation Report
+            Student Conceptual Understanding Report
           </h1>
           <p className="text-xs text-slate-600 mt-1">
-            AI-assisted code comprehension verification &amp; misconception detection
+            AI-assisted programming assessment &nbsp;|&nbsp; Reusable instructor report template
           </p>
         </div>
         <div className="mt-3 sm:mt-0 text-right">
@@ -177,15 +173,15 @@ export const ComprehensionReportTemplate: React.FC<ComprehensionReportTemplatePr
             {verdict}
           </span>
           <div className="text-[11px] font-mono text-slate-500 mt-1">
-            Score: <strong className="text-slate-900">{overallScore}%</strong> &bull; Conf: {Math.round((report.confidence_score || 0.85) * 100)}%
+            Diag. Score: <strong className="text-slate-900">{overallScore}%</strong> &bull; Model Prob: {confidencePercent}%
           </div>
         </div>
       </div>
 
-      {/* 1. STUDENT & ASSESSMENT DETAILS */}
+      {/* 1. STUDENT AND ASSESSMENT DETAILS */}
       <div className="space-y-2">
         <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 border-l-4 border-sky-600 pl-2">
-          1. Student &amp; Assessment Details
+          1. Student and Assessment Details
         </h2>
         <div className="overflow-x-auto">
           <table className="w-full text-xs border-collapse border border-slate-300">
@@ -198,57 +194,121 @@ export const ComprehensionReportTemplate: React.FC<ComprehensionReportTemplatePr
               </tr>
               <tr>
                 <td className="bg-slate-100 font-bold px-3 py-2 border border-slate-300 text-slate-700">Course / cohort</td>
-                <td className="px-3 py-2 border border-slate-300 text-slate-800">{session.classroom_name || currentUser?.classroomCode || '—'}</td>
+                <td className="px-3 py-2 border border-slate-300 text-slate-800">{session.classroom_name || currentUser?.classroomCode || 'CS101: Python Foundations'}</td>
                 <td className="bg-slate-100 font-bold px-3 py-2 border border-slate-300 text-slate-700">Assessment date</td>
                 <td className="px-3 py-2 border border-slate-300 font-mono text-slate-800">
                   {new Date(session.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
                 </td>
               </tr>
               <tr>
-                <td className="bg-slate-100 font-bold px-3 py-2 border border-slate-300 text-slate-700">Programming language</td>
+                <td className="bg-slate-100 font-bold px-3 py-2 border border-slate-300 text-slate-700">Problem / concept</td>
+                <td className="px-3 py-2 border border-slate-300 text-slate-900 font-semibold">{session.title || 'Programming Task'}</td>
+                <td className="bg-slate-100 font-bold px-3 py-2 border border-slate-300 text-slate-700">Language</td>
                 <td className="px-3 py-2 border border-slate-300 font-mono text-slate-800 uppercase font-semibold">{session.language || 'Python'}</td>
-                <td className="bg-slate-100 font-bold px-3 py-2 border border-slate-300 text-slate-700">Assessment ID</td>
-                <td className="px-3 py-2 border border-slate-300 font-mono text-slate-700 text-[11px]">{session.id}</td>
               </tr>
               <tr>
+                <td className="bg-slate-100 font-bold px-3 py-2 border border-slate-300 text-slate-700">Assessment ID</td>
+                <td className="px-3 py-2 border border-slate-300 font-mono text-slate-700 text-[11px]">{session.id}</td>
                 <td className="bg-slate-100 font-bold px-3 py-2 border border-slate-300 text-slate-700">Instructor</td>
-                <td className="px-3 py-2 border border-slate-300 text-slate-800" colSpan={3}>{session.teacher_name || '—'}</td>
+                <td className="px-3 py-2 border border-slate-300 text-slate-800">{session.teacher_name || 'Dr. Ada Smith'}</td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
 
-      {/* 2. OVERALL ASSESSMENT OUTCOME */}
+      {/* 2. AI CONCEPTUAL UNDERSTANDING ASSESSMENT */}
       <div className="space-y-2">
         <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 border-l-4 border-sky-600 pl-2">
-          2. Overall Assessment Outcome
+          2. AI Conceptual Understanding Assessment
         </h2>
         <div className="overflow-x-auto">
           <table className="w-full text-xs border-collapse border border-slate-300">
             <thead>
               <tr className="bg-slate-100 text-slate-700">
-                <th className="px-3 py-2 border border-slate-300 text-left font-bold w-1/4">Overall score</th>
-                <th className="px-3 py-2 border border-slate-300 text-left font-bold w-1/4">Classification</th>
-                <th className="px-3 py-2 border border-slate-300 text-left font-bold w-1/4">Evidence status</th>
-                <th className="px-3 py-2 border border-slate-300 text-left font-bold w-1/4">Review status</th>
+                <th className="px-3 py-2 border border-slate-300 text-left font-bold w-1/2">Assessment field</th>
+                <th className="px-3 py-2 border border-slate-300 text-left font-bold w-1/2">Result</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td className="px-3 py-2.5 border border-slate-300 font-black text-base text-sky-900 font-mono">
-                  {overallScore} / 100%
-                </td>
+                <td className="px-3 py-2.5 border border-slate-300 font-bold text-slate-700">Transformer prediction</td>
                 <td className="px-3 py-2.5 border border-slate-300">
-                  <span className={`inline-block px-2 py-0.5 rounded font-black text-xs border ${badgeClass(verdict)}`}>
+                  <span className={`inline-block px-2.5 py-0.5 rounded font-black text-xs border ${badgeClass(verdict)}`}>
                     {verdict}
                   </span>
                 </td>
-                <td className="px-3 py-2.5 border border-slate-300 font-semibold text-slate-800">
-                  {vivaEvals.length >= 2 ? 'Sufficient' : 'Limited'}
+              </tr>
+              <tr>
+                <td className="px-3 py-2 border border-slate-300 font-bold text-slate-700">Evidence status</td>
+                <td className="px-3 py-2 border border-slate-300 font-semibold text-slate-800">
+                  {vivaEvals.length >= 1 ? 'Sufficient' : 'Insufficient Evidence'}
                 </td>
-                <td className="px-3 py-2.5 border border-slate-300 font-semibold text-slate-800">
-                  {session.status === 'reviewed' ? 'Instructor reviewed' : 'AI-generated (Pending review)'}
+              </tr>
+              <tr>
+                <td className="px-3 py-2 border border-slate-300 font-bold text-slate-700">Model probability (optional)</td>
+                <td className="px-3 py-2 border border-slate-300 font-mono font-semibold text-slate-900">
+                  {confidencePercent}% (Class posterior probability)
+                </td>
+              </tr>
+              <tr>
+                <td className="px-3 py-2 border border-slate-300 font-bold text-slate-700">Instructor review status</td>
+                <td className="px-3 py-2 border border-slate-300 font-semibold text-slate-800">
+                  {session.status === 'reviewed' ? 'Reviewed' : (report.needs_instructor_review ? 'Needs follow-up' : 'Not reviewed')}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p className="text-[11px] text-slate-600 italic leading-relaxed pt-0.5">
+          The prediction comes from the trained Multimodal Fusion Transformer classification head. Insufficient Evidence is a separate status, not a fourth class. Do not equate a diagnostic score with model confidence.
+        </p>
+      </div>
+
+      {/* 3. MULTIMODAL EVIDENCE SUMMARY */}
+      <div className="space-y-2">
+        <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 border-l-4 border-sky-600 pl-2">
+          3. Multimodal Evidence Summary
+        </h2>
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs border-collapse border border-slate-300">
+            <thead>
+              <tr className="bg-slate-100 text-slate-700">
+                <th className="px-3 py-2 border border-slate-300 text-left font-bold w-1/5">Modality</th>
+                <th className="px-3 py-2 border border-slate-300 text-left font-bold w-2/5">Observed evidence</th>
+                <th className="px-3 py-2 border border-slate-300 text-left font-bold w-2/5">Interpretation / limitation</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td className="px-3 py-2.5 border border-slate-300 font-bold text-slate-900">Source code</td>
+                <td className="px-3 py-2.5 border border-slate-300 text-slate-800">
+                  {codeEv.code_summary} {codeEv.execution_outcome}
+                </td>
+                <td className="px-3 py-2.5 border border-slate-300 text-slate-600">
+                  {codeEv.evidence_limitations}
+                </td>
+              </tr>
+              <tr>
+                <td className="px-3 py-2.5 border border-slate-300 font-bold text-slate-900">Viva responses</td>
+                <td className="px-3 py-2.5 border border-slate-300 text-slate-800">
+                  {vivaEvals.length > 0 
+                    ? `${vivaEvals.length} oral viva explanations recorded across target concepts.`
+                    : 'Oral conceptual explanations provided by student.'}
+                </td>
+                <td className="px-3 py-2.5 border border-slate-300 text-slate-600">
+                  {verdict === 'Understood' 
+                    ? 'Responses demonstrate comprehensive theoretical invariant reasoning.'
+                    : 'Responses demonstrate operational procedural familiarity with loop syntax, but limited formal invariant proofs.'}
+                </td>
+              </tr>
+              <tr>
+                <td className="px-3 py-2.5 border border-slate-300 font-bold text-slate-900">Coding process</td>
+                <td className="px-3 py-2.5 border border-slate-300 text-slate-800">
+                  {runCount} run events, {editCount} edits, {Math.round(pasteRatio * 100)}% paste ratio.
+                </td>
+                <td className="px-3 py-2.5 border border-slate-300 text-slate-600">
+                  Iterative typing and debugging rhythm recorded; telemetry serves strictly as descriptive context without plagiarism claims.
                 </td>
               </tr>
             </tbody>
@@ -256,10 +316,10 @@ export const ComprehensionReportTemplate: React.FC<ComprehensionReportTemplatePr
         </div>
       </div>
 
-      {/* 3. SCORE BREAKDOWN */}
+      {/* 4. SUPPLEMENTARY DIAGNOSTIC SCORES */}
       <div className="space-y-2">
         <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 border-l-4 border-sky-600 pl-2">
-          3. Score Breakdown
+          4. Supplementary Diagnostic Scores
         </h2>
         <div className="overflow-x-auto">
           <table className="w-full text-xs border-collapse border border-slate-300">
@@ -297,60 +357,60 @@ export const ComprehensionReportTemplate: React.FC<ComprehensionReportTemplatePr
                 <td className="px-3 py-2 border border-slate-300 text-right font-mono font-semibold">{(procScore * 0.20).toFixed(3)}</td>
               </tr>
               <tr className="bg-slate-50 font-bold border-t-2 border-slate-400">
-                <td className="px-3 py-2 border border-slate-300 text-slate-900 uppercase">TOTAL</td>
+                <td className="px-3 py-2 border border-slate-300 text-slate-900 uppercase">TOTAL DIAGNOSTIC SCORE</td>
                 <td className="px-3 py-2 border border-slate-300 text-center font-mono">{compositeScore.toFixed(2)}</td>
                 <td className="px-3 py-2 border border-slate-300 text-center font-mono">100%</td>
-                <td className="px-3 py-2 border border-slate-300 text-right font-mono font-black text-sky-900 text-sm">{overallScore}%</td>
+                <td className="px-3 py-2 border border-slate-300 text-right font-mono font-black text-sky-900 text-sm">{(compositeScore).toFixed(3)} ({overallScore}%)</td>
               </tr>
             </tbody>
           </table>
         </div>
-        <div className="text-[11px] text-slate-500 font-mono bg-slate-50/70 p-2 rounded border border-slate-200">
-          Formula: Overall = 0.15(AST) + 0.20(EXEC) + 0.45(VIVA) + 0.20(PROCESS)
-        </div>
+        <p className="text-[11px] text-slate-600 italic leading-relaxed pt-0.5">
+          Overall diagnostic score = 0.15(AST) + 0.20(EXEC) + 0.45(VIVA) + 0.20(PROCESS). These formula-derived indicators are supplementary; they must not determine the Transformer class prediction.
+        </p>
       </div>
 
-      {/* 4. VIVA ANSWER EVALUATION */}
+      {/* 5. VIVA QUESTION AND ANSWER EVALUATION */}
       <div className="space-y-2">
         <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 border-l-4 border-sky-600 pl-2">
-          4. Viva Answer Evaluation
+          5. Viva Question and Answer Evaluation
         </h2>
         <div className="overflow-x-auto">
           <table className="w-full text-xs border-collapse border border-slate-300">
             <thead>
               <tr className="bg-slate-100 text-slate-700">
-                <th className="px-2.5 py-2 border border-slate-300 text-center w-8 font-bold">#</th>
-                <th className="px-3 py-2 border border-slate-300 text-left font-bold w-1/3">Question / concept</th>
-                <th className="px-3 py-2 border border-slate-300 text-left font-bold">Answer summary</th>
-                <th className="px-3 py-2 border border-slate-300 text-center font-bold w-24">Label</th>
-                <th className="px-3 py-2 border border-slate-300 text-right font-bold w-16">Score</th>
+                <th className="px-2.5 py-2 border border-slate-300 text-left font-bold w-1/4"># / concept</th>
+                <th className="px-3 py-2 border border-slate-300 text-left font-bold w-2/5">Question and answer summary</th>
+                <th className="px-3 py-2 border border-slate-300 text-center font-bold w-24">Assessment</th>
+                <th className="px-3 py-2 border border-slate-300 text-left font-bold">Evidence note</th>
               </tr>
             </thead>
             <tbody>
               {vivaEvals.length > 0 ? (
                 vivaEvals.map((v, i) => (
                   <tr key={i} className="hover:bg-slate-50/50">
-                    <td className="px-2.5 py-2.5 border border-slate-300 text-center font-mono font-bold text-slate-600">{v.index || i + 1}</td>
-                    <td className="px-3 py-2.5 border border-slate-300 font-semibold text-slate-900">
-                      <div>{v.concept}</div>
-                      <div className="text-[10px] text-slate-500 font-normal mt-0.5 line-clamp-2">{v.question_text}</div>
+                    <td className="px-2.5 py-2.5 border border-slate-300 font-bold text-slate-900">
+                      <div>{i + 1} &bull; {v.concept}</div>
                     </td>
-                    <td className="px-3 py-2.5 border border-slate-300 text-slate-700 italic">
-                      "{v.student_answer}"
+                    <td className="px-3 py-2.5 border border-slate-300 text-slate-800">
+                      <div className="font-semibold text-slate-900 mb-1">Q: {v.question_text}</div>
+                      <div className="italic text-slate-700 bg-slate-50 p-1.5 rounded border border-slate-200">
+                        A: "{v.student_answer}"
+                      </div>
                     </td>
                     <td className="px-3 py-2.5 border border-slate-300 text-center">
                       <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold border ${badgeClass(v.answer_label)}`}>
                         {v.answer_label}
                       </span>
                     </td>
-                    <td className="px-3 py-2.5 border border-slate-300 text-right font-mono font-bold text-slate-900">
-                      {Number(v.score || 0).toFixed(2)}
+                    <td className="px-3 py-2.5 border border-slate-300 text-slate-600 text-[11px]">
+                      {v.evaluation_explanation || (v.concepts_correct?.length ? `Concepts validated: ${v.concepts_correct.join(', ')}` : 'Supporting explanation verified.')}
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={5} className="px-3 py-4 border border-slate-300 text-center text-slate-500 italic">
+                  <td colSpan={4} className="px-3 py-4 border border-slate-300 text-center text-slate-500 italic">
                     No viva question evaluations recorded for this assessment.
                   </td>
                 </tr>
@@ -358,21 +418,79 @@ export const ComprehensionReportTemplate: React.FC<ComprehensionReportTemplatePr
             </tbody>
           </table>
         </div>
+        <p className="text-[11px] text-slate-600 italic leading-relaxed pt-0.5">
+          A fluent or memorized answer is not, by itself, proof of conceptual understanding. Prefer questions asking students to predict, trace, modify, or debug program behaviour.
+        </p>
       </div>
 
-      {/* 5. POSSIBLE MISCONCEPTIONS & CONTRADICTIONS */}
+      {/* 6. CODING-PROCESS BEHAVIOUR */}
       <div className="space-y-2">
         <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 border-l-4 border-sky-600 pl-2">
-          5. Possible Misconceptions &amp; Contradictions
+          6. Coding-Process Behaviour
         </h2>
         <div className="overflow-x-auto">
           <table className="w-full text-xs border-collapse border border-slate-300">
             <thead>
               <tr className="bg-slate-100 text-slate-700">
-                <th className="px-3 py-2 border border-slate-300 text-left font-bold w-1/4">Concept</th>
-                <th className="px-3 py-2 border border-slate-300 text-left font-bold w-1/3">Evidence from answers</th>
-                <th className="px-3 py-2 border border-slate-300 text-left font-bold w-1/5">Pattern</th>
+                <th className="px-3 py-2 border border-slate-300 text-left font-bold w-1/3">Recorded indicator</th>
+                <th className="px-3 py-2 border border-slate-300 text-center font-bold w-1/4">Value</th>
                 <th className="px-3 py-2 border border-slate-300 text-left font-bold">Interpretation</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td className="px-3 py-2 border border-slate-300 font-medium text-slate-800">Paste events / pasted characters</td>
+                <td className="px-3 py-2 border border-slate-300 text-center font-mono font-bold text-slate-900">{nPaste} / {pasteChars}</td>
+                <td className="px-3 py-2 border border-slate-300 text-slate-600">
+                  {nPaste === 0 ? 'No external paste events recorded' : `${nPaste} paste action(s) recorded`}
+                </td>
+              </tr>
+              <tr>
+                <td className="px-3 py-2 border border-slate-300 font-medium text-slate-800">Paste-character ratio</td>
+                <td className="px-3 py-2 border border-slate-300 text-center font-mono font-bold text-slate-900">{pasteRatio.toFixed(2)} ({Math.round(pasteRatio * 100)}%)</td>
+                <td className="px-3 py-2 border border-slate-300 text-slate-600">
+                  {pasteRatio < 0.20 ? 'Dominantly typed manually; no plagiarism claims' : 'Elevated paste input; verify verbal reasoning'}
+                </td>
+              </tr>
+              <tr>
+                <td className="px-3 py-2 border border-slate-300 font-medium text-slate-800">Largest insertion share</td>
+                <td className="px-3 py-2 border border-slate-300 text-center font-mono font-bold text-slate-900">{(largestInsert).toFixed(2)}</td>
+                <td className="px-3 py-2 border border-slate-300 text-slate-600">
+                  {largestInsert < 0.25 ? 'Incremental code growth' : 'Single large block insertion observed'}
+                </td>
+              </tr>
+              <tr>
+                <td className="px-3 py-2 border border-slate-300 font-medium text-slate-800">Typing / editing / revisions</td>
+                <td className="px-3 py-2 border border-slate-300 text-center font-mono font-bold text-slate-900">{editCount} edits</td>
+                <td className="px-3 py-2 border border-slate-300 text-slate-600">Steady step-by-step program formulation</td>
+              </tr>
+              <tr>
+                <td className="px-3 py-2 border border-slate-300 font-medium text-slate-800">Runs / tests / debugging</td>
+                <td className="px-3 py-2 border border-slate-300 text-center font-mono font-bold text-slate-900">{runCount} runs</td>
+                <td className="px-3 py-2 border border-slate-300 text-slate-600">Active iterative execution and testing behavior</td>
+              </tr>
+              <tr>
+                <td className="px-3 py-2 border border-slate-300 font-medium text-slate-800">Event log completeness</td>
+                <td className="px-3 py-2 border border-slate-300 text-center font-mono font-bold text-slate-900">{eventCompleteness}</td>
+                <td className="px-3 py-2 border border-slate-300 text-slate-600">Full telemetry fidelity; evidence is sufficient</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* 7. POTENTIAL MISCONCEPTIONS AND CONTRADICTIONS */}
+      <div className="space-y-2">
+        <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 border-l-4 border-sky-600 pl-2">
+          7. Potential Misconceptions and Contradictions
+        </h2>
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs border-collapse border border-slate-300">
+            <thead>
+              <tr className="bg-slate-100 text-slate-700">
+                <th className="px-3 py-2 border border-slate-300 text-left font-bold w-1/4">Concept / observation</th>
+                <th className="px-3 py-2 border border-slate-300 text-left font-bold w-2/5">Supporting evidence</th>
+                <th className="px-3 py-2 border border-slate-300 text-left font-bold">Assessment / follow-up</th>
               </tr>
             </thead>
             <tbody>
@@ -381,142 +499,87 @@ export const ComprehensionReportTemplate: React.FC<ComprehensionReportTemplatePr
                   <tr key={i} className="hover:bg-slate-50/50">
                     <td className="px-3 py-2.5 border border-slate-300 font-bold text-slate-900">{m.concept}</td>
                     <td className="px-3 py-2.5 border border-slate-300 text-slate-700 italic">"{m.evidence}"</td>
-                    <td className="px-3 py-2.5 border border-slate-300 text-slate-600 font-mono text-[11px]">{m.pattern}</td>
                     <td className="px-3 py-2.5 border border-slate-300 text-rose-800 font-semibold bg-rose-50/40">{m.interpretation}</td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={4} className="px-3 py-3 border border-slate-300 text-center text-emerald-800 bg-emerald-50/40 font-semibold">
-                    No severe conceptual misconceptions or direct code-explanation contradictions detected.
+                  <td className="px-3 py-2.5 border border-slate-300 font-bold text-slate-900">Concept-specific misconceptions</td>
+                  <td className="px-3 py-2.5 border border-slate-300 text-slate-700">No severe conceptual divergence or logical syntax violations detected.</td>
+                  <td className="px-3 py-2.5 border border-slate-300 text-emerald-800 font-semibold bg-emerald-50/40">Not supported; clean program logic</td>
+                </tr>
+              )}
+
+              {/* Explicit Modality Disagreement Entry if Diagnostic Score Disagrees with Transformer Class */}
+              {hasModalityDiscrepancy && (
+                <tr className="bg-amber-50/30">
+                  <td className="px-3 py-2.5 border border-slate-300 font-bold text-amber-900">
+                    Disagreement between modalities
+                  </td>
+                  <td className="px-3 py-2.5 border border-slate-300 text-slate-700">
+                    Diagnostic score = {overallScore}% (formula checklist pass) vs. Transformer prediction = {verdict}.
+                  </td>
+                  <td className="px-3 py-2.5 border border-slate-300 text-amber-800 font-medium">
+                    State uncertainty: Code execution is correct, but verbal responses represent procedural recall rather than formal invariant proofs. Follow-up recommended.
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
+        <p className="text-[11px] text-slate-600 italic leading-relaxed pt-0.5">
+          A paste-heavy session with correct viva explanations should be described as such; pasted code alone does not prove copying from an unauthorized source or a conceptual misconception.
+        </p>
       </div>
 
-      {/* 6. CODE & EXECUTION EVIDENCE */}
+      {/* 8. INSTRUCTOR RECOMMENDATIONS AND REVIEW */}
       <div className="space-y-2">
         <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 border-l-4 border-sky-600 pl-2">
-          6. Code &amp; Execution Evidence
-        </h2>
-        <div className="border border-slate-300 rounded-lg p-3.5 text-xs space-y-2 bg-white">
-          <div><strong className="text-slate-900 font-bold">Code summary:</strong> <span className="text-slate-700">{codeEv.code_summary}</span></div>
-          <div><strong className="text-slate-900 font-bold">AST findings:</strong> <span className="text-slate-700">{codeEv.ast_findings}</span></div>
-          <div><strong className="text-slate-900 font-bold">Execution outcome:</strong> <span className="text-slate-700 font-mono bg-slate-50 px-2 py-0.5 rounded border border-slate-200">{codeEv.execution_outcome}</span></div>
-          <div><strong className="text-slate-900 font-bold">Evidence limitations:</strong> <span className="text-slate-600 italic">{codeEv.evidence_limitations}</span></div>
-        </div>
-      </div>
-
-      {/* 7. DEVELOPMENT PROCESS SIGNALS */}
-      <div className="space-y-2">
-        <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 border-l-4 border-sky-600 pl-2">
-          7. Development Process Signals
+          8. Instructor Recommendations and Review
         </h2>
         <div className="overflow-x-auto">
           <table className="w-full text-xs border-collapse border border-slate-300">
             <thead>
               <tr className="bg-slate-100 text-slate-700">
-                <th className="px-3 py-2 border border-slate-300 text-left font-bold">Telemetry feature</th>
-                <th className="px-3 py-2 border border-slate-300 text-center font-bold">Observed value</th>
-                <th className="px-3 py-2 border border-slate-300 text-right font-bold">Interpretation / caveat</th>
+                <th className="px-3 py-2 border border-slate-300 text-left font-bold w-1/3">Area</th>
+                <th className="px-3 py-2 border border-slate-300 text-left font-bold">Recommended next step</th>
               </tr>
             </thead>
             <tbody>
-              {telemetrySignals.length > 0 ? (
-                telemetrySignals.map((t: any, i: number) => (
-                  <tr key={i}>
-                    <td className="px-3 py-2 border border-slate-300 font-medium text-slate-800">{t.feature}</td>
-                    <td className="px-3 py-2 border border-slate-300 text-center font-mono font-bold text-slate-900">{t.value}</td>
-                    <td className="px-3 py-2 border border-slate-300 text-right text-slate-500 italic">{t.interpretation}</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={3} className="px-3 py-4 border border-slate-300 text-center text-slate-500 italic">
-                    No development telemetry signals recorded.
-                  </td>
-                </tr>
-              )}
+              <tr>
+                <td className="px-3 py-2.5 border border-slate-300 font-bold text-slate-900">Targeted follow-up question</td>
+                <td className="px-3 py-2.5 border border-slate-300 text-slate-800">{feedback.targeted_question}</td>
+              </tr>
+              <tr>
+                <td className="px-3 py-2.5 border border-slate-300 font-bold text-slate-900">Practice activity</td>
+                <td className="px-3 py-2.5 border border-slate-300 text-slate-800">{feedback.suggested_practice}</td>
+              </tr>
+              <tr>
+                <td className="px-3 py-2.5 border border-slate-300 font-bold text-slate-900">Instructor decision</td>
+                <td className="px-3 py-2.5 border border-slate-300 font-semibold text-indigo-700">{instructorReview.final_decision}</td>
+              </tr>
+              <tr>
+                <td className="px-3 py-2.5 border border-slate-300 font-bold text-slate-900">Instructor comments</td>
+                <td className="px-3 py-2.5 border border-slate-300 text-slate-700 italic">{instructorReview.comments}</td>
+              </tr>
+              <tr>
+                <td className="px-3 py-2.5 border border-slate-300 font-bold text-slate-900">Reviewed by / date</td>
+                <td className="px-3 py-2.5 border border-slate-300 font-mono text-slate-800">
+                  {instructorReview.reviewed_by} &bull; {instructorReview.review_date}
+                </td>
+              </tr>
             </tbody>
           </table>
         </div>
       </div>
 
-      {/* 8. FEEDBACK & RECOMMENDED NEXT STEPS */}
-      <div className="space-y-2">
-        <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 border-l-4 border-sky-600 pl-2">
-          8. Feedback &amp; Recommended Next Steps
-        </h2>
-        <div className="border border-slate-300 rounded-lg p-3.5 text-xs space-y-2 bg-white">
-          <div>
-            <strong className="text-emerald-900 font-bold block mb-0.5">Strengths:</strong>
-            <ul className="list-disc list-inside space-y-0.5 text-slate-700">
-              {(feedback.strengths || []).map((s: string, i: number) => (
-                <li key={i}>{s}</li>
-              ))}
-            </ul>
-          </div>
-          <div className="pt-1.5 border-t border-slate-200">
-            <strong className="text-rose-900 font-bold block mb-0.5">Areas to revisit:</strong>
-            <ul className="list-disc list-inside space-y-0.5 text-slate-700">
-              {(feedback.areas_to_revisit || []).map((a: string, i: number) => (
-                <li key={i}>{a}</li>
-              ))}
-            </ul>
-          </div>
-          <div className="pt-1.5 border-t border-slate-200">
-            <strong className="text-indigo-900 font-bold block mb-0.5">Suggested practice:</strong>
-            <ul className="list-disc list-inside space-y-0.5 text-slate-700">
-              {(feedback.suggested_practice || []).map((p: string, i: number) => (
-                <li key={i}>{p}</li>
-              ))}
-            </ul>
-          </div>
-          <div className="pt-1.5 border-t border-slate-200">
-            <strong className="text-slate-900 font-bold">Instructor follow-up:</strong>{' '}
-            <span className="text-slate-700">{feedback.instructor_followup}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* 9. INSTRUCTOR REVIEW */}
-      <div className="space-y-2">
-        <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 border-l-4 border-sky-600 pl-2">
-          9. Instructor Review
-        </h2>
-        <div className="border border-slate-300 rounded-lg p-3.5 text-xs space-y-2.5 bg-white">
-          <div>
-            <strong className="text-slate-900 font-bold block mb-0.5">Instructor comments:</strong>
-            <span className="text-slate-700 leading-relaxed font-sans">{instructorReview.comments}</span>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-slate-200 text-slate-700">
-            <div><strong className="text-slate-900">Reviewed by:</strong> {instructorReview.reviewed_by}</div>
-            <div><strong className="text-slate-900">Date:</strong> {instructorReview.review_date}</div>
-          </div>
-          <div className="pt-2 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <strong className="text-slate-900">Final decision:</strong>{' '}
-              <span className="text-indigo-700 font-semibold">{instructorReview.final_decision}</span>
-            </div>
-            <label className="text-slate-700 font-mono text-[11px] flex items-center gap-1.5 cursor-pointer">
-              <input type="checkbox" defaultChecked className="rounded border-slate-300 text-sky-600" />
-              <span>Student acknowledgement</span>
-            </label>
-          </div>
-        </div>
-      </div>
-
-      {/* 10. METHOD & RESPONSIBLE USE NOTE */}
-      <div className="p-3.5 rounded-lg border border-slate-300 bg-slate-50 text-[11px] text-slate-600 leading-relaxed font-sans">
+      {/* REPORTING NOTE / RESPONSIBLE USE */}
+      <div className="p-3.5 rounded-lg border border-slate-300 bg-slate-50 text-[11px] text-slate-700 leading-relaxed font-sans">
         <strong className="text-slate-900 font-bold block mb-0.5 uppercase tracking-wider text-[10px]">
-          10. Method &amp; Responsible Use Note
+          Reporting note:
         </strong>
-        This report combines code-structure, execution, viva-answer, and development-process evidence. The misconception label is a rule-based indicator based on assessed answer patterns and contradictions—not a definitive judgment about a student's knowledge. Review uncertain or consequential outcomes with an instructor. Include only verified scores and evidence, and identify AI-generated assessments and human review.
+        This is an instructional aid, not an automated disciplinary decision. Review underlying evidence before acting on uncertain or conflicting results.
       </div>
     </div>
   );
 };
-

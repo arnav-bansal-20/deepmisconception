@@ -74,7 +74,7 @@
 | Concept / observation | Supporting evidence | Assessment / follow-up |
 | :--- | :--- | :--- |
 | **[Potential concept-specific misconception]** | [Exact code line, event or viva response] | [Needs verification / Not supported / Follow-up question] |
-| **[Disagreement between modalities]** | [e.g., high diagnostic score vs different predicted class] | [State uncertainty; do not infer a causal explanation without evidence] |
+| **[Assessment Output Uncertainty]** | [e.g., high diagnostic score vs different predicted class] | [State uncertainty; do not infer a causal explanation without evidence] |
 
 > *A paste-heavy session with correct viva explanations should be described as such; pasted code alone does not prove copying from an unauthorized source or a conceptual misconception.*
 

@@ -15,6 +15,7 @@ from app.models.answer_assessment import AnswerAssessment
 from app.models.process_event import ProcessEvent
 from app.models.comprehension_report import ComprehensionReport
 from app.models.instructor_review import InstructorReview
+from app.models.assignment import Assignment
 from app.services.process_telemetry import ProcessTelemetryService
 from app.config import settings
 
@@ -459,35 +460,135 @@ class ComprehensionEngine:
                 "contradictions": a_obj.contradictions if a_obj else [],
             })
 
-        # Structured Misconceptions & Contradictions (Template Section 5)
+        # ------------------------------------------------------------------
+        # EVIDENCE-GROUNDED REASONING & EXPLANATIONS (Template Section 7 & 8)
+        # ------------------------------------------------------------------
+        # Determine student- and problem-specific targeted follow-up question
+        def determine_targeted_followup(problem_title: str) -> str:
+            pt = (problem_title or "").lower()
+            if "accumulator" in pt or "modulo" in pt:
+                return "Trace what your function returns if n <= 0, and explain the initialization invariant of 'total' before the loop begins."
+            elif "palindrome" in pt or "pointer" in pt:
+                return "Trace pointer advancement if the input consists exclusively of punctuation (e.g., '.,,.'). Do pointers terminate safely without out-of-bounds indexing?"
+            elif "frequency" in pt or "dictionary" in pt or "word" in pt:
+                return "How would you handle words attached to punctuation (e.g., 'apple,') and ensure case-insensitivity without raising KeyError or inflating unique counts?"
+            elif "factorial" in pt or "recursion" in pt or "stack" in pt:
+                return "Trace the call stack unwinding for n = 3 down to base case n <= 1, and explain how the runtime prevents infinite recursion for negative inputs."
+            elif "binary" in pt or "search" in pt:
+                return "If the target is absent from a sorted sequence, what are the final values of low and high upon loop termination? How does this mathematically prove non-existence?"
+            else:
+                return f"Can you trace how your solution for '{problem_title}' handles an empty or boundary input, and explain the invariant guaranteeing safe termination?"
+
+        targeted_question = determine_targeted_followup(session.title)
+
         misconceptions_table = []
+        has_demonstrated_flaw = False
+        has_incomplete_explanation = False
+
+        # 1. Viva Evidence: Grounded strictly in actual viva questions and student answers
         for a in assessments:
             q_match = next((q for q in questions if q.id == a.question_id), None)
             concept_name = (q_match.concept if q_match and q_match.concept else "Algorithmic Logic")
+            q_text = q_match.question_text if q_match else "Viva Question"
+            ans_clean = (a.student_answer or "").strip()
+
+            # A. Demonstrated Misunderstanding: Factual contradiction or explicit misunderstanding
             if a.contradictions:
+                has_demonstrated_flaw = True
                 for c in a.contradictions:
                     misconceptions_table.append({
-                        "concept": concept_name,
-                        "evidence": a.student_answer[:90] if a.student_answer else c,
-                        "pattern": "Contradiction against execution trace",
-                        "interpretation": f"Possible misconception ({c})"
+                        "concept": f"{concept_name} (Demonstrated misunderstanding)",
+                        "evidence": f'Q: "{q_text}" — Student answered: "{ans_clean}"',
+                        "pattern": "Demonstrated misunderstanding",
+                        "interpretation": f"Demonstrated misunderstanding: {c}. Explanation contradicts recorded program execution."
                     })
-            if a.concepts_missed and a.answer_label != "Correct":
-                for m in a.concepts_missed:
-                    misconceptions_table.append({
-                        "concept": concept_name,
-                        "evidence": a.student_answer[:90] if a.student_answer else "Verbal explanation",
-                        "pattern": "Repeated error / omitted invariant" if a.answer_label == "Incorrect" else "Nuance omitted",
-                        "interpretation": f"Possible misconception: {m}" if a.answer_label == "Incorrect" else f"Partial flag: {m}"
-                    })
-        if not misconceptions_table and detected_misconceptions:
-            for dm in detected_misconceptions:
+            elif a.answer_label == "Incorrect":
+                has_demonstrated_flaw = True
+                expl = a.evaluation_explanation or "Answer provides incorrect logic for the evaluated concept."
                 misconceptions_table.append({
-                    "concept": session.title if session else "Core Concept",
-                    "evidence": "Observed viva explanations",
-                    "pattern": "Conceptual misalignment",
-                    "interpretation": dm
+                    "concept": f"{concept_name} (Demonstrated misunderstanding)",
+                    "evidence": f'Q: "{q_text}" — Student answered: "{ans_clean}"',
+                    "pattern": "Demonstrated misunderstanding",
+                    "interpretation": f"Demonstrated misunderstanding: {expl}"
                 })
+
+            # B. Incomplete Explanation: Addressed question partially, but missed requested nuances
+            # (Requirement 3: Never describe a Correct answer as weak merely for lacking formal terminology not asked)
+            elif a.answer_label == "Partially Correct" or (a.concepts_missed and a.answer_label != "Correct"):
+                has_incomplete_explanation = True
+                missed_points = ", ".join(a.concepts_missed) if a.concepts_missed else "nuanced boundary behavior"
+                misconceptions_table.append({
+                    "concept": f"{concept_name} (Incomplete explanation)",
+                    "evidence": f'Q: "{q_text}" — Student answered: "{ans_clean}"',
+                    "pattern": "Incomplete explanation",
+                    "interpretation": f"Incomplete explanation: Response addressed primary mechanics but omitted: {missed_points}."
+                })
+
+        # 2. Code & Execution Evidence: Observations grounded in actual execution trace
+        has_code_error = False
+        if latest_sub and not latest_sub.is_valid:
+            has_code_error = True
+            err_msg = latest_sub.error_output.strip() if latest_sub.error_output else "Syntax validation failed"
+            misconceptions_table.append({
+                "concept": "Code Syntax / Structure (Demonstrated misunderstanding)",
+                "evidence": f"Code validation error: {err_msg[:120]}",
+                "pattern": "Demonstrated misunderstanding",
+                "interpretation": "Demonstrated misunderstanding: Source code contains syntax errors and cannot be parsed into a valid AST."
+            })
+        elif latest_sub and latest_sub.error_output and latest_sub.error_output.strip():
+            has_code_error = True
+            err_line = latest_sub.error_output.strip().splitlines()[-1]
+            misconceptions_table.append({
+                "concept": "Runtime Execution (Demonstrated misunderstanding)",
+                "evidence": f"Executed code produced runtime exception: {err_line}",
+                "pattern": "Demonstrated misunderstanding",
+                "interpretation": f"Demonstrated misunderstanding: Program execution crashed with {err_line}, indicating unhandled control flow or bounds violation."
+            })
+
+        # 3. Coding-Process Telemetry Evidence
+        if proc_features and getattr(proc_features, "paste_ratio", 0.0) >= 0.40:
+            misconceptions_table.append({
+                "concept": "Coding-Process Observation",
+                "evidence": f"Telemetry recorded {proc_features.paste_count} paste event(s) accounting for {int(proc_features.paste_ratio * 100)}% of inserted code.",
+                "pattern": "Coding-process evidence",
+                "interpretation": "Context only: Significant block paste observed. Note that pasted code alone does not prove unauthorized source usage or a conceptual flaw; oral viva explanations verify comprehension."
+            })
+
+        # 4. Concepts Not Assessed (Requirement 4)
+        asgn = db.query(Assignment).filter(Assignment.title == session.title).first()
+        if asgn and asgn.concept_tags:
+            assessed_text = " ".join(
+                [q.concept.lower().replace("-", " ") for q in questions if q.concept] 
+                + [q.question_text.lower().replace("-", " ") for q in questions]
+            )
+            unassessed = [
+                tag for tag in asgn.concept_tags 
+                if tag.lower().replace("-", " ") not in assessed_text and tag.lower() not in ("loops", "strings", "invariants")
+            ]
+            if (overall_label == "Partial Understanding" and not has_demonstrated_flaw) and unassessed:
+                u_tag = unassessed[0]
+                misconceptions_table.append({
+                    "concept": f"{u_tag.replace('-', ' ').title()} (Concept not assessed)",
+                    "evidence": f"Assignment requires '{u_tag}', but viva questions covered only evaluated topics ({', '.join([q.concept for q in questions if q.concept][:2])}).",
+                    "pattern": "Concept not assessed",
+                    "interpretation": f"Concept not assessed: Comprehension of '{u_tag}' was not directly probed in this viva session. Follow-up is recommended to verify this area."
+                })
+
+        # 5. Assessment Output Uncertainty / Prediction Discrepancy (Requirements 5 & 7)
+        # If the Transformer predicted Partial Understanding or Possible Misconception,
+        # but recorded evidence (code + vivas + tests) shows no demonstrated misunderstanding or incomplete explanation:
+        if (overall_label in ("Partial Understanding", "Possible Misconception") 
+            and not has_demonstrated_flaw 
+            and not has_incomplete_explanation 
+            and not has_code_error):
+            
+            diag_pct = int(round(composite_score * 100))
+            misconceptions_table.append({
+                "concept": "Assessment Output Uncertainty",
+                "evidence": f"Diagnostic score is {diag_pct}%: Code passed all tests with clean exit code; all {len(assessments)} evaluated viva response(s) were assessed as correct for the questions asked.",
+                "pattern": "Unexplained prediction variance",
+                "interpretation": f"The model's {overall_label} prediction cannot be adequately explained by the available observations. Recorded code and viva responses satisfy the evaluated criteria without demonstrated errors. Follow-up recommended: {targeted_question}"
+            })
 
         # Code & Execution Evidence (Template Section 6)
         ast_sum = (latest_sub.ast_summary or {}) if latest_sub else {}
@@ -533,7 +634,8 @@ class ComprehensionEngine:
         feedback = {
             "strengths": strengths[:4],
             "areas_to_revisit": areas_to_revisit[:4],
-            "suggested_practice": interventions[:3],
+            "suggested_practice": interventions[0] if interventions else "Practice boundary-case tracing and formal loop invariant formulation.",
+            "targeted_question": targeted_question,
             "instructor_followup": "Review ambiguous edge-case traces with student during lab hours." if needs_review else "Demonstrated satisfactory mental model; proceed to higher-order complexity tasks."
         }
 

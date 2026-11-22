@@ -68,9 +68,6 @@ export const ComprehensionReportTemplate: React.FC<ComprehensionReportTemplatePr
       : []
   );
 
-  // Modality Discrepancy Observation (e.g. 99% score vs Partial Understanding)
-  const hasModalityDiscrepancy = overallScore >= 85 && verdict === 'Partial Understanding';
-
   // Section 3: Code & execution evidence
   const codeEv = eb.code_evidence || {
     code_summary: session.title ? `Python solution for "${session.title}".` : 'Python source submission.',
@@ -511,33 +508,42 @@ export const ComprehensionReportTemplate: React.FC<ComprehensionReportTemplatePr
             </thead>
             <tbody>
               {miscTable.length > 0 ? (
-                miscTable.map((m, i) => (
-                  <tr key={i} className="hover:bg-slate-50/50">
-                    <td className="px-3 py-2.5 border border-slate-300 font-bold text-slate-900">{m.concept}</td>
-                    <td className="px-3 py-2.5 border border-slate-300 text-slate-700 italic">"{m.evidence}"</td>
-                    <td className="px-3 py-2.5 border border-slate-300 text-rose-800 font-semibold bg-rose-50/40">{m.interpretation}</td>
-                  </tr>
-                ))
+                miscTable.map((m, i) => {
+                  const isMisunderstanding = m.pattern === 'Demonstrated misunderstanding' || m.interpretation?.includes('Demonstrated misunderstanding');
+                  const isIncomplete = m.pattern === 'Incomplete explanation' || m.interpretation?.includes('Incomplete explanation');
+                  const isNotAssessed = m.pattern === 'Concept not assessed' || m.interpretation?.includes('Concept not assessed');
+                  const isUncertainty = m.pattern === 'Unexplained prediction variance' || m.concept?.includes('Uncertainty');
+
+                  let cellStyle = 'text-slate-800 bg-slate-50/50 font-medium';
+                  if (isMisunderstanding) {
+                    cellStyle = 'text-rose-900 bg-rose-50/70 font-semibold';
+                  } else if (isIncomplete) {
+                    cellStyle = 'text-amber-900 bg-amber-50/70 font-medium';
+                  } else if (isNotAssessed) {
+                    cellStyle = 'text-slate-700 bg-slate-100 font-medium';
+                  } else if (isUncertainty) {
+                    cellStyle = 'text-sky-950 bg-sky-50/70 font-medium';
+                  }
+
+                  return (
+                    <tr key={i} className="hover:bg-slate-50/50">
+                      <td className="px-3 py-2.5 border border-slate-300 font-bold text-slate-900 align-top w-1/4">
+                        {m.concept}
+                      </td>
+                      <td className="px-3 py-2.5 border border-slate-300 text-slate-700 align-top w-2/5">
+                        {m.evidence}
+                      </td>
+                      <td className={`px-3 py-2.5 border border-slate-300 align-top ${cellStyle}`}>
+                        {m.interpretation}
+                      </td>
+                    </tr>
+                  );
+                })
               ) : (
                 <tr>
-                  <td className="px-3 py-2.5 border border-slate-300 font-bold text-slate-900">Concept-specific misconceptions</td>
-                  <td className="px-3 py-2.5 border border-slate-300 text-slate-700">No severe conceptual divergence or logical syntax violations detected.</td>
-                  <td className="px-3 py-2.5 border border-slate-300 text-emerald-800 font-semibold bg-emerald-50/40">Not supported; clean program logic</td>
-                </tr>
-              )}
-
-              {/* Explicit Modality Disagreement Entry if Diagnostic Score Disagrees with Transformer Class */}
-              {hasModalityDiscrepancy && (
-                <tr className="bg-amber-50/30">
-                  <td className="px-3 py-2.5 border border-slate-300 font-bold text-amber-900">
-                    Disagreement between modalities
-                  </td>
-                  <td className="px-3 py-2.5 border border-slate-300 text-slate-700">
-                    Diagnostic score = {overallScore}% (formula checklist pass) vs. Transformer prediction = {verdict}.
-                  </td>
-                  <td className="px-3 py-2.5 border border-slate-300 text-amber-800 font-medium">
-                    State uncertainty: Code execution is correct, but verbal responses represent procedural recall rather than formal invariant proofs. Follow-up recommended.
-                  </td>
+                  <td className="px-3 py-2.5 border border-slate-300 font-bold text-slate-900">Recorded Assessment Observations</td>
+                  <td className="px-3 py-2.5 border border-slate-300 text-slate-700">No runtime exceptions, logical contradictions, or conceptual weaknesses identified in the recorded code and viva explanations.</td>
+                  <td className="px-3 py-2.5 border border-slate-300 text-emerald-800 font-semibold bg-emerald-50/40">Clean recorded performance across all assessed criteria.</td>
                 </tr>
               )}
             </tbody>
@@ -564,11 +570,15 @@ export const ComprehensionReportTemplate: React.FC<ComprehensionReportTemplatePr
             <tbody>
               <tr>
                 <td className="px-3 py-2.5 border border-slate-300 font-bold text-slate-900">Targeted follow-up question</td>
-                <td className="px-3 py-2.5 border border-slate-300 text-slate-800">{feedback.targeted_question}</td>
+                <td className="px-3 py-2.5 border border-slate-300 text-slate-800 font-medium">
+                  {feedback.targeted_question || 'Ask student to predict program behavior under boundary conditions or trace execution on empty/minimal inputs.'}
+                </td>
               </tr>
               <tr>
                 <td className="px-3 py-2.5 border border-slate-300 font-bold text-slate-900">Practice activity</td>
-                <td className="px-3 py-2.5 border border-slate-300 text-slate-800">{feedback.suggested_practice}</td>
+                <td className="px-3 py-2.5 border border-slate-300 text-slate-800">
+                  {Array.isArray(feedback.suggested_practice) ? feedback.suggested_practice.join('; ') : (feedback.suggested_practice || 'Practice boundary-case tracing and loop invariant proofs.')}
+                </td>
               </tr>
               <tr>
                 <td className="px-3 py-2.5 border border-slate-300 font-bold text-slate-900">Instructor decision</td>

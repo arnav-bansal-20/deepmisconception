@@ -106,8 +106,24 @@ export const ComprehensionReportTemplate: React.FC<ComprehensionReportTemplatePr
     targeted_question: 'Ask student to predict program behavior under negative inputs or trace pointer convergence on single-character boundary cases.'
   };
 
+  React.useEffect(() => {
+    const onBeforePrint = () => document.body.classList.add('is-printing-report');
+    const onAfterPrint = () => document.body.classList.remove('is-printing-report');
+    window.addEventListener('beforeprint', onBeforePrint);
+    window.addEventListener('afterprint', onAfterPrint);
+    return () => {
+      window.removeEventListener('beforeprint', onBeforePrint);
+      window.removeEventListener('afterprint', onAfterPrint);
+      document.body.classList.remove('is-printing-report');
+    };
+  }, []);
+
   const handlePrint = () => {
+    document.body.classList.add('is-printing-report');
     window.print();
+    setTimeout(() => {
+      document.body.classList.remove('is-printing-report');
+    }, 1500);
   };
 
   const badgeClass = (label: string) => {
@@ -127,7 +143,7 @@ export const ComprehensionReportTemplate: React.FC<ComprehensionReportTemplatePr
   };
 
   return (
-    <div className="bg-white text-slate-800 font-sans print:p-0 space-y-6">
+    <div className="report-printable-document bg-white text-slate-800 font-sans print:p-0 space-y-6">
       {/* Top Action Bar (Hidden during print) */}
       <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-200 print:hidden">
         <div className="text-xs text-slate-500 font-mono">
@@ -156,7 +172,7 @@ export const ComprehensionReportTemplate: React.FC<ComprehensionReportTemplatePr
       </div>
 
       {/* DOCUMENT HEADER */}
-      <div className="border-b-2 border-slate-900 pb-4 text-center sm:text-left sm:flex sm:items-end sm:justify-between gap-4">
+      <div className="border-b-2 border-slate-900 pb-4 text-center sm:text-left sm:flex sm:items-end sm:justify-between gap-4 report-section">
         <div>
           <span className="text-[11px] font-mono tracking-widest font-black uppercase text-sky-700 block">
             DEEPMISCONCEPTION
@@ -179,7 +195,7 @@ export const ComprehensionReportTemplate: React.FC<ComprehensionReportTemplatePr
       </div>
 
       {/* 1. STUDENT AND ASSESSMENT DETAILS */}
-      <div className="space-y-2">
+      <div className="space-y-2 report-section">
         <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 border-l-4 border-sky-600 pl-2">
           1. Student and Assessment Details
         </h2>
@@ -218,7 +234,7 @@ export const ComprehensionReportTemplate: React.FC<ComprehensionReportTemplatePr
       </div>
 
       {/* 2. AI CONCEPTUAL UNDERSTANDING ASSESSMENT */}
-      <div className="space-y-2">
+      <div className="space-y-2 report-section">
         <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 border-l-4 border-sky-600 pl-2">
           2. AI Conceptual Understanding Assessment
         </h2>
@@ -266,7 +282,7 @@ export const ComprehensionReportTemplate: React.FC<ComprehensionReportTemplatePr
       </div>
 
       {/* 3. MULTIMODAL EVIDENCE SUMMARY */}
-      <div className="space-y-2">
+      <div className="space-y-2 report-section">
         <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 border-l-4 border-sky-600 pl-2">
           3. Multimodal Evidence Summary
         </h2>
@@ -317,7 +333,7 @@ export const ComprehensionReportTemplate: React.FC<ComprehensionReportTemplatePr
       </div>
 
       {/* 4. SUPPLEMENTARY DIAGNOSTIC SCORES */}
-      <div className="space-y-2">
+      <div className="space-y-2 report-section">
         <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 border-l-4 border-sky-600 pl-2">
           4. Supplementary Diagnostic Scores
         </h2>
@@ -371,7 +387,7 @@ export const ComprehensionReportTemplate: React.FC<ComprehensionReportTemplatePr
       </div>
 
       {/* 5. VIVA QUESTION AND ANSWER EVALUATION */}
-      <div className="space-y-2">
+      <div className="space-y-2 report-section">
         <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 border-l-4 border-sky-600 pl-2">
           5. Viva Question and Answer Evaluation
         </h2>
@@ -424,7 +440,7 @@ export const ComprehensionReportTemplate: React.FC<ComprehensionReportTemplatePr
       </div>
 
       {/* 6. CODING-PROCESS BEHAVIOUR */}
-      <div className="space-y-2">
+      <div className="space-y-2 report-section">
         <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 border-l-4 border-sky-600 pl-2">
           6. Coding-Process Behaviour
         </h2>
@@ -480,7 +496,7 @@ export const ComprehensionReportTemplate: React.FC<ComprehensionReportTemplatePr
       </div>
 
       {/* 7. POTENTIAL MISCONCEPTIONS AND CONTRADICTIONS */}
-      <div className="space-y-2">
+      <div className="space-y-2 report-section">
         <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 border-l-4 border-sky-600 pl-2">
           7. Potential Misconceptions and Contradictions
         </h2>
@@ -533,7 +549,7 @@ export const ComprehensionReportTemplate: React.FC<ComprehensionReportTemplatePr
       </div>
 
       {/* 8. INSTRUCTOR RECOMMENDATIONS AND REVIEW */}
-      <div className="space-y-2">
+      <div className="space-y-2 report-section">
         <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 border-l-4 border-sky-600 pl-2">
           8. Instructor Recommendations and Review
         </h2>
@@ -574,7 +590,7 @@ export const ComprehensionReportTemplate: React.FC<ComprehensionReportTemplatePr
       </div>
 
       {/* REPORTING NOTE / RESPONSIBLE USE */}
-      <div className="p-3.5 rounded-lg border border-slate-300 bg-slate-50 text-[11px] text-slate-700 leading-relaxed font-sans">
+      <div className="p-3.5 rounded-lg border border-slate-300 bg-slate-50 text-[11px] text-slate-700 leading-relaxed font-sans report-section">
         <strong className="text-slate-900 font-bold block mb-0.5 uppercase tracking-wider text-[10px]">
           Reporting note:
         </strong>

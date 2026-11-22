@@ -910,7 +910,7 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeIn overflow-y-auto">
           <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl space-y-6 my-8 max-h-[90vh] overflow-y-auto text-slate-800">
             {/* Modal Header */}
-            <div className="flex items-center justify-between border-b border-slate-200 pb-4">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-4 print:hidden">
               <div>
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-sky-50 text-sky-700 border border-sky-200">
@@ -952,7 +952,7 @@ export const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = (
                 )}
 
                 {/* Instructor Ground-Truth Annotation Form */}
-                <div className="p-5 rounded-2xl bg-indigo-50/50 border border-indigo-200 space-y-4">
+                <div className="p-5 rounded-2xl bg-indigo-50/50 border border-indigo-200 space-y-4 print:hidden">
                   <div className="flex items-center gap-2">
                     <ShieldCheck className="w-5 h-5 text-indigo-700" />
                     <h4 className="font-bold text-indigo-950 text-sm">

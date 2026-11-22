@@ -24,19 +24,22 @@ EXACT_24_FEATURES = [
 class DeepMisconceptionMultimodalPredictor:
     def __init__(self, model_dir=None, device="cpu"):
         self.device = torch.device(device)
+        repo_root = Path(__file__).resolve().parents[3]
         self.model_dir = Path(model_dir) if model_dir else Path(__file__).parent
 
         # 1. Load Normalization & Metadata
-        norm_path = Path("process_transformer_results/checkpoints/normalization_stats.json")
+        norm_path = repo_root / "process_transformer_results" / "checkpoints" / "normalization_stats.json"
         if not norm_path.exists():
-            norm_path = Path("DeepMisconception/models/complete_multimodal_model/normalization_stats.json")
+            norm_path = self.model_dir / "normalization_stats.json"
         with open(norm_path) as f:
             self.norm_stats = json.load(f)
 
         # 2. Load Process Predictor
         import importlib.util
-        sys.path.insert(0, "process_transformer_results/scripts")
-        proc_inf_path = Path("process_transformer_results/checkpoints/inference.py")
+        proc_script_dir = str(repo_root / "process_transformer_results" / "scripts")
+        if proc_script_dir not in sys.path:
+            sys.path.insert(0, proc_script_dir)
+        proc_inf_path = repo_root / "process_transformer_results" / "checkpoints" / "inference.py"
         if proc_inf_path.exists():
             spec = importlib.util.spec_from_file_location("proc_inference", proc_inf_path)
             proc_mod = importlib.util.module_from_spec(spec)
@@ -46,7 +49,9 @@ class DeepMisconceptionMultimodalPredictor:
             self.process_predictor = None
 
         # 3. Load Alignment and Fusion Architectures
-        sys.path.insert(0, "DeepMisconception/scripts")
+        deep_scripts_dir = str(repo_root / "DeepMisconception" / "scripts")
+        if deep_scripts_dir not in sys.path:
+            sys.path.insert(0, deep_scripts_dir)
         from train_cross_modal_alignment import CrossModalAlignmentModule
         from train_multimodal_pipeline import MultimodalFusionTransformer
 
@@ -56,7 +61,7 @@ class DeepMisconceptionMultimodalPredictor:
         # 4. Load Trained Weights
         ckpt_path = self.model_dir / "complete_multimodal_model_best.pt"
         if not ckpt_path.exists():
-            ckpt_path = Path("DeepMisconception/models/multimodal_fusion_transformer/fusion_transformer_best.pt")
+            ckpt_path = repo_root / "DeepMisconception" / "models" / "multimodal_fusion_transformer" / "fusion_transformer_best.pt"
 
         ckpt = torch.load(ckpt_path, map_location=self.device, weights_only=False)
         self.fusion_model.load_state_dict(ckpt["model_state"])

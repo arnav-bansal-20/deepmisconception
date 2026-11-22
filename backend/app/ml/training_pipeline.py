@@ -524,7 +524,10 @@ class MultimodalTrainer:
         if not os.path.exists(checkpoint_path):
             raise FileNotFoundError(f"Checkpoint not found at '{checkpoint_path}'")
 
-        checkpoint = torch.load(checkpoint_path, map_location=self.device)
+        try:
+            checkpoint = torch.load(checkpoint_path, map_location=self.device, weights_only=False)
+        except TypeError:
+            checkpoint = torch.load(checkpoint_path, map_location=self.device)
         if not isinstance(checkpoint, dict) or "model_state" not in checkpoint:
             raise ValueError(f"Incompatible or corrupted checkpoint at '{checkpoint_path}': missing 'model_state'")
 

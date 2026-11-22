@@ -399,7 +399,25 @@ class MultimodalCrossAttentionFusion:
                 num_classes=num_classes,
             ).to(self.device)
             self.model.eval()
+
+            # Attempt loading authoritative trained predictor
+            self._predictor = None
+            try:
+                from pathlib import Path
+                import importlib.util
+                root_dir = Path(__file__).resolve().parent.parent.parent.parent
+                pred_path = root_dir / "DeepMisconception" / "models" / "complete_multimodal_model" / "inference.py"
+                if pred_path.exists():
+                    spec = importlib.util.spec_from_file_location("complete_predictor", pred_path)
+                    mod = importlib.util.module_from_spec(spec)
+                    spec.loader.exec_module(mod)
+                    self._predictor = mod.DeepMisconceptionMultimodalPredictor(model_dir=pred_path.parent, device="cpu")
+                    self.is_trained = True
+                    logger.info("Successfully connected DeepMisconceptionMultimodalPredictor from complete_multimodal_model checkpoint!")
+            except Exception as e:
+                logger.warning(f"Could not initialize complete multimodal predictor: {e}")
         else:
+            self._predictor = None
             self.alignment_module = None
             self.process_transformer = None
             self.model = None
@@ -666,12 +684,19 @@ class MultimodalCrossAttentionFusion:
 
     def load_checkpoint(self, path: str):
         """Load PyTorch weights from disk with strict compatibility validation."""
+        if self._predictor is not None and getattr(self._predictor, "status", "") == "READY":
+            self.is_trained = True
+            return
+
         if not TORCH_AVAILABLE or self.model is None:
             return
         if not os.path.exists(path):
             raise FileNotFoundError(f"Checkpoint file not found at '{path}'")
 
-        ckpt = torch.load(path, map_location=self.device)
+        try:
+            ckpt = torch.load(path, map_location=self.device, weights_only=False)
+        except TypeError:
+            ckpt = torch.load(path, map_location=self.device)
         if not isinstance(ckpt, dict) or "model_state" not in ckpt:
             raise ValueError(f"Incompatible or corrupt checkpoint file at '{path}': missing 'model_state'")
 
@@ -709,6 +734,8 @@ class MultimodalCrossAttentionFusion:
 
     def is_trained_checkpoint_available(self, checkpoint_path: Optional[str] = None) -> bool:
         """Check if a valid trained checkpoint file exists on disk."""
+        if self._predictor is not None and getattr(self._predictor, "status", "") == "READY":
+            return True
         path = checkpoint_path or self.DEFAULT_CHECKPOINT_PATH
         return os.path.exists(path)
 
@@ -805,6 +832,33 @@ class MultimodalCrossAttentionFusion:
                     needs_instructor_review=True,
                     confidence=0.0,
                 )
+
+        # 5. Route through authoritative DeepMisconceptionMultimodalPredictor if connected
+        if self._predictor is not None:
+            telemetry_feats = bundle.process.numerical_features if bundle.process else {}
+            pred_res = self._predictor.predict(
+                code_emb=code_t.cpu(),
+                viva_emb=exp_t.cpu(),
+                process_events=proc_events,
+                process_features_24=telemetry_feats,
+            )
+            pred_class = pred_res["predicted_class"]
+            class_probs = pred_res["class_probabilities"]
+            conf = float(class_probs.get(pred_class, 0.0))
+
+            return MultimodalPredictionResult(
+                model_status=STATUS_READY,
+                predicted_class=pred_class,
+                class_probabilities=class_probs,
+                modality_availability=modality_avail,
+                supporting_feature_scores=supporting_scores,
+                needs_instructor_review=(pred_class == "Possible Misconception"),
+                confidence=round(conf, 4),
+                attention_summary={
+                    "predicted_label": pred_class,
+                    "confidence": round(conf, 4),
+                },
+            )
 
         # 5. Process Telemetry Encoding with persistent self.process_transformer
         if has_proc:
